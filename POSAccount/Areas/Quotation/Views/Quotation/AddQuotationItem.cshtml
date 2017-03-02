@@ -1,0 +1,72 @@
+﻿@model POSAccount.Contract.QuotationItem
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { id = "frmAddQutation", name = "frmAddQutation" }))
+{
+    <div class="modal fade" tabindex="-1" role="dialog" id="AddQutationModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="lblHeader">Add/Edit Quotation</h4>
+                </div>
+                <div class="modal-body form-horizontal">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.ChargeCode, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.ChargeCode, Model.ChargeCodeList, "SELECT CHARGE CODE", new { @class = "form-control input-sm", @id = "ddlChargeCode" })
+                                @Html.ValidationMessageFor(m => m.ChargeCode, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.SlabRate, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.CheckBoxFor(m => m.SlabRate, new { @class = "checkbox", @value = "Is Slab Rate", @id = "chkIsSlabRate", onchange = "checkedChanged(this);" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.SlabRateFrom, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.SlabRateFrom, new { @class = "form-control input-sm numCss" })
+                                @Html.ValidationMessageFor(m => m.SlabRateFrom, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.SlabRateTo, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.SlabRateTo, new { @class = "form-control input-sm numCss" })
+                                @Html.ValidationMessageFor(m => m.SlabRateTo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.SellRate, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.SellRate, new { @class = "form-control input-sm decimalCss" })
+                                @Html.ValidationMessageFor(m => m.SellRate, "", new { @class = "text-danger" })
+                                @Html.HiddenFor(m => m.Status)
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" type="button">Cancel</button>
+                    <input class="btn btn-primary" type="button" onclick="AddDataToTable()" value="Save" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

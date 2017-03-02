@@ -1,0 +1,332 @@
+/*!
+ * theme.css
+ * Copyright 2015 Thufael islam
+ * Based on Bootstrap
+*/
+
+
+/*!
+    * Default Styles
+    * Tile Styles
+    * Comments Styles
+    * Form Styles
+    *
+    
+    
+    */
+
+
+
+/* Default Styles */
+body {
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+a, a:hover, a:focus {
+    text-decoration: none;
+}
+
+h1 { 
+    font-size: 36px; 
+    line-height: 40px; 
+}
+
+h2 { 
+    font-size: 30px; 
+    line-height: 40px; 
+}
+
+h3 { 
+    font-size: 24px; 
+    line-height: 40px; 
+}
+
+h4 { 
+    font-size: 18px; 
+     line-height: 20px; 
+}
+
+.container {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.nav-icon {
+    font-size: 30px;
+    display: inline-block;
+    padding-right: 8px;
+    
+}
+
+.nav-icon a {
+ text-decoration: none;
+    
+}
+.nav-title {
+    display: inline-block;   
+}
+
+.dropdown-menu {
+ /* width: 800px;
+  height: 150px;*/
+}
+
+.main-contentbody {
+    /*padding-top: 65px;*/
+    float:left;
+    width:100%;
+}
+
+/* Tile Styles */
+
+.tileItem {
+    margin: 0 10px 10px 0;
+    display: inline-block;
+}
+
+.tileName {
+    padding: 0 9px;
+    position: absolute;
+    color: #ffffff;
+    bottom: 5px;
+    line-height: 14px;
+    text-align: left;
+    white-space: normal;
+    display: block;
+}
+
+.tileIcon {
+    margin-top: 20px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    vertical-align: middle;
+    display: inline-block;
+    line-height: 1em;
+}
+  
+.tileGlow {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+}
+
+.tileGlow:hover, .tileGlow:focus, .tileGlow:active {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.05);
+}
+
+.tileDefault {
+  width: 120px;
+  height: 110px;
+}
+
+.tileMedium {
+  width: 200px;
+  height: 120px;
+}
+
+.tileLarge {
+  width: 250px;
+  height: 110px;
+}
+
+.tileBlue
+{
+outline-color: rgba(27, 160, 225, 1);
+background-color: rgba(27, 160, 225, 1);
+}
+
+.tileDarkBlue {
+    outline-color: #de0000;
+    background-color: #2b579a
+}
+
+.tileGreen {
+    outline-color: rgb(33, 115, 70); 
+    background-color: rgb(33, 115, 70);
+}
+
+.tileOrange {
+    outline-color: #ff9400;
+    background-color: #ff9400;
+}
+
+.tileRed {
+    outline-color: rgba(228, 20, 0, 1);
+    background-color: rgba(228, 20, 0, 1);
+}
+
+.tilePurple {
+    outline-color: rgb(128, 57, 123); 
+    background-color: rgb(128, 57, 123);
+}
+
+.tileSO {
+    outline-color: rgba(0, 170, 168, 1);
+    background-color: rgba(0, 170, 168, 1);
+}
+
+.tileRO {
+    outline-color: rgba(0, 170, 168, 1);
+    background-color: rgba(0, 170, 168, 1);
+}
+
+.tileSO .title {
+    
+}
+
+.tileSO .number {
+    
+}
+
+.tileRO .title {
+
+}
+
+.tileRO .number {
+    
+}
+
+
+/* Comments Styles */
+
+
+.comments {
+ padding: 0px;
+}
+
+.comments li {
+  list-style: none;
+  padding: 5px 0;
+  margin: 10px auto;
+
+}
+
+.comments li .name {
+  color: #3590c1;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.comments li .img {
+
+}
+
+.comments li .message {
+  display: block;
+  padding: 5px;
+  font-size: 14px;
+  position: relative;
+}
+
+.comments li.in .message {
+  text-align: left;
+  border-left: 2px solid #1BBC9B;
+  margin-left: 5px;
+  background: #fafafa;
+}
+
+
+.comments li.in .message .arrow {
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #1BBC9B;
+}
+
+.comments li.out .message {
+  border-right: 2px solid #F3565D;
+  margin-right: 5px;
+  background: #fafafa;
+  text-align: right;
+}
+
+
+.comments li.out .message .arrow {
+  display: block;
+  position: absolute;
+  top: 5px;
+  right: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #F3565D;
+}
+.comments li .body {
+  display: block;
+}
+
+
+
+/* Form Style */
+
+.form-icon 
+{
+    display: inline-block;
+    float: right;
+    margin-top: 20px;
+    height: 25px;
+}
+
+.form-title {
+    display: inline-block;
+    margin-top: 20px;
+    padding-left: 7px;
+	border-left: 3px solid rgba(0, 0, 0, 0.25);
+    font-size: 26px;
+}
+
+.form-instructions {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding-left: 7px;
+	border-left: 3px solid rgba(0, 0, 0, 0.25);
+    font-size: 20px;
+}
+
+.form-helparticles
+{
+    margin-bottom: 30px; 
+    padding-left: 7px;
+    border-left: 3px solid #d84a38;
+}
+
+.requestDetailTitle 
+{
+    display: inline-block;
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.1em;
+    margin-bottom: 10.5px;
+    margin-top: 21px;
+}
+
+.requestDetailCancel
+{
+    display: inline-block; 
+    float: right;  
+    margin-bottom: 10px;
+    margin-top: 16px;
+}
+
+
+

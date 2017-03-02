@@ -1,0 +1,1359 @@
+﻿@model POSAccount.Contract.ARInvoice
+
+
+@{
+    ViewBag.Title = "AR - Invoice";
+}
+
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="mySearch">
+    <div class="modal-dialog modal-lg generated_frm">
+        <div class="modal-content form-horizontal">
+            <div class="modal-header">
+                <button aria-label="Close" data-dismiss="modal" class="close" type="button"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title">Search&nbsp;&nbsp;<span id="modalAni"><i class="fa fa-refresh fa-spin"></i></span></h4>
+            </div>
+            <div id="modalBody" style="display: none;"></div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn btn-default" type="button"><i class="fa fa-times"></i>&nbsp;Close</button>
+            </div>
+        </div>
+        s
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@*@using (Html.BeginForm("SaveARInvoice", "AR", new { area = "AR" }, FormMethod.Post))*@
+@using (Ajax.BeginForm("SaveARInvoice", "AR", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" , name ="myForm"}))
+{
+    <div class="box box-solid box-default">
+        <div class="box-header">
+            <h3 class="box-title">A R Invoice </h3>
+            
+        </div>
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Invoice No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentNo, new { @placeholder = "DocumentNo", @id = "txtDocumentNo", @class = "form-control input-sm ", @readonly = "readonly" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Invoice Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentDate, new { @id = "txtDocumentDate", @class = "form-control input-sm datepicker" })
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Debtor Code</label>
+                        <div class="col-md-6">
+                            @Html.DropDownListFor(m => m.DebtorCode, Model.DebtorList, "", new { @id = "ddlDebtorCode", @class = "form-control select2 select2-hidden-accessible;" })
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Credit Term</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditTerm, new { @class = "form-control input-sm " })
+                        </div>
+                        <label for="txtCompany" class="col-md-2 control-label">Reference No.</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.ReferenceNo, new { @class = "form-control input-sm " })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtRemark" class="col-md-2 input-sm control-label">Print Remark</label>
+                        <div class="col-md-2">
+                            @Html.TextAreaFor(m => m.PrintRemarks, new { @placeholder = "Print Remarks", @class = "form-control input-sm", rows = "1", cols = "80", style = "width:100%" })
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tbDetails" data-toggle="tab">Invoice Details</a>
+                        </li>
+                        <li class="">
+                            <a href="#tbGLDetailsTab" data-toggle="tab">GL Allocation</a>
+                        </li>
+                        <li class="">
+                            <a href="#tbSetOffDetails" data-toggle="tab">Set Off Details</a>
+                        </li>
+
+                    </ul>
+
+
+
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <!-- Details -->
+                        <div class="tab-pane active" id="tbDetails">
+                            <div class="row">
+
+
+                                <label class="col-md-2 control-label input-sm">Account Code :</label>
+                                <div class="col-md-3">
+                                    @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "Select Account code ", new { @class = "form-control select2 select2-hidden-accessible;" })
+                                </div>
+
+
+                                <label class="col-md-1 control-label input-sm">Amount :</label>
+                                <div class="col-md-2">
+                                    @Html.TextBox("txtAmount", "", new { @class = "form-control input-sm decimalCss", data_a_sep = "", aPad = "false", data_a_sign = "" })
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" id="btnAddDetails" name="btnAddDetails" class="btn btn-social btn-success" onclick="AddARDetails()">
+                                        <i class="fa fa-plus-circle"></i>
+                                        <span id="btnAddDetailsSpan">&nbsp;Add Details</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-1" style="display: none" id="btnClearDiv">
+
+                                    <button id="btnClearDetails" onclick="btnClearDetailsClick()" type="button" class="btn btn-social btn-warning">Clear</button>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <table id="tblItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                    <thead style="background-color: steelblue; color: white; font-size: 12px;">
+                                        <tr>
+                                            <th>Account Code</th>
+                                            <th>Account Description</th>
+                                            <th>Base Amount</th>
+                                            <th>Currency Code</th>
+                                            <th>Local Amt</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 12px;">
+
+                                        @{
+    for (int i = 0; i < Model.ARInvoiceDetails.Count; i++)
+    {
+        <tr id="tr_@i" class="arInvoiceDetailsCss">
+            <td name="AccountCode">
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].ItemNo)
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].AccountCode)
+                @*@Html.DisplayFor(m => m.ARInvoiceDetails[i].AccountCode)*@
+                <span id="ARInvoiceDetails@(i)__AccountCode_span">@Model.ARInvoiceDetails[i].AccountCode</span>
+            </td>
+            <td name="AccountCode">
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].AccountCodeDescription)
+                @*@Html.DisplayFor(m => m.ARInvoiceDetails[i].AccountCodeDescription)*@
+                <span id="ARInvoiceDetails_@(i)__AccountCodeDescription_span">@Model.ARInvoiceDetails[i].AccountCodeDescription</span>
+            </td>
+            <td name="BaseAmount">
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].BaseAmount)
+                @* @Html.DisplayFor(m => m.ARInvoiceDetails[i].BaseAmount)*@
+                <span id="ARInvoiceDetails_@(i)__BaseAmount_span">@Model.ARInvoiceDetails[i].BaseAmount</span>
+            </td>
+            <td name="CurrencyCode">
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].CurrencyCode)
+                @* @Html.DisplayFor(m => m.ARInvoiceDetails[i].CurrencyCode)*@
+                <span id="ARInvoiceDetails_@(i)__CurrencyCode_span">@Model.ARInvoiceDetails[i].CurrencyCode</span>
+            </td>
+            <td name="LocalAmount">
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].LocalAmount)
+                @*@Html.DisplayFor(m => m.ARInvoiceDetails[i].LocalAmount)*@
+                <span id="ARInvoiceDetails_@(i)__LocalAmount_span">@Model.ARInvoiceDetails[i].LocalAmount</span>
+                @Html.HiddenFor(m => m.ARInvoiceDetails[i].Status)
+            </td>
+            <td name="Action">
+                <div class="dropdown">
+                    <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Action
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a class="cursorCss" id="Edit_@i" onclick="EditARInvoiceDetails('@(i)')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                        <li><a class="cursorCss" onclick="DeleteARInvoiceDetails('@(i)')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!--GLDetails-->
+                        <div id="tbGLDetailsTab" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblGLDetails" class="table table-striped table-hover table-bordered table-responsive ">
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                <th>Account Code</th>
+                                                <th>Credit Amount</th>
+                                                <th>Debit Amount</th>
+                                                <th>Total Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 12px;">
+                                            @if (Model.GLTransactionDetails != null)
+                                            {
+                                                for (int i = 0; i < Model.GLTransactionDetails.Count; i++)
+                                                {
+                                                    <tr id="tblGLDetailstr_@i" class="tblGLDetailsCss">
+                                                        <td>
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].DocumentNo)
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].ItemNo)
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].DocumentType)
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].Status)
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].AccountCode)
+                                                            <span id="GLTransactionDetails_@(i)__AccountCode_span">@Model.GLTransactionDetails[i].AccountCode</span>
+
+                                                        </td>
+                                                        <td>
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].CreditAmount)
+                                                            <input type="hidden" id="GLTransactionDetails_@(i)__IsDebitCredit" name="GLTransactionDetails_@(i)__IsDebitCredit" value="" />
+                                                            <span id="GLTransactionDetails_@(i)__CreditAmount_span">@Model.GLTransactionDetails[i].CreditAmount</span>
+                                                        </td>
+                                                        <td>
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].DebitAmount)
+                                                            <span id="GLTransactionDetails_@(i)__DebitAmount_span">@Model.GLTransactionDetails[i].DebitAmount</span>
+                                                        </td>
+                                                        <td>
+                                                            @Html.HiddenFor(m => m.GLTransactionDetails[i].LocalAmount)
+                                                            <span id="GLTransactionDetails_@(i)__LocalAmount_span">@Model.GLTransactionDetails[i].LocalAmount</span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                        <tfoot id="trFooter">
+                                            <tr id="whRow" style="display: none; background-color: azure;"></tr>
+                                            <tr id="vatRow" style="display: none; background-color: azure;"></tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Set Off Details-->
+                        <div id="tbSetOffDetails" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control valid" placeholder="Search" name="srch-term" id="srch-term" onkeypress="srchTerm_KeyPress(event)">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default" type="button" onclick="btnSearchClick()"><i class="glyphicon glyphicon-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-top: 5px;">
+                                    <label id="lblErrMsg" style="color: red; font-weight: bold;"></label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblSetoffItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                <th class="hidden">#</th>
+                                                <th class="hidden">Account Code</th>
+                                                <th>Account Description</th>
+                                                <th>Base Amount</th>
+                                                <th>Currency Code</th>
+                                                <th>Local Amt</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 12px;">
+                                            @for (int i = 0; i < Model.ARInvoiceDetails.Count; i++)
+                                            {
+                                                <tr id="tr_@i">
+                                                    <td class='hidden'>
+                                                        @Html.HiddenFor(m => m.ARInvoiceDetails[i].ItemNo)
+                                                    </td>
+                                                    <td class='hidden'>
+                                                        @Html.HiddenFor(m => m.ARInvoiceDetails[i].AccountCode)
+                                                    </td>
+                                                    <td name="AccountCode">
+                                                        @Html.HiddenFor(m => m.ARInvoiceDetails[i].AccountCode)
+                                                        @Html.DisplayFor(m => m.ARInvoiceDetails[i].AccountCode)
+                                                    </td>
+                                                    <td name="BaseAmount">
+                                                        @Html.HiddenFor(m => m.ARInvoiceDetails[i].BaseAmount)
+                                                        @Html.DisplayFor(m => m.ARInvoiceDetails[i].BaseAmount)
+                                                    </td>
+                                                    <td name="CurrencyCode">
+                                                        @Html.HiddenFor(m => m.ARInvoiceDetails[i].CurrencyCode)
+                                                        @Html.DisplayFor(m => m.ARInvoiceDetails[i].CurrencyCode)
+                                                    </td>
+                                                    <td name="LocalAmount">
+                                                        @Html.HiddenFor(m => m.ARInvoiceDetails[i].LocalAmount)
+                                                        @Html.DisplayFor(m => m.ARInvoiceDetails[i].LocalAmount)
+                                                    </td>
+                                                    <td name="Action">
+                                                        @*@Html.ActionLink("Edit Details", "AddAPInvoiceDetails", "AP", new { area = "AP", documentNo = Model.ARInvoiceDetails[i].DocumentNo, itemId = Model.ARInvoiceDetails[i].ItemNo }, new { data_modal = "", onclick = "linkClicked(" + i + ")" })
+                                                    <img class="img-class" onclick="EditAPInvoiceDetails(this,@Model.ARInvoiceDetails[i].ItemNo,0,1)" src="~/Images/Pencil.png" />
+                                                                    <img class="img-class" onclick="DeleteARInvoiceDetails(this,'@Model.ARInvoiceDetails[i].ItemNo',0)" src="~/Images/Delete.png" />*@
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </fieldset>
+
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-4 control-label input-sm">Total Amount</label>
+                            <div class="col-sm-8">
+                                @Html.TextBox("txtLocalAmount", @Model.LocalAmount.ToString("###,##0.00"), new { @class = "form-control input-sm-red", disabled = "disabled" })
+                                @Html.HiddenFor(x => x.LocalAmount)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row" style="margin-top: 10px;">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-4 control-label input-sm">Total Discount</label>
+                            <div class="col-sm-8">
+                                @Html.TextBoxFor(m => m.DiscountAmount, @Model.DiscountAmount.ToString("###,##0.00"), new { @class = "form-control input-sm-red", onblur = "discountAmountBlur()" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-4 control-label input-sm">Amount After Discount</label>
+                            <div class="col-sm-8">
+                                @Html.TextBox("txtPaymentAmount", @Model.PaymentAmount.ToString("###,##0.00"), new { @class = "form-control input-sm-green", disabled = "disabled" })
+                                @Html.HiddenFor(m => m.PaymentAmount)
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">W/H %</label>
+                            <div class="col-sm-3">
+                                @*<select class="form-control input-sm" id="SelectVat" name="SelectVat" onchange="SelectVatOnChange(this)">
+                                    <option value=""></option>
+                                    <option value="1">1</option>
+                                    <option value="3">3</option>
+                                </select>*@
+                                @{
+                                    List<SelectListItem> WHPercentOptions = new List<SelectListItem>() {
+                                        new SelectListItem { Value = "1", Text = "1 %" },
+                                        new SelectListItem { Value = "3", Text = "3 %" }
+                                        
+                                    };
+                                }
+                                @Html.DropDownListFor(m => m.WHPercent, new SelectList(WHPercentOptions, "Value", "Text",Model.WHPercent),  new { @class = "form-control input-sm", onchange = "SelectVatOnChange(this);" })
+
+
+                            </div>
+                            <div class="col-sm-7">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        @Html.CheckBoxFor(m => m.IsWHTax, new { @class = "checkbox", onchange = "chkChange(this)" })
+                                    </span>
+                                    @Html.TextBox("txtWithHoldingAmount", @Model.WithHoldingAmount.ToString("###,##0.00"), new { @class = "form-control input-sm", disabled = "disabled" })
+                                    @Html.HiddenFor(m => m.WithHoldingAmount)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 10px;">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-4 control-label input-sm">VAT (7%)</label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        
+                                        @Html.CheckBoxFor(m => m.IsVAT, new { @class = "checkbox", onchange = "isVat2Change(this)" })
+                                    </span>
+                                   @Html.TextBox("txtTaxAmount", @Model.TaxAmount.ToString("###,##0.00"), new { @class = "form-control input-sm decimalCss", disabled = "disabled", onblur = "CalTaxAmount()" })
+                                    <input type="hidden" name="TaxAmount" id="TaxAmount" />
+                                    @*@Html.HiddenFor(m => m.TaxAmount)*@
+                                   
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 10px;">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-4 control-label input-sm">Net Amt</label>
+                            <div class="col-sm-8">
+                                @*@Html.TextBoxFor(m => m.NetAmount, new { @class = "form-control input-sm-green", id = "txtNetAmount" })*@
+                                @Html.TextBox("txtNetAmount", @Model.NetAmount.ToString("###,##0.00"), new { @class = "form-control input-sm-green", disabled = "disabled" })
+                                @Html.HiddenFor(x => x.NetAmount)
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                    <a href="@Url.Action("ARInvoice", "AR", new { area = "AR", documentNo = "NEW" }, null)" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+                        New
+                    </a>
+                    <button type="button" id="btnSave" class="btn btn-social btn-success" onclick="SaveData();">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+
+                    <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <a href="#" id="btnDelete" onclick="DeleteARInvoice('@Model.DocumentNo')" class="btn btn-social btn-danger">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </a>
+                    <div class="btn-group dropup">
+                        @Html.ActionLink("Print", "ViewARInvoice", "POSReport", new { area = "POSReport", reportSource = "CBReceipt", DocumentId = Model.DocumentNo, URL = "/POSReports/JobTalents.ARInvoice" }, new { data_modal = "test", id = "btnViewReport", @class = "btn btn-small btn-primary" })
+                    </div>
+
+
+                    <a href="@Url.Action("ARInvoiceList", "AR", new { area = "AR" }, null)" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+         <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+    <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+}
+@section Scripts{
+    @Scripts.Render("~/bundles/modalform")
+    @Scripts.Render("~/bundles/dataTable")
+
+
+    <script src="~/ThemeAdminLTE-2.2.0/plugins/select2/select2.min.js"></script>
+    <script src="@Url.Content("~/Scripts/moment.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.js")"></script>
+
+
+    <script type="text/javascript">
+    var isEditLocal = false;
+    var rowdetails;
+    var searchBoxUrl = '@Url.Content("~/search/SearchBox")';
+    var _selectedDocumentNoId;
+    var DocumentNo;
+
+    $("#ddlDebtorCode").select2();
+    $("#AccountCode").select2();
+
+
+    $(document).ready(function () {
+
+       
+        $('#txtDocumentDate').datetimepicker({
+            useCurrent: false,
+            //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+            format: 'DD/MM/YYYY',
+            inline: false
+        });
+
+
+        $('#tblGLDetails').DataTable({
+            'bFilter': false,
+            'bPaginate': false,
+            'bInfo': false,
+            'aoColumnDefs': [
+              {
+                  bSortable: false,
+                  aTargets: [-1]
+              }],
+            'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                //nRow.className = "gradeX odd";
+                nRow.id = 'tblGLDetailstr_' + iDisplayIndex;
+                nRow.className = 'tblGLDetailsCss';
+                return nRow;
+            }
+        });
+
+        $('#tblItem').DataTable({
+            'bFilter': false,
+            'bPaginate': false,
+            'bInfo': false,
+            'aoColumnDefs': [
+              {
+                  bSortable: false,
+                  aTargets: [-1]
+              }],
+            'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                //nRow.className = "gradeX odd";
+                nRow.id = 'tblARInvoiceDetails_' + iDisplayIndex;
+                nRow.className = 'arInvoiceDetailsCss';
+                return nRow;
+            }
+        });
+
+      
+        if ($('#txtDocumentNo').val() == "NEW") {
+            $('#btnDelete').prop('disabled', true);
+        }
+
+        $("#myForm").validate(
+            {
+                rules: {
+                    DebtorCode: { required: true },
+                    DocumentDate: { required: true }
+                },
+
+                messages: {
+                    DebtorCode: { required: "Debtor Code is required" },
+                    DocumentDate: { required: "Invoice Date is required" }
+                }
+
+            });
+
+       
+
+        Number.prototype.round = function (places) {
+            return +(Math.round(this + "e+" + places) + "e-" + places);
+        }
+
+    });
+
+    function SelectVatOnChange(el) {
+        
+        var ischecked = $('#IsWHTax').is(':checked');
+        if (ischecked)
+            ProcessWithHoldingTax(true);
+
+    }
+
+    function commaSeparateNumber(val) {
+        while (/(\d+)(\d{3})/.test(val.toString())) {
+            val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+        }
+        return val;
+    }
+
+    function discountAmountBlur() {
+        var totalAmount = parseFloat($('#LocalAmount').val());
+        var discountAmount = parseFloat($('#DiscountAmount').val());
+        $('#txtPaymentAmount').val(commaSeparateNumber((totalAmount - discountAmount).toFixed(2)));
+        $('#PaymentAmount').val(totalAmount - discountAmount);
+
+
+
+        ProcessWithHoldingTax($('#IsVAT').is(':checked'));
+    }
+
+    function chkChange(el) {
+
+        ProcessWithHoldingTax(el.checked);
+    }
+
+    function SaveData() {
+        
+        $('.select2-hidden-accessible').next().next().css('border', '');
+
+        if ($('#myForm').valid()) {
+            if ($('.arInvoiceDetailsCss').length > 0) {
+                $('#overlayDiv').fadeIn();
+                $('#myForm').submit();
+            }
+            else
+                alert('Atleast one Invoice detail is required');
+        } else {
+            if ($('.select2-hidden-accessible').hasClass('error')) {
+                $('.select2-hidden-accessible.error').next().next().css('border', 'solid 1px red');
+            }
+            return false;
+        }
+    }
+
+    function btnClear() {
+        $('.form-control').val('');
+        $('#ddlDebtorCode').select2("val", "");
+        $('#AccountCode').select2("val", "");
+        $('#NetAmount').val(0.0);
+        $('#txtNetAmount').val(0.0);
+        $('#LocalAmount').val(0.0);
+        $('#WithHoldingAmount').val(0.0);
+        $("#TaxAmount").val(0.0);
+        $("#PaymentAmount").val(0.0);
+        $('#trFooter').empty();
+        $('#tblGLDetails, #tblItem').DataTable().clear().draw();       
+    }
+
+    function ProcessWithHoldingTax(isChecked) {
+       
+        var vatValue = 0;
+        if (isChecked) {
+            vatValue = $('#WHPercent').val();
+            if (vatValue == '') {
+                vatValue = 0;
+            }
+        }
+
+        var paymentAmount = parseFloat($('#PaymentAmount').val());
+        var vatAmount = CalculateVat(parseInt(vatValue));
+
+        $('#txtWithHoldingAmount').val(commaSeparateNumber(vatAmount.toFixed(2)));
+        $('#WithHoldingAmount').val(vatAmount.round(2));
+
+        $('#txtNetAmount').val(commaSeparateNumber((paymentAmount - vatAmount).toFixed(2)));
+        $('#NetAmount').val(paymentAmount - vatAmount);
+
+
+        $.ajax({
+            url: '@Url.Content("~/CB/GetCBRecAPWHTaxAccount")',
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+                    var bankAccount = data.bankAccount;
+                    
+                    if (isChecked) {
+                        var whRowIndex = $('.tblGLDetailsCss').length;
+                        var isVatFooter = ($('.footerCss').length == 0);
+
+                        var flag = $('.whFooterCss').length;
+                        if (flag > 0) {
+                            var tempIndex = $('.whFooterCss')[0].id.split('_');
+                            whRowIndex = tempIndex[1];
+                        }
+                        else {
+                            if (isVatFooter)
+                                whRowIndex = whRowIndex + 1;
+                            else
+                                whRowIndex = whRowIndex + 2;
+                        }
+
+                        var whRowAccountCode = bankAccount;
+                        var whRowDebitAmount = parseFloat($('#WithHoldingAmount').val()).toFixed(2);
+                        var whRow = [
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__DocumentNo" class="footerCss whFooterCss" name="GLTransactionDetails[' + whRowIndex + '].DocumentNo" type="hidden" value="">' +
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__ItemNo" name="GLTransactionDetails[' + whRowIndex + '].ItemNo" type="hidden" value="' + whRowIndex + '">' +
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__DocumentType" name="GLTransactionDetails[' + whRowIndex + '].DocumentType" type="hidden" value="AP">' +
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__AccountCode" name="GLTransactionDetails[' + whRowIndex + '].AccountCode" type="hidden" value="' + whRowAccountCode + '">' +
+                                '<span id="GLTransactionDetails_' + whRowIndex + '__AccountCode_span">' + whRowAccountCode + '</span>',
+
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__CreditAmount" name="GLTransactionDetails[' + whRowIndex + '].CreditAmount" type="hidden" value="' + (data.accountType == 'CREDIT' ? whRowDebitAmount : 0.00) + '"><input id="GLTransactionDetails_' + whRowIndex + '__IsDebitCredit" name="GLTransactionDetails_' + whRowIndex + '__IsDebitCredit" type="hidden" value="' + data.accountType + '">' +
+                                '<span id="GLTransactionDetails_' + whRowIndex + '__CreditAmount_span">' + (data.accountType == 'CREDIT' ? parseFloat(whRowDebitAmount).toFixed(2) : 0.00) + '</span>',
+
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__DebitAmount" name="GLTransactionDetails[' + whRowIndex + '].DebitAmount" type="hidden" value="' + (data.accountType == 'DEBIT' ? whRowDebitAmount : 0.00) + '">' +
+                                '<span id="GLTransactionDetails_' + whRowIndex + '__DebitAmount_span">' + (data.accountType == 'DEBIT' ? parseFloat(whRowDebitAmount).toFixed(2) : 0.00) + '</span>',
+
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__LocalAmount" name="GLTransactionDetails[' + whRowIndex + '].LocalAmount" type="hidden" value="' + whRowDebitAmount + '">' +
+                                '<span id="GLTransactionDetails_' + whRowIndex + '__LocalAmount_span">' + whRowDebitAmount + '</span>' +
+                                '<input id="GLTransactionDetails_' + whRowIndex + '__Status" name="GLTransactionDetails[' + whRowIndex + '].Status" type="hidden" value="True">'
+                        ];
+
+                        var whRowHtml = '<td>' + whRow[0] + '</td><td>' + whRow[1] + '</td><td>' + whRow[2] + '</td><td>' + whRow[3] + '</td>'
+                        $('#whRow').html(whRowHtml).show();
+                    }
+                    else {
+                        $('#whRow').hide();
+
+                        if ($('.whFooterCss').length > 0) {
+                            var tempIndex = $('.whFooterCss')[0].id.split('_');
+                            whRowIndex = tempIndex[1];
+
+                            $('#whRow').html('<input type="hidden" name="GLTransactionDetails[' + whRowIndex + ']" />');
+                        }
+                    }
+                    
+                    if ($('#IsVAT').is(':checked')) {
+                        IsVAT($('#IsVAT').is(':checked'));
+                    }
+                    else {
+                        $('#vatRow').empty();
+                    }
+                }
+            });
+
+        }
+
+
+        function CalculateVat(vat) {
+            var paymentAmount = parseFloat($('#PaymentAmount').val());
+            return ((paymentAmount * vat) / 100).round(2);
+        }
+
+        function chkChange(el) {
+
+            ProcessWithHoldingTax(el.checked);
+        }
+
+        function isVat2Change(el) {
+            IsVAT($('#IsVAT').is(':checked'));
+        }
+
+function CalTaxAmount() {
+        var localAmount = parseFloat($('#LocalAmount').val());
+        var TotalAmount = parseFloat($('#NetAmount').val());//
+        var oldTaxAmount = parseFloat($('#TaxAmount').val());
+        TotalAmount=TotalAmount - oldTaxAmount
+        var TaxAmount = parseFloat($('#txtTaxAmount').val());
+        $('#TaxAmount').val(TaxAmount);
+        var isChecked = true;
+        $.ajax({
+            url: '@Url.Content("~/CB/GetAdvanceVATAccountCode")',
+            method: 'GET',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {              
+                var bankAccount = data.bankAccount;
+                if (isChecked) {
+                    $('#txtTaxAmount').prop("disabled", false);
+
+                    $('#txtTaxAmount').val(TaxAmount.toFixed(2));
+                    $('#TaxAmount').val(TaxAmount);
+
+                    $('#txtNetAmount').val(commaSeparateNumber((TotalAmount + TaxAmount).toFixed(2)));//
+                    $('#NetAmount').val(TotalAmount + TaxAmount);//
+
+                    var vatRowIndex = $('.tblGLDetailsCss').length - 1;
+                    var isWHFooter = ($('.footerCss').length == 0);
+
+                    var flag = $('.vatFooterCss').length;
+                    if (flag > 0) {
+                        var tempIndex = $('.vatFooterCss')[0].id.split('_');
+                        vatRowIndex = tempIndex[1];
+                    }
+                    else {
+                        if (isWHFooter)
+                            vatRowIndex = vatRowIndex + 1;
+                        else {
+                            vatRowIndex = vatRowIndex + 2;
+                        }
+                    }
+
+                    var vatRowAccountCode = bankAccount;
+                    var vatRowDebitAmount = TaxAmount.toFixed(2);
+                    var vatRow = [
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DocumentNo" class="footerCss vatFooterCss" name="GLTransactionDetails[' + vatRowIndex + '].DocumentNo" type="hidden" value="">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__ItemNo" name="GLTransactionDetails[' + vatRowIndex + '].ItemNo" type="hidden" value="' + vatRowIndex + '">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DocumentType" name="GLTransactionDetails[' + vatRowIndex + '].DocumentType" type="hidden" value="AP">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__AccountCode" name="GLTransactionDetails[' + vatRowIndex + '].AccountCode" type="hidden" value="' + bankAccount + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__AccountCode_span">' + bankAccount + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__CreditAmount" name="GLTransactionDetails[' + vatRowIndex + '].CreditAmount" type="hidden" value="' + (data.accountType == 'CREDIT' ? vatRowDebitAmount : 0.00) + '"><input id="GLTransactionDetails_' + vatRowIndex + '__IsDebitCredit" name="GLTransactionDetails_' + vatRowIndex + '__IsDebitCredit" type="hidden" value="' + data.accountType + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__CreditAmount_span">' + (data.accountType == 'CREDIT' ? vatRowDebitAmount : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DebitAmount" name="GLTransactionDetails[' + vatRowIndex + '].DebitAmount" type="hidden" value="' + (data.accountType == 'DEBIT' ? vatRowDebitAmount : 0.00) + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__DebitAmount_span">' + (data.accountType == 'DEBIT' ? vatRowDebitAmount : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__LocalAmount" name="GLTransactionDetails[' + vatRowIndex + '].LocalAmounts" type="hidden" value="' + vatRowDebitAmount + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__LocalAmount_span">' + vatRowDebitAmount + '</span>' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__Status" name="GLTransactionDetails[' + vatRowIndex + '].Status" type="hidden" value="True">'
+                    ];
+
+                    var vatRowHtml = '<td>' + vatRow[0] + '</td><td>' + vatRow[1] + '</td><td>' + vatRow[2] + '</td><td>' + vatRow[3] + '</td>'
+                    $('#vatRow').html(vatRowHtml).show();
+                }                
+            }
+        });
+
+    }
+
+
+        function IsVAT(isChecked) {
+          
+            var localAmount = parseFloat($('#LocalAmount').val());
+            var TotalAmount = parseFloat($('#NetAmount').val());//
+            var TaxAmount = getVat(localAmount);
+            //url: Url.Content("~/CB/GetCBRecAPVatTaxAccount");
+          
+            $.ajax({
+                url: '@Url.Content("~/CB/GetAdvanceVATAccountCode")',
+            method: 'GET',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {
+             
+                var bankAccount = data.bankAccount;
+                if (isChecked) {
+
+                    $('#txtTaxAmount').prop("disabled", false);
+
+                    $('#txtTaxAmount').val(TaxAmount);
+                    $('#TaxAmount').val(TaxAmount);
+
+                    $('#txtNetAmount').val(commaSeparateNumber((TotalAmount + TaxAmount).toFixed(2)));//
+                    $('#NetAmount').val(TotalAmount + TaxAmount);//
+
+                    var vatRowIndex = $('.tblGLDetailsCss').length - 1;
+                    var isWHFooter = ($('.footerCss').length == 0);
+
+                    var flag = $('.vatFooterCss').length;
+                    if (flag > 0) {
+                        var tempIndex = $('.vatFooterCss')[0].id.split('_');
+                        vatRowIndex = tempIndex[1];
+                    }
+                    else {
+                        if (isWHFooter)
+                            vatRowIndex = vatRowIndex + 1;
+                        else {
+                            vatRowIndex = vatRowIndex + 2;
+                        }
+                    }
+
+                    var vatRowAccountCode = bankAccount;
+                    var vatRowDebitAmount = TaxAmount.toFixed(2);
+                    var vatRow = [
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DocumentNo" class="footerCss vatFooterCss" name="GLTransactionDetails[' + vatRowIndex + '].DocumentNo" type="hidden" value="">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__ItemNo" name="GLTransactionDetails[' + vatRowIndex + '].ItemNo" type="hidden" value="' + vatRowIndex + '">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DocumentType" name="GLTransactionDetails[' + vatRowIndex + '].DocumentType" type="hidden" value="AP">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__AccountCode" name="GLTransactionDetails[' + vatRowIndex + '].AccountCode" type="hidden" value="' + bankAccount + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__AccountCode_span">' + bankAccount + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__CreditAmount" name="GLTransactionDetails[' + vatRowIndex + '].CreditAmount" type="hidden" value="' + (data.accountType == 'CREDIT' ? vatRowDebitAmount : 0.00) + '"><input id="GLTransactionDetails_' + vatRowIndex + '__IsDebitCredit" name="GLTransactionDetails_' + vatRowIndex + '__IsDebitCredit" type="hidden" value="' + data.accountType + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__CreditAmount_span">' + (data.accountType == 'CREDIT' ? vatRowDebitAmount : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DebitAmount" name="GLTransactionDetails[' + vatRowIndex + '].DebitAmount" type="hidden" value="' + (data.accountType == 'DEBIT' ? vatRowDebitAmount : 0.00) + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__DebitAmount_span">' + (data.accountType == 'DEBIT' ? vatRowDebitAmount : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__LocalAmount" name="GLTransactionDetails[' + vatRowIndex + '].LocalAmounts" type="hidden" value="' + vatRowDebitAmount + '">' +
+                            '<span id="GLTransactionDetails_' + vatRowIndex + '__LocalAmount_span">' + vatRowDebitAmount + '</span>' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__Status" name="GLTransactionDetails[' + vatRowIndex + '].Status" type="hidden" value="True">'
+                    ];
+
+                    var vatRowHtml = '<td>' + vatRow[0] + '</td><td>' + vatRow[1] + '</td><td>' + vatRow[2] + '</td><td>' + vatRow[3] + '</td>'
+                    $('#vatRow').html(vatRowHtml).show();
+                }
+                else {
+		  $('#txtTaxAmount').prop("disabled", true);
+                    $('#txtTaxAmount').val('0.00');
+                    $('#TaxAmount').val(0.00);
+
+                    $('#txtNetAmount').val(commaSeparateNumber((TotalAmount - TaxAmount).toFixed(2)));//
+                    $('#NetAmount').val(TotalAmount - TaxAmount);
+
+                    if ($('.vatFooterCss').length > 0) {
+                        var tempIndex = $('.vatFooterCss')[0].id.split('_');
+                        vatRowIndex = tempIndex[1];
+
+                        $('#vatRow').html('<input type="hidden" name="GLTransactionDetails[' + vatRowIndex + ']" />').hide();
+                    }
+                }
+            }
+        });
+    }
+
+        function getVat(localAmount) {
+            //alert(roundDown((localAmount / 100) * 7), 3);
+        return ((localAmount / 100) * 7).round(2);
+    }
+
+       
+
+    function Search() {
+        var _selectedDocumentNoId = $("#txtSearch").val();
+        $("#btnSearch").href = "/AR/SearchARInvoice?DocumentNo=" + _selectedDocumentNoId;
+        $("#btnSearch").attr("href", "/AR/SearchARInvoice?DocumentNo=" + _selectedDocumentNoId)
+
+        return true;
+    }
+
+    function OnSaveFailure(result) {
+        ModalShow(result.Message, "Failure", "Save");
+    }
+
+    function OnSaveSuccess(result) {
+
+        ModalShow(result.Message, "Success", "Save");
+        DocumentNo = result.arInvoiceData.DocumentNo;
+    }
+
+    function BtnOK() {
+
+        if (ActionType == "Save") {
+            location.href = "/AR/ARInvoiceList";
+
+            //location.href = "/AR/Invoice?DocumentNo=" + DocumentNo;
+
+
+        }
+    }
+
+    function DeleteARInvoice() {
+        var documentNo = $("#txtDocumentNo").val();
+        $.ajax({
+            url: "/AR/DeleteARInvoice", type: "POST", dataType: "json",
+            data: { DocumentNo: documentNo, CancelBy: "" },
+            async: true,
+            success: function (response) {
+                if (response.result) {
+                    ModalShow(response.Message, "Success", "Delete");
+                    $("#txtDocumentNo").addClass("StrikeOut")
+                    $("#btnSave").attr("disabled", " disabled")
+                    $("#btnApprove").attr("disabled", " disabled")
+
+                } else {
+                    ModalShow(response.Message, "Failure", "Delete");
+                }
+            }
+        })
+    }
+
+
+    function AddARDetails() {
+        
+        var accountCode = $("#AccountCode").val();
+        var amount = $("#txtAmount").val();
+
+        $('.select2-hidden-accessible').next().next().css('border', '');        
+
+        if (!$("#myForm").valid()) {
+            if ($('.select2-hidden-accessible').hasClass('error')) {
+                $('.select2-hidden-accessible.error').next().next().css('border', 'solid 1px red');
+            }
+            return false;
+        } else if ((accountCode == null || accountCode == "") && (amount == "" || amount == null)) {
+            return false;
+        }
+
+        
+        var debtorCode = $('#ddlDebtorCode option:selected').val();
+        var rooturl = "@Url.Action("AddARInvoiceItem", "AR", new { area = "AR" })"
+        var url = rooturl + "?debtorCode=" + debtorCode + "&accountCode=" + accountCode + "&amount=" + amount;
+
+
+        var rowCount = 0;
+        if ($('#tblItem').dataTable().fnSettings().aoData.length > 0) {
+            rowCount = $('#tblItem tr').length - 1;;
+        }
+
+        $.post(url, null, function (data) {
+        
+            var hdnFlag = $('#hdnFlag').val();
+            var Obj = {};
+            if (hdnFlag == '-1') {
+                var _index = $('.arInvoiceDetailsCss').length;
+                Obj = {
+                    Index: _index,
+                    ItemNo: data.ARInvoiceDetail.ItemNo,
+                    AccountCode: data.ARInvoiceDetail.AccountCode,
+                    AccountCodeDescription: data.ARInvoiceDetail.AccountCodeDescription,
+                    BaseAmount: data.ARInvoiceDetail.BaseAmount,
+                    CurrencyCode: data.ARInvoiceDetail.CurrencyCode,
+                    LocalAmount: data.ARInvoiceDetail.LocalAmount,
+                    customerDebitCredit: data.customerDebitCredit,
+                    accountDebitCredit: data.accountDebitCredit
+                };
+                var rowData = [
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__ItemNo" name="ARInvoiceDetails[' + Obj.Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__AccountCode" name="ARInvoiceDetails[' + Obj.Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '">' +
+                    '<span id="ARInvoiceDetails_' + Obj.Index + '__AccountCode_span">' + Obj.AccountCode + '</span>' +
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__Status" name="ARInvoiceDetails[' + Obj.Index + '].Status" type="hidden" value="True">',
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__AccountCodeDescription" name="ARInvoiceDetails[' + Obj.Index + '].AccountCodeDescription" type="hidden" value="' + Obj.AccountCodeDescription + '">' +
+                    '<span id="ARInvoiceDetails_' + Obj.Index + '__AccountCodeDescription_span">' + Obj.AccountCodeDescription + '</span>',
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__BaseAmount" name="ARInvoiceDetails[' + Obj.Index + '].BaseAmount" type="hidden" value="' + Obj.BaseAmount + '">' +
+                    '<span id="ARInvoiceDetails_' + Obj.Index + '__BaseAmount_span">' + Obj.BaseAmount.toFixed(2) + '</span>',
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__CurrencyCode" name="ARInvoiceDetails[' + Obj.Index + '].CurrencyCode" type="hidden" value="' + Obj.CurrencyCode + '">' +
+                    '<span id="ARInvoiceDetails_' + Obj.Index + '__CurrencyCode_span">' + Obj.CurrencyCode + '</span>',
+                    '<input id="ARInvoiceDetails_' + Obj.Index + '__LocalAmount" name="ARInvoiceDetails[' + Obj.Index + '].LocalAmount" type="hidden" value="' + Obj.LocalAmount + '">' +
+                    '<span id="ARInvoiceDetails_' + Obj.Index + '__LocalAmount_span">' + Obj.LocalAmount.toFixed(2) + '</span>',
+                    '<div class="dropdown">' +
+                '<button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Action<span class="caret"></span></button>' +
+                '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+                    '<li><a class="cursorCss" id="Edit_' + Obj.index + '" onclick="EditARInvoiceDetails(' + Obj.Index + ')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>' +
+                    '<li><a class="cursorCss" onclick="DeleteARInvoiceDetails(' + Obj.Index + ')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>' +
+                '</ul></div>'];
+                $('#tblItem').dataTable().fnAddData(rowData);
+            }
+            else {
+
+                Obj = {
+                    Index: _index,
+                    ItemNo: data.ARInvoiceDetail.ItemNo,
+                    AccountCode: data.ARInvoiceDetail.AccountCode,
+                    AccountCodeDescription: data.ARInvoiceDetail.AccountCodeDescription,
+                    BaseAmount: data.ARInvoiceDetail.BaseAmount,
+                    CurrencyCodse: data.ARInvoiceDetail.CurrencyCode,
+                    LocalAmount: data.ARInvoiceDetail.LocalAmount,
+                    customerDebitCredit: data.customerDebitCredit,
+                    accountDebitCredit: data.accountDebitCredit
+
+                };
+
+                $('#ARInvoiceDetails_' + hdnFlag + '__AccountCode').val(data.ARInvoiceDetail.AccountCode);
+                $('#ARInvoiceDetails_' + hdnFlag + '__AccountCode_span').text(data.ARInvoiceDetail.AccountCode);
+                $('#ARInvoiceDetails_' + hdnFlag + '__AccountCodeDescription').val(data.ARInvoiceDetail.AccountCode);
+                $('#ARInvoiceDetails_' + hdnFlag + '__AccountCodeDescription_span').text(data.ARInvoiceDetail.AccountCodeDescription);
+                $('#ARInvoiceDetails_' + hdnFlag + '__BaseAmount').val(data.ARInvoiceDetail.BaseAmount);
+                $('#ARInvoiceDetails_' + hdnFlag + '__BaseAmount_span').text(data.ARInvoiceDetail.BaseAmount.toFixed(2));
+                $('#ARInvoiceDetails_' + hdnFlag + '__CurrencyCode').val(data.ARInvoiceDetail.CurrencyCode);
+                $('#ARInvoiceDetails_' + hdnFlag + '__CurrencyCode_span').text(data.ARInvoiceDetail.CurrencyCode);
+                $('#ARInvoiceDetails_' + hdnFlag + '__LocalAmount').val(data.ARInvoiceDetail.LocalAmount);
+                $('#ARInvoiceDetails_' + hdnFlag + '__LocalAmount_span').text(data.ARInvoiceDetail.LocalAmount.toFixed(2));
+
+                $('#btnClearDiv').hide();
+                $('#btnAddDetailsSpan').text('Add Details');
+            }
+            var rowsCount = $('.arInvoiceDetailsCss').length;
+            var amount = 0.00;
+            for (var x = 0; x < rowsCount; x++) {
+                if (!$('#ARInvoiceDetails_' + x + '__ItemNo').hasClass('deletedItem')) {
+                    amount = amount + parseFloat($('#ARInvoiceDetails_' + x + '__LocalAmount').val());
+                }
+            }
+            $('#txtLocalAmount').val(commaSeparateNumber(amount.toFixed(2)));
+            $('#LocalAmount').val(amount);
+            discountAmountBlur();
+            $('#hdnFlag').val('-1');
+
+            setTimeout(function () {
+                AddToGLAllocationTbl(Obj, data.DebtorAccount, parseInt(hdnFlag));
+            }, 500);
+        });
+        $('#AccountCode').val("");
+        $("#AccountCode").select2();
+        $('#txtAmount').val('');
+
+    }
+
+    var glTotalAmount = 0.00;
+    function AddToGLAllocationTbl(Obj, DebtorAccount, hdnFlag) {
+        
+        var Index = $('.tblGLDetailsCss').length;
+        if ($('.tblGLDetailsCss').length > 0)
+        {
+            glTotalAmount = glTotalAmount + parseFloat($('#GLTransactionDetails_0__LocalAmount').val());
+        }
+
+        if (hdnFlag == -1)
+            glTotalAmount = glTotalAmount + Obj.BaseAmount;
+        else {
+            var glIndex = hdnFlag + 1;
+            var oldVal = parseInt($('#GLTransactionDetails_' + glIndex + '__DebitAmount').val());
+            glTotalAmount = glTotalAmount - oldVal;
+            glTotalAmount = glTotalAmount + Obj.BaseAmount;
+        }
+
+        if (Index == 0) {
+            var totalRow = [
+                '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + DebtorAccount + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + DebtorAccount + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.customerDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__IsDebitCredit" name="GLTransactionDetails_' + Index + '__IsDebitCredit" type="hidden" value="' + Obj.customerDebitCredit + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.customerDebitCredit == 'CREDIT' ? Obj.BaseAmount.toFixed(2) : 0.00) + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.customerDebitCredit == 'DEBIT' ? Obj.BaseAmount : 0.00) + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.customerDebitCredit == 'DEBIT' ? Obj.BaseAmount.toFixed(2) : 0.00) + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__LocalAmount" name="GLTransactionDetails[' + Index + '].LocalAmount" type="hidden" value="' + glTotalAmount + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__LocalAmount_span">' + glTotalAmount.toFixed(2) + '</span>' +
+                '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">'
+            ];
+
+            $('#tblGLDetails').dataTable().fnAddData(totalRow);
+
+            Index = Index + 1;
+        }
+        else {
+            if (Obj.customerDebitCredit == 'DEBIT') {
+                $('#GLTransactionDetails_0__LocalAmount_span, #GLTransactionDetails_0__DebitAmount_span').text(glTotalAmount.toFixed(2));
+                $('#GLTransactionDetails_0__LocalAmount, #GLTransactionDetails_0__DebitAmount').val(glTotalAmount);
+            } else if (Obj.customerDebitCredit == 'CREDIT') {
+                $('#GLTransactionDetails_0__LocalAmount_span, #GLTransactionDetails_0__CreditAmount_span').text(glTotalAmount.toFixed(2));
+                $('#GLTransactionDetails_0__LocalAmount, #GLTransactionDetails_0__CreditAmount').val(glTotalAmount);
+            }
+        }
+        //Index = Index + 1;
+
+        if (hdnFlag == -1) {
+            var rowData = [
+                    '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                    '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                    '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                    '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + Obj.AccountCode + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.customerDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__IsDebitCredit" name="GLTransactionDetails_' + Index + '__IsDebitCredit" type="hidden" value="' + Obj.customerDebitCredit + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.customerDebitCredit == 'CREDIT' ? Obj.BaseAmount.toFixed(2) : 0.00) + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.customerDebitCredit == 'DEBIT' ? Obj.BaseAmount : 0.00) + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.customerDebitCredit == 'DEBIT' ? Obj.BaseAmount.toFixed(2) : 0.00) + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__LocalAmount" name="GLTransactionDetails[' + Index + '].LocalAmount" type="hidden" value="' + Obj.BaseAmount + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__LocalAmount_span">' + Obj.BaseAmount.toFixed(2) + '</span>' +
+                    '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">'
+            ];
+            $('#tblGLDetails').dataTable().fnAddData(rowData);
+        }
+        else {
+            var glIndex = hdnFlag + 1;
+            if (Obj.customerDebitCredit == 'DEBIT') {
+                $('#GLTransactionDetails_' + glIndex + '__DebitAmount_span').text(Obj.BaseAmount.toFixed(2));
+                $('#GLTransactionDetails_' + glIndex + '__DebitAmount').val(Obj.BaseAmount);
+                $('#GLTransactionDetails_' + glIndex + '__IsDebitCredit').val(Obj.customerDebitCredit);
+
+            }
+            if (Obj.customerDebitCredit == 'CREDIT') {
+                $('#GLTransactionDetails_' + glIndex + '__CreditAmount_span').text(Obj.BaseAmount.toFixed(2));
+                $('#GLTransactionDetails_' + glIndex + '__CreditAmount').val(Obj.BaseAmount);
+                $('#GLTransactionDetails_' + glIndex + '__IsDebitCredit').val(Obj.customerDebitCredit);
+            }
+
+            $('#GLTransactionDetails_' + glIndex + '__LocalAmount_span').text(Obj.BaseAmount.toFixed(2));
+            $('#GLTransactionDetails_' + glIndex + '__LocalAmount').val(Obj.BaseAmount);
+        }
+    }
+
+    function EditARInvoiceDetails(index) {
+      
+        $('#AccountCode').val($('#ARInvoiceDetails_' + index + '__AccountCode').val());
+        $('#txtAmount').val($('#ARInvoiceDetails_' + index + '__LocalAmount').val());
+        $("#AccountCode").select2();
+        $('#btnAddDetailsSpan').text('Update');
+        $('#btnClearDiv').fadeIn();
+
+        $('#hdnFlag').val(index);
+    }
+
+    function DeleteARInvoiceDetails(index) {
+        
+        $('#tblARInvoiceDetails_' + index).css({
+            'text-decoration': 'line-through',
+            'color': 'red',
+            'font-style': 'italic'
+        });
+        $('#ARInvoiceDetails_' + index + '__ItemNo').addClass('deletedItem');
+        $('#ARInvoiceDetails_' + index + '__Status').val('False');
+
+        var rowsCount = $('.arInvoiceDetailsCss').length;
+        var amount = 0.00;
+        for (var x = 0; x < rowsCount; x++) {
+            if (!$('#ARInvoiceDetails_' + x + '__ItemNo').hasClass('deletedItem')) {
+                amount = amount + parseFloat($('#ARInvoiceDetails_' + x + '__LocalAmount').val());
+            }
+        }
+        glTotalAmount = amount;
+        $('#txtLocalAmount').val(commaSeparateNumber(amount.toFixed(2)));
+        $('#LocalAmount').val(amount);
+        discountAmountBlur();
+        DeleteGLAllocationItem(index, amount);
+        $('#hdnFlag').val('-1');
+    }
+
+    function DeleteGLAllocationItem(index, amount) {
+        
+
+        $('#tblGLDetailstr_' + (index)).css({
+            'text-decoration': 'line-through',
+            'color': 'red',
+            'font-style': 'italic'
+        });
+        var IsDebitCredit = $('#GLTransactionDetails_' + index + '__IsDebitCredit').val();
+
+        $('#GLTransactionDetails_' + (index) + '__Status').val('False');
+        if (IsDebitCredit == 'DEBIT') {
+            $('#GLTransactionDetails_0__DebitAmount_span, #GLTransactionDetails_0__LocalAmount_span').text(amount.toFixed(2));
+            $('#GLTransactionDetails_0__DebitAmount, #GLTransactionDetails_0__LocalAmount').val(amount.toFixed(2));
+        } else {
+            $('#GLTransactionDetails_0__CreditAmount_span, #GLTransactionDetails_0__LocalAmount_span').text(amount.toFixed(2));
+            $('#GLTransactionDetails_0__CreditAmount, #GLTransactionDetails_0__LocalAmount').val(amount.toFixed(2));
+        }
+    }
+
+
+
+    function linkClicked(li) {
+        linkedIndex = li;
+    }
+
+
+
+    function btnClearDetailsClick() {
+        $('#AccountCode').val("");
+        $('#AccountCode').select2();
+        $('#txtAmount').val('');
+        $('#hdnFlag').val('-1');
+        $('#btnAddDetailsSpan').text('Add Details');
+        $('#btnClearDiv').fadeOut();
+    }
+
+    function SummaryCalculation() {
+
+        var table = $('#tblItem').DataTable();
+        var totalAmount = 0;
+        var totalprice = 0;
+        var totaldiscAmt = 0;
+        var paymentAmt = 0;
+        //var totalpartialAmt = 0;
+        table.column(3).data()
+            .each(function (value, index) {
+                totalprice += Number($(value).val());
+            });
+        table.column(6).data()
+            .each(function (value, index) {
+                var controlid = "#" + $(value).attr("id");
+                totalAmount += Number($(controlid).val());
+            });
+
+
+        totaldiscAmt = totalprice - totalAmount;
+
+        $("#txtLocalAmount").val(totalprice);
+        $("#txtTotalDiscount").val(totaldiscAmt);
+
+        $("#txtPaymentAmount").val(totalAmount);
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+    $(function () {
+        $("#searchItem").autocomplete({
+            minLength: 2,
+            source: function (request, response) {
+                $.ajax({
+                    url: "/AR/SearchItem", type: "GET", dataType: "json",
+                    data: { searchText: request.term, limitRecords: -1, source: "ARInvoice" },
+                    async: true,
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item.ContactFirstName, value: item.ContactFirstName, PKContactID: item.PKContactID }
+                        }));
+                    }
+                })
+            },
+            select: function (event, ui) {
+                var PKContactID = ui.item.PKContactID;
+                _selectedContactId = PKContactIDForAddLoan = PKContactID;
+                return false;
+            }
+        });
+    });
+
+    /* Search Functions */
+
+    function SearchBox(SearchTable) {
+        sessionStorage.setItem('SsnSearchTbl', SearchTable);
+        var Obj = {
+            SearchTable: SearchTable,
+            whereclause: '',
+            txtSearch: '',
+            SearchBy: ''
+        };
+        Search(Obj);
+    }
+
+    function Search(Obj) {
+        $('#modalBody').empty().css('display', 'none');
+        $('#modalAni').html('<i class="fa fa-refresh fa-spin"></i>');
+        $('#mySearch').modal('show');
+        ajaxCall(Obj);
+    }
+
+    function ajaxCall(Obj) {
+        $.ajax({
+            type: 'POST',
+            url: searchBoxUrl,
+            dataType: 'html',
+            data: JSON.stringify(Obj),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $('#modalAni').empty();
+                $('#modalBody').html(data).slideDown(700);
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+
+    function trClick(rowId, searchTable) {
+        var Obj = $('#' + rowId);
+        var documentNo = Obj.data('document-no');
+        location.href = '@Url.Content("~/AR/Invoice?documentNo=")' + documentNo;
+
+    }
+
+
+
+
+    </script>
+}

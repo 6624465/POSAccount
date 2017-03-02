@@ -1,0 +1,513 @@
+﻿@model POSAccount.Contract.Quotation
+
+@{
+    ViewBag.Title = "StandardRateProfile";
+}
+
+<style type="text/css">
+    label.error {
+        color: red;
+    }
+</style>
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+@{ Html.RenderAction("AddQuotation", "Quotation", new { area = "Quotation", quotationNo = "", itemID = 0 }); }
+@using (Html.BeginForm("SaveStandardRateProfile", "Quotation", new { area = "Quotation" }, FormMethod.Post, new { id = "MyForm" }))
+{
+    <div class="box box-solid  box-default">
+        <!-- Header -->
+        <div class="box-header with-border">
+            <h3 class="box-title">Standard Rate Profile
+            </h3>
+        </div>
+        <!-- body -->
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Quotation No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(q => q.QuotationNo, new { @class = "form-control input-sm", @readonly = "readonly" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Quotation Date</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.QuotationDate, new { @class = "datepicker form-control input-sm", @id = "dtpQuotationDate", Value = @Model.EffectiveDate.ToString("dd-MM-yyyy"), @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Customer</label>
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.CustomerCode, new { @class = "form-control input-sm", @value = "NONE", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Effective Date</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.EffectiveDate, new { @class = "datepicker form-control input-sm", @id = "dtpEffectiveDate", @Value = @Model.EffectiveDate.ToString("dd-MM-yyyy") })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Expiry Date</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.ExpiryDate, new { @class = "datepicker form-control input-sm", @id = "dtpExpiryDate" })
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="tbDetails" data-toggle="tab">Quotation Details</a>
+                        </li>
+                        <li class="pull-right">
+                            <div class="btn-group btn-primary">
+                                @*<a class="btn btn-small btn-primary" data-toggle="modal" href="@Url.Content("~/Quotation/AddQuotation?quotationNo=STANDARD&itemID=0")" id="btnCreate"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Item</a>*@
+                                @*@Html.ActionLink("Add Item", "AddQuotation", "Quotation", new { area = "Quotation", quotationNo = "STANDARD", itemID = 0 }, new { data_modal = "", id = "btnCreate", @class = "btn btn-small btn-primary" })*@
+                                <button type="button" class="btn btn-small btn-primary" onclick="EditQuotationItems('-1');"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Item</button>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tbDetails">
+                            <table id="tblQuotationItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                <thead style="background-color: steelblue; color: white; font-size: 12px;">
+                                    <tr>
+                                        <th>Charge Code</th>
+                                        <th>Slab Rate</th>
+                                        <th>From </th>
+                                        <th>To</th>
+                                        <th>Sell Rate</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size: 12px;">
+
+                                    @{
+    for (int i = 0; i < Model.QuotationItems.Count; i++)
+    {
+                                        <tr>
+                                            <td name="ChargeCodeDescription">
+                                                @Html.HiddenFor(m => m.QuotationItems[i].ItemID)
+                                                @Html.HiddenFor(m => m.QuotationItems[i].Status)
+                                                @Html.HiddenFor(m => m.QuotationItems[i].ChargeCode)
+                                                @Html.HiddenFor(m => m.QuotationItems[i].ChargeCodeDescription)
+                                                <span id="QuotationItems_@(i)__ChargeCodeDescription_span" class="QuotationItemsCss" >@Model.QuotationItems[i].ChargeCodeDescription</span>
+                                            </td>
+                                            <td name="SlabRate">
+                                                @Html.HiddenFor(m => m.QuotationItems[i].SlabRate)
+                                                <span id="QuotationItems_@(i)__SlabRate_Span">@(Model.QuotationItems[i].SlabRate ? 1 : 0)</span>
+                                            </td>
+                                            <td name="SlabRateFrom">
+                                                @Html.HiddenFor(m => m.QuotationItems[i].SlabRateFrom)
+                                                <span id="QuotationItems_@(i)__SlabRateFrom_Span">@(Model.QuotationItems[i].SlabRateFrom)</span>
+                                            </td>
+                                            <td name="SlabRateTo">
+                                                @Html.HiddenFor(m => m.QuotationItems[i].SlabRateTo)
+                                                <span id="QuotationItems_@(i)__SlabRateTo_Span">@(Model.QuotationItems[i].SlabRateTo)</span>
+                                            </td>
+                                            <td name="SellRate">
+                                                @Html.HiddenFor(m => m.QuotationItems[i].SellRate)
+                                                <span id="QuotationItems_@(i)__SellRate_Span">@(Model.QuotationItems[i].SellRate.ToString("0.00"))</span>
+                                            </td>
+                                            <td name="Action">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                        Action
+                                                                <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                        <li><a class="cursorCss" id="Edit_@i" onclick="EditQuotationItems('@(i)')" ><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                        <li><a class="cursorCss" id="Delete_@i" onclick="DeleteQuotationItems('@(i)')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+    }
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+            </fieldset>
+        </div>
+
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                    <button type="button" class="btn btn-social btn-success" onclick="btnSave()">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>
+                    </div>
+                    <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+
+        </div>
+        <input type="hidden" id="hdnQuotationItemFlag" name="hdnQuotationItemFlag" />
+
+        <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+
+
+}
+@section Scripts{
+
+    <script type="text/javascript">
+        var linkedIndex;
+        $(function () {
+
+            $('#tblQuotationItem').DataTable({
+                responsive: true,
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.className = "gradeX odd";
+                    nRow.id = 'EditQuotationItemstr_' + iDisplayIndex;
+                    nRow.className = 'EditQuotationItemstrCss';
+                    return nRow;
+                }
+            });
+            var table = $('#tblQuotationItem').DataTable();
+            $('#tblQuotationItem tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+
+            var dateNow = new Date();
+
+            $('#dtpQuotationDate, #dtpEffectiveDate, #dtpExpiryDate').datetimepicker({
+                useCurrent: false,
+                //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+
+            AddQuotationValidation();
+
+
+            $('#MyForm').validate({
+                rules: {
+                    EffectiveDate: {
+                        required: true
+                    },
+                    ExpiryDate: {
+                        required: true
+                    }
+                },
+                messages: {
+                    EffectiveDate: {
+                        required: 'Effective Date is required.'
+                    },
+                    ExpiryDate: {
+                        required: 'Expiry Date is required.'
+                    }
+                }
+            });
+
+        });
+
+        function btnSave() {
+            if ($('#MyForm').valid()) {
+
+
+                if ($('.EditQuotationItemstrCss').length > 0) {
+                    $('#overlayDiv').fadeIn();
+                    setTimeout(function () {
+                        $('#overlayDiv').fadeOut();
+                    }, 2000)
+                    $('#MyForm').submit();
+                }
+                else {
+                    alert('Please key in atleast 1 item to proceed to save');
+                }
+            }
+        }
+
+        $(".datepicker").on("dp.change", function (e) {
+
+            var count = 0;
+            var expirydate = effectivedate = null;
+            if (typeof $("#dtpEffectiveDate").val() != "undefined" && $("#dtpEffectiveDate").val() != "") {
+                //expirydate = new Date($("#dtpEffectiveDate").val().replace('-', '/').replace('-', '/'));
+                effectivedate = new moment($("#dtpEffectiveDate").val(), 'DD/MM/YYYY');
+                count = count + 1;
+            }
+            if (typeof $("#dtpExpiryDate").val() != "undefined" && $("#dtpExpiryDate").val() != "") {
+                //effectivedate = new Date($("#dtpExpiryDate").val().replace('-', '/').replace('-', '/'));
+                expirydate = new moment($("#dtpExpiryDate").val(), 'DD/MM/YYYY');
+                count = count + 1;
+            }
+
+            if (count == 2 && expirydate <= effectivedate) {
+                //ShowNotifyMessage("Warning:", "The expiry date should be more than effective date.", 'danger')
+                alert("The expiry date should be more than effective date.");
+                $("#dtpExpiryDate").val('');
+            }
+
+
+        });
+
+        function btnDelete() {
+            $('#MyForm').attr('action', '@Url.Content("~/Quotation/DeleteStandardRateProfile")');
+            $('#MyForm').submit();
+        }
+
+        function linkClicked(li) {
+            linkedIndex = li;
+        }
+
+        function AddQuotationValidation() {
+            $('#frmAddQutation').validate({
+                rules: {
+                    ChargeCode: {
+                        required: true
+                    },
+                    SellRate: {
+                        required: true
+                    }
+                },
+                messages: {
+                    ChargeCode: {
+                        required: 'Charge Code is required.'
+                    },
+                    SellRate: {
+                        required: 'SellRate is required.'
+                    },
+                    SlabRateFrom: {
+                        required: 'SellRate From is required.'
+                    },
+                    SlabRateTo: {
+                        required: 'SellRate To is required.'
+                    }
+                }
+            });
+        }
+
+        function AddDataToTable() {
+            debugger;
+            if ($('#frmAddQutation').valid()) {
+                var rowId = $('#hdnQuotationItemFlag').val();
+                if (rowId == '-1') {
+                    var _index = $('.QuotationItemsCss').length;
+                    var Obj = {
+                        index: _index,
+                        ItemID: '',
+                        ChargeCode: $('#ddlChargeCode').val(),
+                        ChargeCodeDescription: $('#ddlChargeCode option:selected').text(),
+                        SlabRate: $('#chkIsSlabRate').is(':checked'),
+                        SlabRateFrom: $('#SlabRateFrom').val(),
+                        SlabRateTo: $('#SlabRateTo').val(),
+                        SellRate: $('#SellRate').val(),
+                        Status: true
+                    };
+
+                    $('#tblQuotationItem').dataTable().fnAddData([
+
+                      "<input id='QuotationItems_" + Obj.index + "__ItemID' type='hidden' value=" + Obj.index + " name='QuotationItems[" + Obj.index + "].ItemID'><input id='QuotationItems_" + Obj.index + "__Status' type='hidden' value=" + Obj.Status + " name='QuotationItems[" + Obj.index + "].Status'>" +
+                       "<input id='QuotationItems_" + Obj.index + "__ChargeCode' type='hidden' value=" + Obj.ChargeCode + " name='QuotationItems[" + Obj.index + "].ChargeCode'>" +
+                      "<input id='QuotationItems_" + Obj.index + "__ChargeCodeDescription' type='hidden' value=" + Obj.ChargeCodeDescription + " name='QuotationItems[" + Obj.index + "].ChargeCodeDescription'><span id='ChargeCodeDescription_" + Obj.index + "'>" + Obj.ChargeCodeDescription + '</span>'
+                      , "<input id='QuotationItems_" + Obj.index + "__SlabRate' type='hidden' value=" + $('#chkIsSlabRate').is(':checked') + " name='QuotationItems[" + Obj.index + "].SlabRate'><span id='SlabRate_" + Obj.index + "'>" + ($('#chkIsSlabRate').is(':checked') ? 1 : 0) + '</span>'
+                      , "<input id='QuotationItems_" + Obj.index + "__SlabRateFrom' type='hidden' value=" + Obj.SlabRateFrom + " name='QuotationItems[" + Obj.index + "].SlabRateFrom'><span id='SlabRateFrom_" + Obj.index + "'>" + Obj.SlabRateFrom + '</span>'
+                      , "<input id='QuotationItems_" + Obj.index + "__SlabRateTo' type='hidden' value=" + Obj.SlabRateTo + " name='QuotationItems[" + Obj.index + "].SlabRateTo'><span id='SlabRateTo_" + Obj.index + "'>" + Obj.SlabRateTo + '</span>'
+                      , "<input id='QuotationItems_" + Obj.index + "__SellRate' type='hidden' value=" + Obj.SellRate + " name='QuotationItems[" + Obj.index + "].SellRate'><span id='SellRate_" + Obj.index + "'>" + parseFloat(Obj.SellRate).toFixed(2) + '</span>'
+                       , " <div class='dropdown'>" +
+                    "<button class='btn btn-warning btn-sm dropdown-toggle' style='border-radius: 0px !important;' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true'>Action<span class='caret'></span></button>" +
+                    "<ul class='dropdown-menu' aria-labelledby='dropdownMenu1'>" +
+                        "<li><a class='cursorCss' id='Edit_" + Obj.index + " onclick='EditCBPaymentDetails(" + Obj.index + ")'><i class='fa fa-pencil'></i>&nbsp;Edit</a></li>" +
+                        "<li><a class='cursorCss' onclick='DeleteCBPaymentDetails(" + Obj.index + ")'><i class='fa fa-trash-o'></i>&nbsp;Delete</a></li>" +
+                    "</ul></div>"
+                    ]);
+
+                }
+                else {
+                    $('#QuotationItems_' + rowId + '__ChargeCode').val($('#ddlChargeCode').val());
+                    $('#QuotationItems_' + rowId + '__ChargeCode_Span').text($('#ddlChargeCode option:selected').text());
+
+                    $('#QuotationItems_' + rowId + '__SlabRate').val($('#chkIsSlabRate').is(':checked'));
+                    $('#QuotationItems_' + rowId + '__SlabRate_Span').text(($('#chkIsSlabRate').is(':checked') ? 1 : 0));
+
+                    $('#QuotationItems_' + rowId + '__SlabRateFrom').val($('#SlabRateFrom').val());
+                    $('#QuotationItems_' + rowId + '__SlabRateFrom_Span').text($('#SlabRateFrom').val());
+
+                    $('#QuotationItems_' + rowId + '__SlabRateTo').val($('#SlabRateTo').val());
+                    $('#QuotationItems_' + rowId + '__SlabRateTo_Span').text($('#SlabRateTo').val());
+
+                    $('#QuotationItems_' + rowId + '__SellRate').val($('#SellRate').val());
+                    $('#QuotationItems_' + rowId + '__SellRate_Span').text($('#SellRate').val());
+
+                    $('#hdnQuotationItemFlag').val('-1');
+
+                }
+                $('#AddQutationModal').modal('hide');
+            }
+        }
+           @* var isVal = $('#frmAddQutation').valid();
+            if (!isVal)
+                return;
+
+            var tblData = new Array();
+
+
+            tblData = [{ ChargeCode: $("#ddlChargeCode").val(), SlabRate: $("#chkIsSlabRate").is(':checked'), SlabRateFrom: $("#SlabRateFrom").val(), SlabRateTo: $("#SlabRateTo").val(), SellRate: $("#SellRate").val() }];
+            if (linkedIndex != null) {
+                //if ($('#tr_' + linkedIndex).length == 1) {
+
+                //    $('#tblQuotationItem').dataTable().fnAddData([
+                //     this.ServiceType, this.ChargeCode, this.ChargeType, this.From, this.To, this.SellRate, "Action"
+                //    ]);
+
+                //    //QuotationItemTable.row.add(tblData).draw();
+                //    //$('#tr_' + linkedIndex).html(newHtml);
+                //}
+                //$('#AddQutationModal').modal('hide');
+
+                $('#QuotationItems_' + linkedIndex + '__ChargeCode').val($('#ddlChargeCode').val());
+                $('#ChargeCodeDescription_' + linkedIndex).text($('#ddlChargeCode option:selected').text());
+
+                $('#QuotationItems_' + linkedIndex + '__SlabRate').val($('#chkIsSlabRate').is(':checked'));
+                $('#SlabRate_' + linkedIndex).text(($('#chkIsSlabRate').is(':checked') ? 'Yes' : 'No'));
+
+                $('#QuotationItems_' + linkedIndex + '__SlabRateFrom').val($('#SlabRateFrom').val());
+                $('#SlabRateFrom_' + linkedIndex).text($('#SlabRateFrom').val());
+
+                $('#QuotationItems_' + linkedIndex + '__SlabRateTo').val($('#SlabRateTo').val());
+                $('#SlabRateTo_' + linkedIndex).text($('#SlabRateTo').val());
+
+                $('#QuotationItems_' + linkedIndex + '__SellRate').val($('#SellRate').val());
+                $('#SellRate_' + linkedIndex).text($('#SellRate').val());
+
+                linkedIndex = null;
+            }
+            else {
+                var row = "";
+                var rowCount = 0;
+                if ($('#tblQuotationItem').dataTable().fnSettings().aoData.length > 0) {
+                    rowCount = $('#tblQuotationItem tr').length - 1;;
+                }
+
+                $('#tblQuotationItem').dataTable().fnAddData([
+                  //0,
+                   "<input id='QuotationItems_" + rowCount + "__ItemID' type='hidden' value=" + rowCount + " name='QuotationItems[" + rowCount + "].ItemID'>"
+                   , "<input id='QuotationItems_" + rowCount + "__ChargeCode' type='hidden' value=" + this.ddlChargeCode.value + " name='QuotationItems[" + rowCount + "].ChargeCode'>" + this.ddlChargeCode.value
+                   , "<input id='QuotationItems_" + rowCount + "__ChargeCodeDescription' type='hidden' value=" + this.ddlChargeCode.options[ddlChargeCode.selectedIndex].text + " name='QuotationItems[" + rowCount + "].ChargeCodeDescription'><span id='ChargeCodeDescription_" + rowCount + "'>" + this.ddlChargeCode.options[ddlChargeCode.selectedIndex].text + '</span>'
+                   , "<input id='QuotationItems_" + rowCount + "__SlabRate' type='hidden' value=" + $('#chkIsSlabRate').is(':checked') + " name='QuotationItems[" + rowCount + "].SlabRate'><span id='SlabRate_" + rowCount + "'>" + ($('#chkIsSlabRate').is(':checked') ? "Yes" : "No") + '</span>'
+                   , "<input id='QuotationItems_" + rowCount + "__SlabRateFrom' type='hidden' value=" + this.SlabRateFrom.value + " name='QuotationItems[" + rowCount + "].SlabRateFrom'><span id='SlabRateFrom_" + rowCount + "'>" + this.SlabRateFrom.value + '</span>'
+                   , "<input id='QuotationItems_" + rowCount + "__SlabRateTo' type='hidden' value=" + this.SlabRateTo.value + " name='QuotationItems[" + rowCount + "].SlabRateTo'><span id='SlabRateTo_" + rowCount + "'>" + parseFloat(this.SlabRateTo.value).toFixed(2) + '</span>'
+                   , "<input id='QuotationItems_" + rowCount + "__SellRate' type='hidden' value=" + this.SellRate.value + " name='QuotationItems[" + rowCount + "].SellRate'>" +
+                     "<input id='QuotationItems_" + rowCount + "__Status' type='hidden' value=" + '@Boolean.TrueString' + " name='QuotationItems[" + rowCount + "].Status'><span id='SellRate_" + rowCount + "'>" + this.SellRate.value + '</span>'
+                   , " <img src='/Images/Pencil.png' onclick='EditQuotationItems(" + rowCount + ")' class='img-class'> <img src='/Images/Delete.png' onclick='DeleteQuotationItems(" + rowCount + ")' class='img-class'>"
+                ]);
+                //<a onclick='return linkClicked(0)' href='/Quotation/AddQuotation?itemId=" + rowCount + "' data-modal=''>Edit Details</a>
+                $('tr td:nth-child(1)').hide()
+                $('tr td:nth-child(2)').hide()
+            }
+            $('#AddQutationModal').modal('hide');// $('#myModalContent').modal('hide');
+        }*@
+
+        function checkedChanged(el) {
+
+            var isChecked = $(el).is(':checked');
+            if (isChecked) {
+                $('#SlabRateFrom, #SlabRateTo').attr('required', 'required');
+            }
+            else {
+                $('#SlabRateFrom, #SlabRateTo').removeAttr('required');
+            }
+        }
+
+        function EditQuotationItems(rowId) {
+            debugger;
+            var tempRowId = rowId;
+            if (rowId != '-1') {
+
+                $('#ddlChargeCode').val($('#QuotationItems_' + rowId + '__ChargeCode').val());
+                if ($('#QuotationItems_' + rowId + '__SlabRate').val().toLowerCase() == 'true') {
+                    $('#chkIsSlabRate').prop('checked', 'checked');
+                }
+                else {
+                    $('#chkIsSlabRate').removeAttr('checked');
+                }
+                $('#SlabRateFrom').val($('#QuotationItems_' + rowId + '__SlabRateFrom').val());
+                $('#SlabRateTo').val($('#QuotationItems_' + rowId + '__SlabRateTo').val());
+                $('#SellRate').val($('#QuotationItems_' + rowId + '__SellRate').val());
+
+              
+
+            }
+            else {
+                $('#ddlChargeCode').val('');
+                $('#chkIsSlabRate').removeAttr('checked');
+                $('#SlabRateFrom').val('');
+                $('#SlabRateTo').val('');
+                $('#SellRate').val('');
+
+            }
+
+            $('#hdnQuotationItemFlag').val(tempRowId);
+            $('#AddQutationModal').modal('show');
+            
+        }
+
+        function DeleteQuotationItems(index) {
+            $('#EditQuotationItemstr_' + index).css({
+                'text-decoration': 'line-through',
+                'color': 'red',
+                'font-style': 'italic'
+            });
+
+            $('#QuotationItems_' + index + '__Status').val('False');
+        }
+
+        function btnadditem() {
+            //data-toggle="modal" data-target="#AddQutationModal"
+            $('#ddlChargeCode').val('');
+            $('#chkIsSlabRate').removeAttr('checked');
+            $('#SlabRateFrom, #SlabRateTo, #SellRate').val('');
+            $('#AddQutationModal').modal('show');
+
+        }
+
+    </script>
+
+}
+
+
+

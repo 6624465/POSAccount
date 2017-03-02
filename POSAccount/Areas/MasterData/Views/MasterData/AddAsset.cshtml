@@ -1,0 +1,222 @@
+﻿@model POSAccount.Contract.AssetHeader
+
+@{
+    ViewBag.Title = "List Of Charge Codes";
+}
+
+@*@using (Html.BeginForm("SaveAsset", "MasterData", FormMethod.Post, new { id = "frmAssetMaster", @class = "form-hirizontal" }))
+{ *@
+
+@using (Ajax.BeginForm("", "", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnMethodFailure" }, new { enctype = "multipart/form-data", id = "frmAssetMaster" }))
+{
+    <div class="box box-solid box-default">
+        <div class="box-header">
+            <h3 class="box-title">Asset Master</h3>
+        </div>
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.AssetCode, new { @class = "control-label input-sm col-md-2" })
+                        <div class="col-md-4">
+
+                            @Html.TextBoxFor(m => m.AssetCode, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.Description, new { @class = "form-control input-sm " })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.BuyingDate, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.BuyingDate, new { @Value = Model.BuyingDate.ToString("dd/MM/yyyy"), @placeholder = "BuyingDate", @class = "form-control input-sm datepicker" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.Price, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.Price, new { @placeholder = "Price", @class = "form-control input-sm decimalCss" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label class="col-md-2 input-sm control-label">Rate (%)</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.Rate, new { @class = "form-control input-sm decimalCss" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.DepreciationType, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.DepreciationType, Model.DepreciationTypeList, "", new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+
+        <div class="box-footer">
+            <div class="row ">
+                <div class="col-xs-12">
+                    <button type="button" class="btn btn-social btn-success" onclick="btnSave();">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+                    <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <button type="button" onclick="DeleteAsset('@Model.AssetCode');" class="btn btn-social btn-danger" id="btnDelete">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </button>
+
+                    <a href="@Url.Action("AssetMaster", "MasterData", new { area = "MasterData" }, null)" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+}
+
+@section Scripts
+{
+
+
+
+    <script type="text/javascript">
+        $(function () {
+
+            $('.datepicker').datetimepicker({
+                useCurrent: false,
+                //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+
+            if ($('#AssetCode').val() != "") {
+                $('#AssetCode').prop("readonly", true);
+                $('#btnDelete').prop("disabled", false);
+            } else {
+                $('#AssetCode').prop("readonly", false);
+                $('#btnDelete').prop("disabled", true);
+            }
+
+            $('#frmAssetMaster').validate({
+                rules: {
+                    AssetCode: {
+                        required: true
+                    },
+                    Description: {
+                        required: true
+                    },
+                    BuyingDate: {
+                        required: true
+                    },
+                    Price: {
+                        required: true,
+                        number: true
+                    },
+                    Rate: {
+                        required: true,
+                        number: true
+                    },
+                    DepreciationType: {
+                        required: true,
+                    }
+                },
+                messages: {
+                    AssetCode: {
+                        required: "AssetCode is required"
+                    },
+                    Description: {
+                        required: "Description is required"
+                    },
+                    BuyingDate: {
+                        required: "BuyingDate is required"
+                    },
+                    Price: {
+                        required: "Price is required",
+                        number: "Price is required"
+                    },
+                    Rate: {
+                        required: "Rate is required",
+                        number: "Rate is required"
+                    },
+                    DepreciationType: {
+                        required: "DepreciationType is required",
+                    }
+                }
+
+            });
+
+        });
+
+
+        var chargeCode;
+
+        function btnSave() {
+            if ($('#frmAssetMaster').valid()) {
+                $('#overlayDiv').fadeIn();
+                $('#frmAssetMaster').attr('action', '@Url.Content("~/MasterData/SaveAsset")');
+                $('#frmAssetMaster').submit();
+            }
+        }
+
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function OnSaveSuccess(result) {           
+            ModalShow(result.Message, "Success", "Save");           
+        }
+
+        var urlList = "@Url.Action("AssetMaster", "MasterData", new { area = "MasterData" })"
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = urlList;
+            }
+        }
+
+        function btnClear() {
+            $('.form-control').val('');
+            $('#AssetCode').prop("readonly", false);
+            $('#btnDelete').prop("disabled", true);
+        }
+
+        function DeleteAsset(assetCode)
+        {
+            if ($('#frmAssetMaster').valid()) {
+                $('#overlayDiv').fadeIn();
+                $('#frmAssetMaster').attr('action', '@Url.Content("~/MasterData/DeleteAsset")');
+                $('#frmAssetMaster').submit();
+            }
+        }
+
+
+    </script>
+}
+
+
+
+

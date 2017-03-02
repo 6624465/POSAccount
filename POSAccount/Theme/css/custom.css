@@ -1,0 +1,68 @@
+.form-title {
+display: inline-block;
+
+}
+
+.form-icon {
+    display: inline-block;
+    float: right;
+    height: 30px;
+}
+
+.form-instructions {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-left: 7px;
+    border-left: 3px solid #d84a38;
+}
+
+.form-helparticles 
+{
+    margin-bottom: 5px;
+    padding-left: 7px;
+    border-left: 3px solid #d84a38;
+
+}
+
+.tile-ID {
+    display: inline-block;
+    margin-left: -40px;
+    float: right;
+}
+
+/* centered columns styles */
+.row-centered {
+    text-align:center;
+}
+.col-centered {
+    display:inline-block;
+    float:none;
+    /* reset the text-align */
+    text-align:left;
+    /* inline-block space fix */
+    margin-right:-4px;
+}
+
+
+/* Background Tile Colours */
+
+.bg-announcement {
+background-color: #44B4A6;
+}
+
+.bg-submitrequest {
+background-color: #5C90D2;
+}
+
+.bg-myrequests {
+background-color: #A48AD4;
+}
+
+.bg-knowledgebase {
+background-color: #FF6B6B;
+}
+
+.workitemstatusbutton {
+    display:inline-block;
+    float: right;
+}

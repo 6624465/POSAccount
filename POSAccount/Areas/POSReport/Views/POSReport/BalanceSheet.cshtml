@@ -1,0 +1,87 @@
+﻿@model POSAccount.Contract.ReportParams
+
+@{
+    ViewBag.Title = "BalanceSheet";
+}
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="box box-solid box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">Balance Sheet</h3>
+
+    </div>
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Year</label>
+                    <div class="col-md-2">
+                        @Html.DropDownListFor(m => m.Year, Model.YearList, "", new {@id="ddlYear", @class = "form-control input-sm" })
+
+                    </div>
+
+
+                </div>
+            </div>
+
+        </fieldset>
+    </div>
+
+
+    <div class="box-footer">
+        <div class="row  no-print">
+            <div class="col-xs-12">
+                <div class="btn-group dropup">
+                    @Html.ActionLink("Print", "ViewBalanceSheet", "POSReport", new { area = "POSReport", year = Model.Year, URL = "/POSReport/ViewBalanceSheet" }, new { data_modal = "test", id = "btnViewReport", @class = "btn btn-small btn-primary",onclick="PrintClick()" })
+                    @*<button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>*@
+                </div>
+                <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                    <i class="fa fa-arrow-circle-o-left"></i>
+                    Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    
+@Scripts.Render("~/bundles/modalform")
+    <script type="text/javascript">
+        
+        function PrintClick() {
+            
+            var blYear = $("#ddlYear").val();
+             
+            var ReportURL = ("/POSReports/BalanceSheet");
+
+            var rooturl = '@Url.Action("ViewBalanceSheet", "POSReport", new { area = "POSReport" })';
+            var url = rooturl + "?year=" + blYear + "&URL=" + ReportURL;
+            //alert(url);
+            $("#btnViewReport").attr("href", url);
+        }
+
+        //$("#ddlYear").select2();
+
+         
+
+    </script>
+}
+

@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3C67F7B2-611A-4A2D-9337-731337E4646D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>POSAccount.DataFactory</RootNamespace>
+    <AssemblyName>POSAccount.DataFactory</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=5.0.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EnterpriseLibrary.Common.5.0.505.0\lib\NET35\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Data, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Practices.EnterpriseLibrary.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Unity.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception">
+      <HintPath>..\packages\Unity.Interception.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception.Configuration">
+      <HintPath>..\packages\Unity.Interception.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Interception.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountGroupDAL.cs" />
+    <Compile Include="AddressDAL.cs" />
+    <Compile Include="APCreditNoteDAL.cs" />
+    <Compile Include="APCreditNoteDetailDAL.cs" />
+    <Compile Include="APDebitNoteDAL.cs" />
+    <Compile Include="APDebitNoteDetailDAL.cs" />
+    <Compile Include="APFileDetailDAL.cs" />
+    <Compile Include="APFileUploadDAL.cs" />
+    <Compile Include="APInvoiceDAL.cs" />
+    <Compile Include="APInvoiceDetailDAL.cs" />
+    <Compile Include="ARCreditNoteDAL.cs" />
+    <Compile Include="ARCreditNoteDetailDAL.cs" />
+    <Compile Include="ARDebitNoteDAL.cs" />
+    <Compile Include="ARDebitNoteDetailDAL.cs" />
+    <Compile Include="ARInvoiceDAL.cs" />
+    <Compile Include="ARInvoiceDetailDAL.cs" />
+    <Compile Include="AssetHeaderDAL.cs" />
+    <Compile Include="BankDAL.cs" />
+    <Compile Include="BranchDAL.cs" />
+    <Compile Include="CBBankTransferDAL.cs" />
+    <Compile Include="CBPaymentDAL.cs" />
+    <Compile Include="CBPaymentDetailDAL.cs" />
+    <Compile Include="CBPaymentGlDetailDAL.cs" />
+    <Compile Include="CBPaymentSetOffDetailDAL.cs" />
+    <Compile Include="CBReceiptDAL.cs" />
+    <Compile Include="CBReceiptDetailDAL.cs" />
+    <Compile Include="CBReceiptGlDetailDAL.cs" />
+    <Compile Include="CBReceiptSetOffDetailDAL.cs" />
+    <Compile Include="ChargeCodeDAL.cs" />
+    <Compile Include="ChartOfAccountDAL.cs" />
+    <Compile Include="CompanyDAL.cs" />
+    <Compile Include="CountryDAL.cs" />
+    <Compile Include="CreditorDAL.cs" />
+    <Compile Include="CurrencyDAL.cs" />
+    <Compile Include="CustomerDAL.cs" />
+    <Compile Include="DBRoutine.cs" />
+    <Compile Include="DebtorDAL.cs" />
+    <Compile Include="GLFinancialPeriodDAL.cs" />
+    <Compile Include="GLJournalDAL.cs" />
+    <Compile Include="GLJournalDetailDAL.cs" />
+    <Compile Include="GLOpeningDAL.cs" />
+    <Compile Include="GLOpeningDetailDAL.cs" />
+    <Compile Include="GLTransactionDAL.cs" />
+    <Compile Include="LookUpDAL.cs" />
+    <Compile Include="OrderDetailsDAL.cs" />
+    <Compile Include="OrderHeaderDAL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuotationDAL.cs" />
+    <Compile Include="QuotationItemDAL.cs" />
+    <Compile Include="RoleRightsDAL.cs" />
+    <Compile Include="RolesDAL.cs" />
+    <Compile Include="SearchColumnDAL.cs" />
+    <Compile Include="SystemWideConfigurationDAL.cs" />
+    <Compile Include="UsersDAL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\POSAccount.Contract\POSAccount.Contract.csproj">
+      <Project>{16781035-c84a-4e41-a56d-e475e6d75296}</Project>
+      <Name>POSAccount.Contract</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

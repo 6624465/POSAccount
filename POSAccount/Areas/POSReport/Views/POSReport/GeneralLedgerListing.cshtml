@@ -1,0 +1,151 @@
+﻿@model POSAccount.Contract.ReportParams
+
+@{
+    ViewBag.Title = "GeneralLedgerListing";
+
+    var accountGroupList = Utility.GetAccountGroupItemList(Convert.ToInt16((Session["BranchId"]))).ToList();
+}
+
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="box box-solid box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">General Ledger Listing</h3>
+
+    </div>
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Account From</label>
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(m => m.AccountFrom, Model.AccountCodeList, "", new { @class = "form-control select2 select2-hidden-accessible; input-sm" })
+
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Account To</label>
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(m => m.AccountTo, Model.AccountCodeList, "", new { @class = "form-control select2 select2-hidden-accessible; input-sm" })
+
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">From </label>
+                    <div class="col-md-2">
+                        @Html.TextBoxFor(m => m.PeriodFrom, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm datepicker" })
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">To </label>
+                    <div class="col-md-2">
+                        @Html.TextBoxFor(m => m.PeriodTo, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm datepicker" })
+
+                    </div>
+                </div>
+            </div>
+
+             
+        </fieldset>
+    </div>
+
+
+    <div class="box-footer">
+        <div class="row  no-print">
+            <div class="col-xs-12">
+                <div class="btn-group dropup">
+                    @Html.ActionLink("Print", "ViewGeneralLedgerListing", "POSReport", new { area = "POSReport", URL = "/POSReports/GeneralLedgerListing" }, new { data_modal = "test", id = "btnViewReport", @class = "btn btn-small btn-primary", onclick = "PrintClick()" })
+                    @*<button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>*@
+                </div>
+                <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                    <i class="fa fa-arrow-circle-o-left"></i>
+                    Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+@Scripts.Render("~/bundles/modalform")    
+
+    <script type="text/javascript">
+    /*
+    function PrintClick() {
+
+        var blYear = $("#Year").val();
+
+        var pFrom = $("#PeriodFrom").val();
+        var pTo = $("#PeriodTo").val();
+
+        var ReportURL = ("/POSReports/GeneralLedgerListing");
+
+        var rooturl = 'Url.Action("ViewGeneralLedgerListing", "POSReport", new { area = "POSReport" })';
+            var url = rooturl + "?year=" + blYear + "&periodFrom=" + pFrom + "&periodTo=" + pTo + "&URL=" + ReportURL;
+            //alert(url);
+            $("#btnViewReport").attr("href", url);
+        }
+        */
+        function PrintClick() {
+
+            var accountCodeFrom = $("#AccountFrom").val();
+            var accountCodeTo = $("#AccountTo").val();
+
+
+            var fromDt = $("#PeriodFrom").val();
+            var toDt = $("#PeriodTo").val();
+
+            var ReportURL = ("/POSReports/GeneralLedgerListing");
+
+            var rooturl = '@Url.Action("ViewGeneralLedgerListing", "POSReport", new { area = "POSReport" })';
+            //debugger;
+            //accountCodeFrom accountCodeTo
+            //var url = rooturl + "?accountCode=" + accountCode + "&fromDt=" + fromDt + "&toDt=" + toDt + "&URL=" + ReportURL;
+            var url = rooturl + "?accountCodeFrom=" + accountCodeFrom + "&accountCodeTo=" + accountCodeTo + "&fromDt=" + moment(fromDt, 'DD/MM/YYYY').format('MM/DD/YYYY') + "&toDt=" + moment(toDt, 'DD/MM/YYYY').format('MM/DD/YYYY') + "&URL=" + ReportURL;
+            //alert(url);
+            $("#btnViewReport").attr("href", url);
+        }
+        $(function () {
+            $('.datepicker').datetimepicker({
+                useCurrent: false,
+                //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+
+            $('#Year').select2();
+        });
+    </script>
+}
+

@@ -1,0 +1,151 @@
+﻿@using MvcReportViewer
+<style>
+    .modal-dialog, .modal-content {
+        width: 950px;
+    }
+
+    #ReportViewerContent .modal-header {
+        background-color: #00a7d0 !important;
+    }
+
+        #ReportViewerContent .modal-header h4 {
+            color: white;
+        }
+</style>
+
+@{
+    var settings = new ControlSettings { ShowToolBar = true, ShowParameterPrompts = false };
+    string url = Convert.ToString(ViewBag.Url);
+    string parmDNo = Convert.ToString(ViewBag.DocumentId);
+    string parmYear = Convert.ToString(ViewBag.Year);
+    string parmPeriod = Convert.ToString(ViewBag.Period);
+    string reportsource = Convert.ToString(ViewBag.ReportSource);
+    string paramBranchID = Convert.ToString(ViewBag.BranchID);
+    string paramAccountCode = Convert.ToString(ViewBag.AccountCode);
+    string paramPeriodFrom = Convert.ToString(ViewBag.PeriodFrom);
+    string paramPeriodTo = Convert.ToString(ViewBag.PeriodTo);
+
+    string paramAccountCodeFrom = Convert.ToString(ViewBag.AccountCodeFrom);
+    string paramAccountCodeTo = Convert.ToString(ViewBag.AccountCodeTo);
+    
+    //string paramFromDt = Convert.ToString(ViewBag.FromDt).Replace("-", "/");
+    //string paramToDt = Convert.ToString(ViewBag.ToDt).Replace("-", "/");
+
+
+    //DateTime df = DateTime.Now.Date;
+    //DateTime dt = DateTime.Now.Date;
+
+    //if (paramFromDt.Length > 0)
+    //{
+    //    //df = DateTime.ParseExact(paramFromDt, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+    //}
+
+    //if (paramToDt.Length > 0)
+    //{
+    //    //dt = DateTime.ParseExact(paramToDt, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+
+    //}
+
+
+
+
+}
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="lblHeader">Report Details</h4>
+
+</div>
+@{
+    if (reportsource == "CBReceipt")
+    {
+        @Html.MvcReportViewer(
+    url,
+              new { DocumentNo = parmDNo, },
+         new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+    else if (reportsource == "SalesReceipt")
+    {
+        @Html.MvcReportViewer(
+    url,
+                                       new { SalesOrderNo = parmDNo, },
+    new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+    else if (reportsource == "JobTalents.ARInvoice")
+    {
+        @Html.MvcReportViewer(
+    url,
+                                       new { DocumentNo = parmDNo, },
+    new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+
+    else if (reportsource == "JobTalents.WithHoldingTax")
+    {
+        @Html.MvcReportViewer(
+    url,
+                                       new { DocumentNo = parmDNo, },
+    new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+
+    else if (reportsource == "BalanceSheet")
+    {
+        @Html.MvcReportViewer(
+    url,
+                                  new { BranchID = paramBranchID, Year = parmYear, },
+         new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+    else if (reportsource == "TrailBalance")
+    {
+        @Html.MvcReportViewer(
+    url,
+                             new { BranchID = paramBranchID, Year = parmYear, Period = parmPeriod },
+    new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+
+
+
+    else if (reportsource == "GeneralLedgerListing")
+    {
+        @*@Html.MvcReportViewer(
+            url,
+                                     new { BranchID = paramBranchID, FromAccountDate = df.ToString("dd/MM/yyyy"), ToAccountDate = dt.ToString("dd/MM/yyyy"), AccountCode = paramAccountCode },
+            new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)*@
+
+        @Html.MvcReportViewer(url,
+                              new
+                              {
+                                  BranchID = paramBranchID,
+                                  FromAccountDate = ViewBag.FromDt,
+                                  ToAccountDate = ViewBag.ToDt,
+                                  AccountCodeFrom = paramAccountCodeFrom,
+                                  AccountCodeTo = paramAccountCodeTo,
+                                  
+                              },
+                              new
+                              {
+                                  Height = 900,
+                                  Width = "100%",
+                                  style = "border: none"
+                              }).ControlSettings(settings)
+    }
+
+
+    else
+    {
+        @Html.MvcReportViewer(
+         url,
+         new { Height = 900, Width = "100%", style = "border: none" }).ControlSettings(settings)
+
+    }
+}
+
+
+<div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Ok</button>
+</div>

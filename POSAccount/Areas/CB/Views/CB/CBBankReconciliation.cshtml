@@ -1,0 +1,288 @@
+﻿@model POSAccount.Contract.BankRecon
+
+
+@{
+    ViewBag.Title = "APInvoice";
+}
+
+<style type="text/css">
+    .cursorCss {
+        cursor: pointer;
+    }
+</style>
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mySearch">
+    <div class="modal-dialog modal-lg generated_frm">
+        <div class="modal-content form-horizontal">
+            <div class="modal-header">
+                <button aria-label="Close" data-dismiss="modal" class="close" type="button"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title">Search&nbsp;&nbsp;<span id="modalAni"><i class="fa fa-refresh fa-spin"></i></span></h4>
+            </div>
+            <div id="modalBody" style="display: none;"></div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn btn-default" type="button"><i class="fa fa-times"></i>&nbsp;Close</button>
+            </div>
+        </div>
+        
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@*@using (Html.BeginForm("SaveAPInvoice", "AP", new { area = "AP" }, FormMethod.Post))*@
+@using (Ajax.BeginForm("", "", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid box-default">
+        <div class="box-header box-solid">
+            <h3 class="box-title">Bank Reconciliation</h3>
+            <div class="box-tools pull-right">
+                <div class="has-feedback">
+                    <div class="input-group input-group-sm">
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Start Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.StartDate, new { @placeholder = "Statement Start Date",  @class = "form-control input-sm datepicker"})
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">End Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.EndDate, new { @placeholder = "Statement End Date",  @class = "form-control input-sm datepicker" })
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Bank Code</label>
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(m => m.BankCode, Model.BankCodeList, "", new {  @class = "form-control select2 select2-hidden-accessible;" ,@required="required"})
+                        </div>
+                        <label for="" class="col-md-2 control-label"></label>
+                        <div class="col-md-2">
+                            <input type="button" id="btnDetails" name="btnDetails" value="Get Details" onclick="GetBankReconDetails();" class="btn btn-social btn-success"/>
+                        </div>
+                    </div>
+                </div>               
+                
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tbDetails" data-toggle="tab">Bank Reconciliation</a>
+                        </li>                       
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <!-- Details -->
+                        <div class="tab-pane active" id="tbDetails">                                                      
+                         
+                            <div class="row">
+                                <table id="tblItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                    <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                        <tr>
+                                            <th>Page No</th>
+                                            <th>TotalAmount</th>
+                                            <th>Document Date</th>
+                                            <th>Document Type</th>
+                                            <th>Document No</th>
+                                            <th>Cheque No</th>
+                                            <th>Remark</th>
+                                            <th>Receipt</th>
+                                            <th>Payment</th>
+                                            <th>Date Reconciled</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 12px;" id="tblBody">
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="display:none;">
+                                            <td colspan="7"></td>
+                                            <td id="totlRecAmount"></td>
+                                            <td id="totlPayAmount"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>                     
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Bank Balance</label>
+                            <div class="col-sm-5">                                
+                                @Html.TextBox("txtBankBalance", "", new { @class = "form-control input-sm-red", disabled = "disabled" })                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Bank Stmt Balance</label>
+                            <div class="col-sm-5">
+                                  @Html.TextBox("txtBankStmtBalance", "", new { @class = "form-control input-sm-red", disabled = "disabled" })                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                   
+                    <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+}
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/modalform")
+    @Scripts.Render("~/bundles/dataTable")
+
+
+    <script src="~/ThemeAdminLTE-2.2.0/plugins/select2/select2.min.js"></script>
+    <script src="@Url.Content("~/Scripts/moment.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.js")"></script>
+    <script type="text/javascript">
+
+
+        $("#BankCode").select2();
+
+        $(document).ready(function () {
+
+            $('#myForm').validate({
+                rules: {
+                    BankCode: {
+                        required:true
+                    },
+                    StartDate: {
+                        required: true
+                    },
+                    EndDate: {
+                        required:true
+                    }
+                },
+                messages: {
+                    BankCode: {
+                        required: "Bank is required"
+                    },
+                    StartDate: {
+                        required: "Start Date is requied"
+                    },
+                    EndDate: {
+                        required: "End Date is required"
+                    }
+                }
+            });
+
+
+           
+
+            $('#tblItem').DataTable({
+                'bFilter': false,
+                'bPaginate': false,
+                'bInfo': false,
+                'aoColumnDefs': [
+                  {
+                      bSortable: false,
+                      aTargets: [-1]
+                  }],
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.className = "gradeX odd";
+                    nRow.id = 'tblCBBankReconDetails_' + iDisplayIndex;
+                    nRow.className = 'cbBankReconDetailsCss';
+                    return nRow;
+                }
+            });
+
+            $('.datepicker').datetimepicker({
+                useCurrent: false,
+                //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+        });
+
+
+        function GetBankReconDetails() {          
+            if ($('#myForm').valid()) {
+                var bankCode = $("#BankCode").val();
+                var startDate = $("#StartDate").val();
+                var endDate = $('#EndDate').val();
+
+                debugger;
+                var rooturl = '@Url.Content("~/CB/GetBankReconDetails")';
+                //var url = rooturl + "?bankCode=" + bankCode + "&startDate=" + startDate + "&endDate=" + endDate;
+
+                var Obj = {
+                    bankCode: bankCode,
+                    startDate: startDate,
+                    endDate: endDate
+                };
+
+                $.ajax({
+                    url: rooturl,
+                    method: 'POST',
+                    dataType: 'html',
+                    contentType: 'application/json',
+                    data: JSON.stringify(Obj),
+                    success: function(res){
+                        $('#tblBody').html(res);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        debugger;
+                        alert(jqXHR.responseText);
+                    }
+                });
+                /*
+                $.post(url, null, function (data) {
+                    if (data.length > 0) {
+                        var totalReceiptAmt = 0.0;
+                        var totalPaymentAmt = 0.0;
+                        for (var i = 0; i < data.length; i++) {
+                            totalReceiptAmt += data[i].ReceiptAmount;
+                            totalPaymentAmt += data[i].PaymentAmount
+                            $("#tblBody").append("<tr><td>" + (i + 1) + "</td><td>" + data[i].LocalAmount + "</td><td>" + data[i].DocumentDate + "</td><td>" + data[i].DocumentType + "</td><td>" + data[i].DocumentNo + "</td><td>" + data[i].ChequeNo + "</td><td>" + data[i].Remark + "</td><td>" + data[i].ReceiptAmount + "</td><td>" + data[i].PaymentAmount + "</td><td>" + data[i].DateReconciled + "</td></tr>");
+                        }
+                        $("#totlRecAmount").append(totalReceiptAmt);
+                        $("#totlPayAmount").append(totalPaymentAmt);
+                        $('#txtBankStmtBalance').val(totalReceiptAmt - totalPaymentAmt);
+                    }
+                });*/
+            }
+        }
+    </script>
+}

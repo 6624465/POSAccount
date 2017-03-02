@@ -1,0 +1,830 @@
+﻿@model POSAccount.Contract.APDebitNote
+@{
+    ViewBag.Title = "APDebitNote";
+}
+
+@section CssSection
+{
+    <style>
+        input[type=text].error, select.error
+        {
+            border-color: red;
+            font-size: 12px;
+        }
+
+        label.error
+        {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+}
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <form id="frmDebitNoteModal" name="frmDebitNoteModal" class="form-horizontal" method="post">
+            <div class="modal-content">
+                <div id='myModalContent'></div>
+            </div>
+        </form>
+    </div>
+</div>
+@*@using (Html.BeginForm("SaveAPDebitNote", "AP", new { area = "AP" }, FormMethod.Post, new { id = "frmCompanyProfile" }))*@
+@using (Ajax.BeginForm("SaveAPDebitNote", "AP", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid box-default ">
+        <div class="box-header box-solid ">
+            <h3 class="box-title">A P Debit Note</h3>
+            <div class="box-tools pull-right">
+                <div class="has-feedback">
+                    <div class="input-group input-group-sm">
+                        <input id="txtSearch" class="form-control" type="text" placeholder="Search Invoice No." />
+                        <span class="input-group-btn" style="width: 70px">
+                            <div class="btn-group">
+                                <a href="@Url.Action("SearchAPDebitNote", "AP", new { area = "AP", DocumentNo = 0 }, null)" class="btn btn-info btn-flat" onclick="return Search()" id="btnSearch">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtDocumentNo" class="col-md-2 control-label">Document No.</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentNo, new { @placeholder = "Document No", @id = "txtDocumentNo", @readonly = "readonly", @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtDocumentDate" class="col-md-2 control-label">Document Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentDate, new { @id = "dtpDocumentDate", @class = "form-control input-sm datepicker" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtCreditorCode" class="col-md-2 control-label">Creditor Code</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(m => m.CreditorCode, Model.CreditorList, "", new { @id = "ddlCreditorCode", @class = "form-control select2 select2-hidden-accessible;", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Credit Term</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditTerm, new { @placeholder = "Credit Term", @id = "txtCreditTerm", @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtReferenceNo" class="col-md-2 control-label">Reference No.</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.ReferenceNo, new { @placeholder = "0.00", @id = "txtReferenceNo", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtRemark" class="col-md-2 control-label">Remarks</label>
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Remark, new { @placeholder = "Remark", @id = "txtRemark", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tbDetails" data-toggle="tab">DebitNote Details</a>
+                        </li>
+                        @*<li class="pull-right">
+                            <div class="btn-group btn-primary">
+                                <a class="btn btn-small btn-primary" data-modal="" href="@Url.Content("~/AP/AddAPDebitNoteItem?itemNo=-1")" id="btnCreate1"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Details</a>
+                            </div>
+                        </li>*@
+                        <li class="">
+                            <a href="#tbGLDetailsTab" data-toggle="tab">GL Allocation</a>
+                        </li>
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tbDetails">
+                            <div class="row">
+                                <label class="col-md-2 control-label input-sm">Account Code :</label>
+                                <div class="col-md-3">
+                                    @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "Please select one", new { @class = "form-control select2 select2-hidden-accessible;" })
+                                </div>
+                                <label class="col-md-1 control-label input-sm">Amount :</label>
+                                <div class="col-md-2">
+                                    @Html.TextBox("txtAmount", "", new { @class = "form-control input-sm numbersOnly", data_a_sep = "", aPad = "false", data_a_sign = "" })
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" id="btnAddDetails" name="btnAddDetails" class="btn btn-social btn-success" onclick="AddDataToTable()">
+                                        <i class="fa fa-plus-circle"></i>
+                                        <span id="btnAddDetailsSpan">&nbsp;Add Details</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-1" style="display: none" id="btnClearDiv">
+
+                                    <button id="btnClearDetails" onclick="btnClearDetailsClick()" type="button" class="btn btn-social btn-warning">Clear</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <table id="tblItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                    <thead style="background-color: steelblue; color: white; font-size: 12px;">
+                                        <tr>
+                                            <th>Account Code</th>
+                                            <th>Account Description</th>
+                                            <th>Base Amt</th>
+                                            <th>Currency Code</th>
+                                            <th>Local Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 12px;">
+                                        @{
+    for (int i = 0; i < Model.APDebitNoteDetails.Count; i++)
+    {
+        string hiddenClass = "";
+        if (Model.APDebitNoteDetails[i].Status == false)
+        {
+            hiddenClass = "display:none";
+            //hiddenClass = "display:block";
+        }       
+        
+                                            <tr id="tr_@i" style="@hiddenClass" class="apDebitNoteDetailsCss">
+                                                <td name="AccountCode">
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].ItemNo)
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].AccountCode)
+                                                    @Html.DisplayFor(m => m.APDebitNoteDetails[i].AccountCode)
+
+                                                </td>
+                                                <td name="AccountCode">
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].AccountCodeDescription)
+                                                    @Html.DisplayFor(m => m.APDebitNoteDetails[i].AccountCodeDescription)
+                                                    @Html.DisplayFor(m => m.APDebitNoteDetails[i].AccountCodeDescription)
+                                                </td>
+                                                <td name="BaseAmount">
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].BaseAmount)
+                                                    @Html.DisplayFor(m => m.APDebitNoteDetails[i].BaseAmount)
+                                                </td>
+                                                <td name="CurrencyCode">
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].CurrencyCode)
+                                                    @Html.DisplayFor(m => m.APDebitNoteDetails[i].CurrencyCode)
+                                                </td>
+                                                <td name="LocalAmount">
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].LocalAmount)
+                                                    @Html.DisplayFor(m => m.APDebitNoteDetails[i].LocalAmount)
+                                                    @Html.HiddenFor(m => m.APDebitNoteDetails[i].Status)
+                                                </td>
+                                                <td name="Action">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                            Action
+                                                        <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                            <li><a class="cursorCss" id="Edit_@i" onclick="EditAPDebitNoteDetails('@(i)')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                            <li><a class="cursorCss" onclick="DeleteAPDebitNoteDetails('@(i)')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                        </ul>
+                                                    </div>
+
+                                                </td>
+
+                                            </tr>
+    }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--GLDetails-->
+                        <div id="tbGLDetailsTab" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblGLDetails" class="table table-striped table-hover table-bordered table-responsive ">
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                <th>Account Code</th>
+                                                <th>Credit Amount</th>
+                                                <th>Debit Amount</th>
+                                                <th>Total Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 12px;">
+                                            @if (Model.GLTransactionDetails != null)
+                                            {
+                                                for (int i = 0; i < Model.GLTransactionDetails.Count; i++)
+                                                {
+                                                <tr id="tblGLDetailstr_@i" class="tblGLDetailsCss">
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].DocumentNo)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].ItemNo)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].DocumentType)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].Status)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].AccountCode)
+                                                        <span id="GLTransactionDetails_@(i)__AccountCode_span">@Model.GLTransactionDetails[i].AccountCode</span>
+
+                                                    </td>
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].CreditAmount)
+                                                        <span id="GLTransactionDetails_@(i)__CreditAmount_span">@Model.GLTransactionDetails[i].CreditAmount</span>
+                                                    </td>
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].DebitAmount)
+                                                        <span id="GLTransactionDetails_@(i)__DebitAmount_span">@Model.GLTransactionDetails[i].DebitAmount</span>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row" id="whRow">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Total Amount</label>
+                            <div class="col-sm-5">
+                                @Html.TextBox("txtLocalAmount", "", new { @class = "form-control input-sm-red", disabled = "disabled" })
+                                @Html.HiddenFor(x => x.LocalAmount)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="row  no-print">
+                    <div class="col-xs-12">
+                        <a href="@Url.Action("APDebitNote", "AP", new { area = "AP", debitNote = "NEW" }, null)" class="btn btn-social btn-primary">
+                            <i class="fa fa-file-o"></i>
+                            New
+                        </a>
+                        <button type="button" onclick="SaveData();" class="btn btn-social btn-success">
+                            <i class="fa fa-save"></i>
+                            Save
+                        </button>
+
+
+                        <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                            <i class="fa fa-close"></i>
+                            Clear
+                        </a>
+                        <a href="#" id="btnDelete" onclick="DeleteAPInvoice('@Model.DocumentNo')" class="btn btn-social btn-danger">
+                            <i class="fa fa-times-circle"></i>
+                            Delete
+                        </a>
+
+                        <div class="btn-group dropup">
+                            <button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                                <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                                <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                            </ul>
+                        </div>
+                        <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                            <i class="fa fa-arrow-circle-o-left"></i>
+                            Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+        </div>
+        <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+}
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/modalform")
+    @Scripts.Render("~/bundles/dataTable")
+
+
+    <script type="text/javascript">
+        var isEditLocal = false;
+        var rowdetails;
+        var rowNumber = 0;
+        var DocumentNo;
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function Search() {
+            var _selectedDocumentNoId = $("#txtSearch").val();
+            $("#btnSearch").href = "/AP/SearchAPDebitNote?DocumentNo=" + _selectedDocumentNoId;
+            $("#btnSearch").attr("href", "/AP/SearchAPDebitNote?DocumentNo=" + _selectedDocumentNoId)
+
+            return true;
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+            DocumentNo = result.apDebitNoteData.DocumentNo;
+        }
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = "/AP/DebitNote?DocumentNo=" + DocumentNo;
+            }
+        }
+
+        $(document).ready(function () {
+
+
+            $("#ddlCreditorCode").select2();
+            $("#AccountCode").select2();
+
+            if ($('#txtDocumentNo').val() == "")
+            {
+                $('#btnDelete').prop('disabled', true);
+            }
+
+            $(".numbersOnly").on("keypress keyup blur", function (event) {
+                $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+                if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                    event.preventDefault();
+                }
+            });
+
+
+            $('#myForm').validate({
+                rule: {
+                    CreditorCode: {
+                        required: true
+                    },
+
+                    DocumentDate: {
+                        required: true
+                    }
+                },
+                messages: {
+                    CreditorCode: {
+                        required: "Creditor Code is required"
+                    },
+
+                    DocumentDate: {
+                        required: "DocumentDate is required",
+
+                    }
+                }
+            });
+
+            $('#tblItem').DataTable({
+                'bFilter': false,
+                'bPaginate': false,
+                'bInfo': false,
+                'aoColumnDefs': [
+                  {
+                      bSortable: false,
+                      aTargets: [-1]
+                  }],
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.className = "gradeX odd";
+                    nRow.id = 'tblAPDebitNoteDetails_' + iDisplayIndex;
+                    nRow.className = 'apDebitNoteDetailsCss';
+                    return nRow;
+                }
+            });
+
+
+            $('#tblGLDetails').DataTable({
+                'bFilter': false,
+                'bPaginate': false,
+                'bInfo': false,
+                'aoColumnDefs': [
+                  {
+                      bSortable: false,
+                      aTargets: [-1]
+                  }],
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.className = "gradeX odd";
+                    nRow.id = 'tblGLDetailstr_' + iDisplayIndex;
+                    nRow.className = 'tblGLDetailsCss';
+                    return nRow;
+                }
+            });
+
+            $('#dtpDocumentDate').datetimepicker({
+                useCurrent: false,
+                //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+        });
+
+
+        $("#btnCreate1").on("click", function () {
+            isEditLocal = false;
+        })
+
+
+        function SaveData() {
+            
+            $('.select2-hidden-accessible').next().next().css('border', '');
+
+            if ($('#myForm').valid()) {
+                if ($('.apDebitNoteDetailsCss').length > 0) {
+                    $('#overlayDiv').fadeIn();
+                    $('#myForm').submit();
+                }
+                else
+                    alert('Atleast one Invoice detail is required');
+            } else {
+                if ($('.select2-hidden-accessible').hasClass('error')) {
+                    $('.select2-hidden-accessible.error').next().next().css('border', 'solid 1px red');
+                }
+                return false;
+            }
+        }
+
+        function btnClear() {
+            $('.form-control').val('');
+            $("#ddlCreditorCode").select2("val", "");
+            $("#AccountCode").select2("val", "");
+        }
+
+        function EditAPDebitNoteDetails(index) {
+
+            $('#AccountCode').val($('#APDebitNoteDetails_' + index + '__AccountCode').val());
+            $('#txtAmount').val($('#APDebitNoteDetails_' + index + '__LocalAmount').val());
+
+            $('#AccountCode').select2();
+
+            $('#btnAddDetailsSpan').text('Update');
+            $('#btnClearDiv').fadeIn();
+
+            $('#hdnFlag').val(index);
+        }
+
+        function DeleteAPDebitNoteDetails(index) {
+
+            //'APInvoiceDetails_2__ItemNo'
+            $('#tblAPDebitNoteDetails_' + index).css({
+                'text-decoration': 'line-through',
+                'color': 'red',
+                'font-style': 'italic'
+            });
+            $('#APDebitNoteDetails_' + index + '__ItemNo').addClass('deletedItem');
+            $('#APDebitNoteDetails_' + index + '__Status').val('False');
+
+            var rowsCount = $('.apDebitNoteDetailsCss').length;
+            var amount = 0.00;
+            for (var x = 0; x < rowsCount; x++) {
+                if (!$('#APDebitNoteDetails_' + x + '__ItemNo').hasClass('deletedItem')) {
+                    amount = amount + parseFloat($('#APDebitNoteDetails_' + x + '__LocalAmount').val());
+                }
+            }
+            glTotalAmount = amount;
+            $('#txtLocalAmount').val(commaSeparateNumber(amount.toFixed(2)));
+            $('#LocalAmount').val(amount);
+
+            DeleteGLAllocationItem(index, amount);
+            $('#hdnFlag').val('-1');
+        }
+
+
+        function DeleteGLAllocationItem(index, amount) {
+
+
+            $('#tblGLDetailstr_' + (index + 1)).css({
+                'text-decoration': 'line-through',
+                'color': 'red',
+                'font-style': 'italic'
+            });
+            $('#GLTransactionDetails_' + (index + 1) + '__Status').val('False');
+            $('#GLTransactionDetails_0__DebitAmount_span, #GLTransactionDetails_0__TotalAmount_span').text(amount);
+            $('#GLTransactionDetails_0__DebitAmount, #GLTransactionDetails_0__TotalAmount').val(amount);
+        }
+
+        function btnClearDetailsClick() {
+            $("#AccountCode").select2("val", "");
+            $('#AccountCode').val("");
+            $('#txtAmount').val("");
+            $('#hdnFlag').val('-1');
+            $('#btnAddDetailsSpan').text('Add Details');
+            $('#btnClearDiv').fadeOut();
+        }
+
+
+
+        $('#tblQuotationItem tbody').on('click', 'tr', function () {
+            var table = $('#tblQuotationItem').DataTable();
+            //alert('Row index: ' + table.row(this).index());
+        });
+
+
+        function linkClicked(li) {
+            linkedIndex = li;
+        }
+
+        function AddDataToTable() {
+
+            var accountCode = $("#AccountCode").val();
+            var amount = $("#txtAmount").val();
+
+            $('.select2-hidden-accessible').next().next().css('border', '');
+
+            if (!$("#myForm").valid()) {
+                if ($('.select2-hidden-accessible').hasClass('error')) {
+                    $('.select2-hidden-accessible.error').next().next().css('border', 'solid 1px red');
+                }
+                return false;
+            } else if ((accountCode == null || accountCode == "") && (amount == "" || amount == null)) {
+                return false;
+            }
+
+            var customerCode = $('#ddlCreditorCode option:selected').val();
+
+            var rooturl = '@Url.Content("~/AP/AddAPDebitNote")';
+            var url = rooturl + "?customerCode=" + customerCode + "&accountCode=" + accountCode + "&amount=" + amount;
+
+            $.post(url, null, function (data) {
+
+
+                var hdnFlag = $('#hdnFlag').val();
+                var Obj = {};
+                if (hdnFlag == '-1') {
+                    var _index = $('.apDebitNoteDetailsCss').length;
+                    Obj = {
+                        Index: _index,
+                        AccountCode: data.ARDebitNoteDetail.AccountCode,
+                        AccountDebitCredit: data.AccountDebitCredit,
+                        CustomerDebitCredit: data.CustomerDebitCredit,
+                        BaseAmount: data.ARDebitNoteDetail.BaseAmount,
+                        AccountCodeDescription: data.ARDebitNoteDetail.AccountCodeDescription,
+                        CurrencyCode: data.ARDebitNoteDetail.CurrencyCode,
+                        LocalAmount: data.ARDebitNoteDetail.LocalAmount,
+                    };
+                    var rowData = [
+                         '<input id="APDebitNoteDetails_' + Obj.Index + '__ItemNo" name="APDebitNoteDetails[' + Obj.Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                        '<input id="APDebitNoteDetails_' + Obj.Index + '__AccountCode" name="APDebitNoteDetails[' + Obj.Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '">' +
+                        '<span id="APDebitNoteDetails_' + Obj.Index + '__AccountCode_span">' + Obj.AccountCode + '</span>' +
+                        '<input id="APDebitNoteDetails_' + Obj.Index + '__Status" name="APDebitNoteDetails[' + Obj.Index + '].Status" type="hidden" value="True">',
+
+                        '<input id="APDebitNoteDetails_' + Obj.Index + '__AccountCodeDescription" name="APDebitNoteDetails[' + Obj.Index + '].AccountCodeDescription" type="hidden" value="' + Obj.AccountCodeDescription + '">' +
+                        '<span id="APDebitNoteDetails_' + Obj.Index + '__AccountCodeDescription_span">' + Obj.AccountCodeDescription + '</span>',
+                        '<input id="APDebitNoteDetails_' + Obj.Index + '__BaseAmount" name="APDebitNoteDetails[' + Obj.Index + '].BaseAmount" type="hidden" value="' + Obj.BaseAmount + '">' +
+                        '<span id="APDebitNoteDetails_' + Obj.Index + '__BaseAmount_span">' + parseFloat(Obj.BaseAmount).toFixed(2) + '</span>',
+                        '<input id="APDebitNoteDetails_' + Obj.Index + '__CurrencyCode" name="APDebitNoteDetails[' + Obj.Index + '].CurrencyCode" type="hidden" value="' + Obj.CurrencyCode + '">' +
+                        '<span id="APDebitNoteDetails_' + Obj.Index + '__CurrencyCode_span">' + Obj.CurrencyCode + '</span>',
+                        '<input id="APDebitNoteDetails_' + Obj.Index + '__LocalAmount" name="APDebitNoteDetails[' + Obj.Index + '].LocalAmount" type="hidden" value="' + Obj.LocalAmount + '">' +
+                        '<span id="APDebitNoteDetails_' + Obj.Index + '__LocalAmount_span">' +  parseFloat(Obj.LocalAmount).toFixed(2) + '</span>',
+                        '<div class="dropdown">' +
+                    '<button id="btnAction_' + Obj.Index + '" class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Action<span class="caret"></span></button>' +
+                    '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+                        '<li><a class="cursorCss" id="Edit_' + Obj.index + '" onclick="EditAPDebitNoteDetails(' + Obj.Index + ')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>' +
+                        '<li><a class="cursorCss" onclick="DeleteAPDebitNoteDetails(' + Obj.Index + ')" ><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>' +
+                    '</ul></div>'
+                    ];
+
+                    $('#tblItem').dataTable().fnAddData(rowData);
+
+
+                }
+                else {
+                    Obj = {
+                        Index: _index,
+                        AccountCode: data.ARDebitNoteDetail.AccountCode,
+                        AccountDebitCredit: data.AccountDebitCredit,
+                        CustomerDebitCredit: data.CustomerDebitCredit,
+                        BaseAmount: data.ARDebitNoteDetail.BaseAmount,
+                        AccountCodeDescription: data.ARDebitNoteDetail.AccountCodeDescription,
+                        CurrencyCode: data.ARDebitNoteDetail.CurrencyCode,
+                        LocalAmount: data.ARDebitNoteDetail.LocalAmount,
+                    };
+
+
+                    $("#APDebitNoteDetails_" + hdnFlag + "__AccountCode").val(Obj.AccountCode);
+                    $("#APDebitNoteDetails_" + hdnFlag + "__AccountCode_span").text(Obj.AccountCode);
+                    $('#APInvoiceDetails_' + hdnFlag + '__AccountCodeDescription').val(Obj.AccountCode);
+                    $('#APInvoiceDetails_' + hdnFlag + '__AccountCodeDescription_span').text(Obj.AccountCodeDescription);
+                    $("#APDebitNoteDetails_" + hdnFlag + "__BaseAmount").val(Obj.BaseAmount);
+                    $("#APDebitNoteDetails_" + hdnFlag + "__BaseAmount_span").text(Obj.BaseAmount.toFixed(2));
+                    $("#APDebitNoteDetails_" + hdnFlag + "__CurrencyCode").val(Obj.CurrencyCode);
+                    $("#APDebitNoteDetails_" + hdnFlag + "__CurrencyCode_span").text(Obj.CurrencyCode);
+                    $("#APDebitNoteDetails_" + hdnFlag + "__LocalAmount").val(Obj.LocalAmount);
+                    $("#APDebitNoteDetails_" + hdnFlag + "__LocalAmount_span").text(Obj.LocalAmount.toFixed(2));
+
+                    $('#btnClearDiv').hide();
+                    $('#btnAddDetailsSpan').text('Add Details');
+                }
+
+                var table = $('#tblItem').DataTable();
+
+                var rowsCount = $('.apDebitNoteDetailsCss').length;
+                var amount = 0.00;
+                for (var x = 0; x < rowsCount; x++) {
+                    if (!$('#APDebitNoteDetails_' + x + '__ItemNo').hasClass('deletedItem')) {
+                        amount = amount + parseFloat($('#APDebitNoteDetails_' + x + '__LocalAmount').val());
+                    }
+                }
+                $('#txtLocalAmount').val(commaSeparateNumber(amount.toFixed(2)));
+                $('#LocalAmount').val(amount);
+                //discountAmountBlur();
+                $('#hdnFlag').val('-1');
+
+                setTimeout(function () {
+                    AddToGLAllocationTbl(Obj, data.CreditorAccount, parseInt(hdnFlag));
+                }, 500);
+
+            });
+
+            $('#AccountCode').val("");
+            $('#txtAmount').val("");
+            $("#AccountCode").select2("val", "");
+        }
+
+
+        function commaSeparateNumber(val) {
+
+            while (/(\d+)(\d{3})/.test(val.toString())) {
+                val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+            return val;
+        }
+
+
+
+        function ProcessWithHoldingTax(isChecked) {
+            var vatValue = 0;
+            if (isChecked) {
+                vatValue = $('#SelectVat').val();
+                if (vatValue == '') {
+                    vatValue = 0;
+                }
+            }
+
+            var paymentAmount = parseFloat($('#PaymentAmount').val());
+            var vatAmount = CalculateVat(parseInt(vatValue));
+
+            $('#txtTaxAmount').val(commaSeparateNumber(vatAmount));
+            $('#TaxAmount').val(vatAmount);
+
+            $('#txtTotalAmount').val(commaSeparateNumber((paymentAmount - vatAmount).toFixed(2)));
+            $('#TotalAmount').val(paymentAmount - vatAmount);
+
+            if (isChecked) {
+                var whRowIndex = $('.tblGLDetailsCss').length;
+                var whRowAccountCode = 'XYZ';
+                var whRowDebitAmount = parseFloat($('#TaxAmount').val());
+                var whRow = [
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__DocumentNo" name="GLTransactionDetails[' + whRowIndex + '].DocumentNo" type="hidden" value="">' +
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__ItemNo" name="GLTransactionDetails[' + whRowIndex + '].ItemNo" type="hidden" value="' + whRowIndex + '">' +
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__DocumentType" name="GLTransactionDetails[' + whRowIndex + '].DocumentType" type="hidden" value="AP">' +
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__AccountCode" name="GLTransactionDetails[' + whRowIndex + '].AccountCode" type="hidden" value="' + whRowAccountCode + '">' +
+                        '<span id="GLTransactionDetails_' + whRowIndex + '__AccountCode_span">' + whRowAccountCode + '</span>',
+
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__CreditAmount" name="GLTransactionDetails[' + whRowIndex + '].CreditAmount" type="hidden" value="' + 0.00 + '">' +
+                        '<span id="GLTransactionDetails_' + whRowIndex + '__CreditAmount_span">' + 0.00 + '</span>',
+
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__DebitAmount" name="GLTransactionDetails[' + whRowIndex + '].DebitAmount" type="hidden" value="' + whRowDebitAmount + '">' +
+                        '<span id="GLTransactionDetails_' + whRowIndex + '__DebitAmount_span">' + whRowDebitAmount + '</span>',
+
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__TotalAmount" name="GLTransactionDetails[' + whRowIndex + '].TotalAmount" type="hidden" value="' + whRowDebitAmount + '">' +
+                        '<span id="GLTransactionDetails_' + whRowIndex + '__TotalAmount_span">' + whRowDebitAmount + '</span>' +
+                        '<input id="GLTransactionDetails_' + whRowIndex + '__Status" name="GLTransactionDetails[' + whRowIndex + '].Status" type="hidden" value="True">'
+                ];
+
+                var whRowHtml = '<div class="col-md-3">' + whRow[0] + '</div><div class="col-md-3">' + whRow[1] + '</div><div class="col-md-3">' + whRow[2] + '</div><div class="col-md-3">' + whRow[3] + '</div>'
+                $('#whRow').html(whRowHtml);
+            }
+            else {
+                $('#whRow').empty();
+            }
+
+
+        }
+
+        function chkChange(el) {
+            ProcessWithHoldingTax(el.checked);
+        }
+
+        function CalculateVat(vat) {
+            var paymentAmount = parseFloat($('#PaymentAmount').val());
+            return ((paymentAmount * vat) / 100);
+        }
+
+        function SelectVatOnChange(el) {
+            var ischecked = $('#IsVAT').is(':checked');
+            if (ischecked)
+                ProcessWithHoldingTax(true);
+            //$('#IsVAT').removeAttr('checked');
+
+            //$('#txtTaxAmount').val('');
+            //$('#TaxAmount').val(0);
+
+            //$('#txtTotalAmount').val('');
+            //$('#TotalAmount').val(0);
+        }
+
+
+        var glTotalAmount = 0.00;
+        function AddToGLAllocationTbl(Obj, CreditorAccount, hdnFlag) {
+            var Index = $('.tblGLDetailsCss').length;
+
+            if (hdnFlag == -1)
+                glTotalAmount = glTotalAmount + Obj.BaseAmount;
+            else {
+                var glIndex = hdnFlag + 1;
+                var oldVal = parseInt($('#GLTransactionDetails_' + glIndex + '__DebitAmount').val());
+                glTotalAmount = glTotalAmount - oldVal;
+                glTotalAmount = glTotalAmount + Obj.BaseAmount;
+            }
+
+
+            if (Index == 0) {
+                var totalRow = [
+                   '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                    '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                    '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                    '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + DebtorAccount + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + CreditorAccount + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.CustomerDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__IsDebitCredit" type="hidden" value="' + Obj.CustomerDebitCredit + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.CustomerDebitCredit == 'CREDIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0.00) + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.CustomerDebitCredit == 'DEBIT' ? Obj.BaseAmount : 0.00) + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.CustomerDebitCredit == 'DEBIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0.00) + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + glTotalAmount + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + parseFloat(glTotalAmount).toFixed(2) + '</span>' +
+                    '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">'
+                ];
+
+                $('#tblGLDetails').dataTable().fnAddData(totalRow);
+
+                Index = Index + 1;
+            }
+            else {
+                if (Obj.CustomerDebitCredit == 'CREDIT') {
+                    $('#GLTransactionDetails_0__TotalAmount_span, #GLTransactionDetails_0__CreditAmount_span').text(parseFloat(glTotalAmount).toFixed(2));
+                    $('#GLTransactionDetails_0__TotalAmount, #GLTransactionDetails_0__CreditAmount').val(glTotalAmount);
+                } else if (Obj.CustomerDebitCredit == 'DEBIT') {
+                    $('#GLTransactionDetails_0__TotalAmount_span, #GLTransactionDetails_0__DebitAmount_span').text(parseFloat(glTotalAmount).toFixed(2));
+                    $('#GLTransactionDetails_0__TotalAmount, #GLTransactionDetails_0__DebitAmount').val(glTotalAmount);
+                }
+            }
+            //Index = Index + 1;
+
+            if (hdnFlag == -1) {
+                var rowData = [
+                       '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                        '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                        '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                        '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '">' +
+                        '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + Obj.AccountCode + '</span>',
+
+                        '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.AccountDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__IsDebitCredit" type="hidden" value="' + Obj.AccountDebitCredit + '">' +
+                        '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.AccountDebitCredit == 'CREDIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0.00) + '</span>',
+
+                        '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.AccountDebitCredit == 'DEBIT' ? Obj.BaseAmount : 0.00) + '">' +
+                        '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.AccountDebitCredit == 'DEBIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0.00) + '</span>',
+
+                        '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + Obj.BaseAmount + '">' +
+                        '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + parseFloat(Obj.BaseAmount).toFixed(2) + '</span>' +
+                        '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">'
+                ];
+                $('#tblGLDetails').dataTable().fnAddData(rowData);
+            }
+            else {
+                var glIndex = hdnFlag + 1;
+                if (Obj.AccountDebitCredit == "DEBIT") {
+                    $('#GLTransactionDetails_' + glIndex + '__DebitAmount_span').text(parseFloat(Obj.BaseAmount).toFixed(2));
+                    $('#GLTransactionDetails_' + glIndex + '__DebitAmount').val(Obj.BaseAmount);
+                } else if (Obj.AccountDebitCredit == 'CREDIT') {
+                    $('#GLTransactionDetails_' + glIndex + '__DebitAmount_span').text(parseFloat(Obj.BaseAmount).toFixed(2));
+                    $('#GLTransactionDetails_' + glIndex + '__DebitAmount').val(Obj.BaseAmount);
+                }
+
+                $('#GLTransactionDetails_' + glIndex + '__TotalAmount_span').text(parseFloat(Obj.BaseAmount).toFixed(2));
+                $('#GLTransactionDetails_' + glIndex + '__TotalAmount').val(Obj.BaseAmount);
+            }
+        }
+    </script>
+}

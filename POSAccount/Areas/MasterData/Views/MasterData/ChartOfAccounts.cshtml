@@ -1,0 +1,216 @@
+@model List<POSAccount.Areas.MasterData.Controllers.AccountGroupVm>
+
+@{
+    ViewBag.Title = "ChartOfAccounts";
+}
+@functions {
+    MvcHtmlString GenerateChildLinks(List<POSAccount.Areas.MasterData.Controllers.ChartOfAccountsVm> chartOfAccounts, string code)
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.AppendFormat("<ul id=\"{0}\" class=\"collapse\">", code);
+        for (int a = 0; a < chartOfAccounts.Count; a++)
+        {
+
+            sb.Append("<li>");
+            sb.AppendFormat("<span class=\"curCss\" data-target=\"#{1}\" data-toggle=\"collapse\">{2}</span>&nbsp;&nbsp;&nbsp;<a id=\"{4}\" onclick=\"anchNavFrmSubmit('{4}')\" data-desc=\"{3}\" data-accountcode=\"{5}\" class=\"curCss\"><span class=\"side_text anchoverCss\" style=\"font-style: italic;\">{0}({1})</span></a>",
+                chartOfAccounts[a].Description, chartOfAccounts[a].AccountCode,
+                chartOfAccounts[a].COAList.Count > 0 ? MvcHtmlString.Create("<i class=\"fa fa-plus\" aria-hidden=\"true\"></i>") : MvcHtmlString.Create("<span>&nbsp;&nbsp;</span>"),
+                chartOfAccounts[a].Description, chartOfAccounts[a].AccountCode + "" + chartOfAccounts[a].AccountGroup, chartOfAccounts[a].AccountCode);
+
+            /*
+            sb.AppendFormat("<a data-target=\"#{1}\" data-toggle=\"collapse\">{0}</a>",
+                chartOfAccounts[a].COAList.Count > 0 ? MvcHtmlString.Create("<i class=\"fa fa-plus\" aria-hidden=\"true\"></i>") : MvcHtmlString.Create(""),
+                chartOfAccounts[a].AccountCode);
+            */
+            if (chartOfAccounts[a].COAList.Count > 0)
+            {
+                sb.AppendFormat("{0}", GenerateChildLinks(chartOfAccounts[a].COAList, chartOfAccounts[a].AccountCode).ToHtmlString());
+            }
+            sb.Append("</li>");
+
+        }
+        sb.Append("</ul>");
+        return MvcHtmlString.Create(sb.ToString());
+    }
+}
+@section CssSection
+{
+    <style type="text/css">
+        .curCss {
+            cursor: pointer;
+        }
+
+        li {
+            list-style: none;
+            line-height: 20px;
+        }
+
+        label.error {
+            color: red;
+        }
+
+        .anchoverCss {
+            color: maroon;
+        }
+
+            .anchoverCss:hover, .selectedCss {
+                color: #337ab7;
+                font-weight: bold;
+            }
+    </style>
+}
+<div class="box box-solid box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">Chart Of Accounts <span id="accountDesc"></span></h3>
+    </div>
+    <div class="box-body">
+        <div class="row" style="margin-right: 10px;">
+            <div class="col-md-6" style="max-height: 380px; overflow-y: scroll;">
+                @using (Ajax.BeginForm("ChartOfAccountMaster", "MasterData", new AjaxOptions { HttpMethod = "POST", OnSuccess = "COAOnSaveSuccess", OnFailure = "COAOnSaveFailure" }, new { id = "frmNav" }))
+                {
+                    <ul class="nav nav-stacked">
+                        @for (var i = 0; i < Model.Count; i++)
+                        {
+                            <li class="nav-header">
+                                <a data-toggle="collapse" data-target="#@Model[i].Code" aria-expanded="true" class="curCss collapsed anchoverCss">@(Model[i].COAList.Count > 0 ? MvcHtmlString.Create("<i class=\"fa fa-plus\" aria-hidden=\"true\"></i>") : MvcHtmlString.Create(""))&nbsp;<span class="side_text" style="font-style: italic;">@Model[i].Description &nbsp;(@Model[i].Code)</span></a>
+                                @if (Model[i].COAList.Count > 0)
+                                {
+                                    @GenerateChildLinks(Model[i].COAList, Model[i].Code)
+                                }
+                            </li>
+                        }
+                    </ul>
+                    <input type="hidden" name="hdnAccountCode" id="hdnAccountCode" />
+                }
+            </div>
+            <div class="col-md-6">
+                @{ Html.RenderAction("EditChartOfAccount", "MasterData", new { area = "MasterData", accountCode = Convert.ToString(ViewData["hdnAccountCode"]) }); }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle=collapse]').click(function () {
+                $(this).find("i").toggleClass("fa-minus");
+            });
+
+            var accountDesc = sessionStorage.getItem('SsnAccountDesc');
+            if (typeof accountDesc != 'undefined' && accountDesc != null) {
+                $('#accountDesc').text(accountDesc);
+            }
+
+            var exMsg = '@TempData["TempExMsg"]';
+            //
+            if (exMsg != '') {
+                //alert(exMsg);
+                ModalShow(exMsg, 'Failure', '');
+            }
+
+            $('#frmChartOfAccount').validate({
+                rules: {
+                    AccountCode: {
+                        required: true
+                    },
+                    Description: {
+                        required: true
+                    },
+
+                    AccountGroup: {
+                        required: true
+                    },
+                    DebitCredit: {
+                        required: true
+                    },
+                    CurrencyCode: {
+                        required: true
+                    }
+                },
+                messages: {
+                    AccountCode: {
+                        required: 'Account Code is required'
+                    },
+                    Description: {
+                        required: 'Description is required'
+                    },
+
+                    AccountGroup: {
+                        required: 'Account Group is required'
+                    },
+                    DebitCredit: {
+                        required: 'Debit Credit is required'
+                    },
+                    CurrencyCode: {
+                        required: 'Currency Code is required'
+                    }
+                }
+            });
+        });
+
+
+        function anchNavFrmSubmit(id) {
+            var accountCode = $('#' + id).data('accountcode');
+            $('.side_text').removeClass('selectedCss');
+            $('#' + id).children('span').addClass('selectedCss');
+            $('#overlayDiv').fadeIn();
+            /*
+            var desc = $('#' + id).data('desc');
+            sessionStorage.setItem('SsnAccountDesc', desc);
+            $('#hdnAccountCode').val(accountCode);
+            $('#frmNav').submit();*/
+            $.ajax({
+                url: '@Url.Content("~/MasterData/chartofaccount/")' + accountCode,
+                        method: 'GET',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (res) {
+                            $('#AccountCode').prop("readonly", true);
+                            $('#AccountCode').val(res.AccountCode);
+                            $('#Description').val(res.Description);
+                            $('#Description2').val(res.Description2);
+                            $('#AccountGroup').val(res.AccountGroup);
+                            $('#DebitCredit').val(res.DebitCredit);
+                            $('#CurrencyCode').val(res.CurrencyCode);
+                            $('#BranchID').val(res.BranchID);
+                            setTimeout(function () {
+                                $('#overlayDiv').fadeOut();
+                            }, 1000);
+                        },
+                        error: function (error) {
+
+                        }
+                    });
+                }
+
+                function btnEditChartOfAccountSave() {
+                    $('#overlayDiv').fadeIn();
+                    setTimeout(function () {
+                        $('#overlayDiv').fadeOut();
+                    }, 2000);
+                    if ($('#frmChartOfAccount').valid())
+                        $('#frmChartOfAccount').submit();
+                }
+
+                function btnAddNew() {
+                    $('#AccountCode, #Description, #Description2, #DebitCredit, #CurrencyCode,#AccountGroup').val('');
+                    $('#AccountCode').prop("readonly", false);
+                }
+
+                function btnRemoveCOA() {
+                    if ($('#frmChartOfAccount').valid()) {
+                        $('#overlayDiv').fadeIn();
+                        $('#frmChartOfAccount').attr({
+                            'action': '@Url.Content("~/MasterData/DeleteChartOfAccount")'
+                        }
+                        ).submit();
+                    }
+                    return false;
+                }
+
+                function COAOnSaveSuccess(data) {
+
+                }
+    </script>
+}
+

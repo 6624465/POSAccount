@@ -1,0 +1,291 @@
+﻿@model POSAccount.Contract.APFileUpload
+
+
+@{
+    ViewBag.Title = "EDIAPInvoice";
+}
+
+@section CssSection
+{
+   
+    <style type="text/css">
+        .cursorCss {
+            cursor: pointer;
+        }
+    </style>
+}
+
+
+
+
+@using (Html.BeginForm("SaveEDIAPInvoice", "AP", new { area = "AP" }, FormMethod.Post))
+{
+    <div class="box box-solid box-default">
+        <div class="box-header box-solid">
+            <h3 class="box-title">EDI Invoice</h3>
+
+        </div>
+
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Ref. Document No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentNo, new { @placeholder = "DocumentNo", @id = "txtDocumentNo", @readonly = "readonly", @class = "form-control input-sm " })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Invoice Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentDate, new { @placeholder = "DocumentDate", @readonly = "readonly", @id = "txtDocumentDate", @class = "form-control input-sm datepicker" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Creditor Code</label>
+                        <div class="col-md-6">
+                            @Html.TextBoxFor(m => m.CreditorCode, new { @readonly = "readonly", @class = "form-control input-sm datepicker" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Credit Term</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditTerm, new { @readonly = "readonly", @class = "form-control input-sm " })
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tbDetails" data-toggle="tab">Invoice Details</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tbDetails">
+                            <div class="row">
+                                <table id="tblItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                    <thead style="background-color: steelblue; color: white; font-size: 12px;">
+                                        <tr>
+                                            <th>Account Code</th>
+                                            <th>Account Description</th>
+                                            <th>Base Amount</th>
+                                            <th>Currency Code</th>
+                                            <th>Local Amt</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 12px;">
+                                        @{
+                                            for (int i = 0; i < Model.FileDetailList.Count; i++)
+                                            {
+                                            <tr id="tr_@i" class="apInvoiceDetailsCss">
+                                                <td name="AccountCode">
+                                                    @Html.DisplayFor(m => m.FileDetailList[i].AccountCode)
+                                                </td>
+                                                <td name="AccountCode">
+                                                    @Html.DisplayFor(m => m.FileDetailList[i].AccountCodeDescription)
+                                                </td>
+                                                <td name="BaseAmount">
+
+                                                    @Html.DisplayFor(m => m.FileDetailList[i].BaseAmount)
+                                                </td>
+                                                <td name="CurrencyCode">
+
+                                                    @Html.DisplayFor(m => m.FileDetailList[i].CurrencyCode)
+                                                </td>
+                                                <td name="LocalAmount">
+
+                                                    @Html.DisplayFor(m => m.FileDetailList[i].LocalAmount)
+
+                                                </td>
+
+                                            </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Total Amount</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(m => m.LocalAmount, new { @readonly = "readonly", @class = "form-control input-sm " })
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Total Discount</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(m => m.DiscountAmount, new { @class = "form-control input-sm-red", @readonly = "readonly" })
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Amount After Discount</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(m => m.PaymentAmount, new { @readonly = "readonly", @class = "form-control input-sm " })
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+                        <div>
+
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">W/H %</label>
+                            <div class="col-sm-3">
+                                <select class="form-control input-sm" id="SelectVat" name="SelectVat" onchange="SelectVatOnChange(this)">
+                                    <option value=""></option>
+                                    <option value="1">1</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        @Html.CheckBoxFor(m => m.IsVAT, new { @class = "checkbox", onchange = "chkChange(this)" })
+                                    </span>
+                                    @Html.TextBoxFor(m => m.TaxAmount, new { @readonly = "readonly", @class = "form-control input-sm " })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="pull-right col-xs-4">
+                    <div class="form-group">
+
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-5 control-label input-sm">Net Amt</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(m => m.TotalAmount, new { @readonly = "readonly", @class = "form-control input-sm " })
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+
+                    <button type="submit" id="btnSave" class="btn btn-social btn-success">
+                        <i class="fa fa-save"></i>
+                        Generate Invoice
+                    </button>
+
+
+                    <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+    <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+}
+
+
+@section Scripts{
+    
+    
+    
+    <script type="text/javascript">
+        var isEditLocal = false;
+        var rowdetails;
+        var searchBoxUrl = '@Url.Content("~/search/SearchBox")';
+        var _selectedDocumentNoId;
+        var DocumentNo;
+
+        $("#ddlCreditorCode").select2();
+        $("#AccountCode").select2();
+
+
+
+
+
+
+
+        $(document).ready(function () {
+
+
+            $('#tblItem').DataTable({
+                'bFilter': false,
+                'bPaginate': false,
+                'bInfo': false,
+                'aoColumnDefs': [
+                  {
+                      bSortable: false,
+                      aTargets: [-1]
+                  }],
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.className = "gradeX odd";
+                    nRow.id = 'APInvoiceDetails_' + iDisplayIndex;
+                    nRow.className = 'apInvoiceDetailsCss';
+                    return nRow;
+                }
+            });
+
+            $('#txtDocumentDate').datetimepicker({
+                useCurrent: false,
+                //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+
+
+        });
+
+
+
+
+        $('#tblItem tbody').on('click', 'tr', function () {
+            var table = $('#tblItem').DataTable();
+            //alert('Row index: ' + table.row(this).index());
+        });
+
+
+
+    </script>
+}

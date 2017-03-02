@@ -1,0 +1,133 @@
+﻿@model List<POSAccount.Contract.Quotation>
+@{
+    ViewBag.Title = "ListOfQuotation";
+}
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+<div class="box box-solid box-default ">
+    <div class="box-header with-border">
+        <h3 class="box-title">Customer Quotations
+    </div>
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+            <div class="row pull-right" style="padding-bottom: 10px;">
+                <div class="col-md-12">
+                    @*<a class="btn btn-small btn-primary" data-modal="" href="@Url.Content("~/POS/SalesOrder?documentNo=NEW")" id="btnCreate"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New Quotation</a>*@
+                     <a href="@Url.Action("SalesOrder", "POS", new { area = "POS", documentNo = "NEW" }, null)" class="btn btn-default btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New Quotation</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblList" class="table table-striped table-hover table-bordered table-responsive setting-table">
+                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+                            <tr>
+                                <th>Quotation No.</th>
+                                    <th>Customer</th>
+                                    <th>Effective Date</th>
+                                    <th>Expiry Date</th>
+                                    <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody style="font-size: 12px;">
+                            @if (Model != null)
+                            {
+                               foreach (POSAccount.Contract.Quotation item in Model)
+                               {
+                                    <tr>                                        
+                                        <td><a href="@Url.Content("~/Quotation/CustomerQuotation?quotationNo=" + item.QuotationNo)">@item.QuotationNo</a></td>
+                                        <td> @item.CustomerName </td>
+                                        <td> @item.EffectiveDate.Date.ToString("dd-MM-yyyy") </td>
+                                        <td> @item.ExpiryDate.Date.ToString("dd-MM-yyyy") </td>
+                                        <td>@(item.EffectiveDate<item.ExpiryDate?"Active":"Expired")</td>
+                                        @*<td> @(item.Status ? "Active" : "Expired")</td>*@
+                                    </tr>
+                               }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+@*<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Customer Quotations</h3>
+    </div>
+    <div class="panel-body">
+        <fieldset class="form-horizontal">         
+
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="tbDetails" data-toggle="tab">Quotations Details</a>
+                    </li>
+                    <li class="pull-right">
+                        <div class="btn-group btn-primary">                          
+                            <a class="btn btn-small btn-primary" href="@Url.Content("~/Quotation/CustomerQuotation?quotationNo=NEW")" id="btnCreate"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New Quotation</a>
+
+                        </div>
+                    </li>
+                </ul>
+                <!-- Display List Section -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tbDetails">
+                        <table id="tblCustomerQuotation" class="table table-striped table-hover table-bordered table-responsive setting-table">
+                            <thead style="background-color:steelblue;color:white;font-size:12px;">
+                                <tr>
+                                    <th>Quotation No.</th>
+                                    <th>Customer</th>
+                                    <th>Effective Date</th>
+                                    <th>Expiry Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-size:12px;">
+                                @foreach (POSAccount.Contract.Quotation item in Model)
+                                {
+                                    <tr>                                        
+                                        <td><a href="@Url.Content("~/Quotation/CustomerQuotation?quotationNo=" + item.QuotationNo)">@item.QuotationNo</a></td>
+                                        <td> @item.CustomerName </td>
+                                        <td> @item.EffectiveDate.Date.ToString("dd-MM-yyyy") </td>
+                                        <td> @item.ExpiryDate.Date.ToString("dd-MM-yyyy") </td>
+                                        <td> @(item.Status ? "Active" : "Expired")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>            
+        </fieldset>
+    </div>
+</div>*@
+
+
+@section Scripts {
+    
+    @Scripts.Render("~/bundles/modalform")
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('#tblCustomerQuotation').DataTable({
+            responsive: true
+        });
+        var table = $('#tblCustomerQuotation').DataTable();
+        $('#tblCustomerQuotation tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+    });
+    </script>
+}

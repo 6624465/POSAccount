@@ -1,0 +1,512 @@
+﻿@model POSAccount.Contract.GLJournal
+
+@{
+    ViewBag.Title = "GLJournalEntry";
+}
+
+@section CssSection
+{
+    <style type="text/css">
+        input[type=text].error, select.error {
+            border-color: red;
+            font-size: 12px;
+        }
+
+        label.error {
+            color: red;
+            font-size: 12px;
+        }
+
+        .cursorCss {
+            cursor: pointer;
+        }
+    </style>
+}
+
+
+@using (Ajax.BeginForm("", "", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid  box-default">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">JV Manual</h3>
+            <div class="box-tools pull-right">
+                <div class="has-feedback">
+                    <div class="input-group input-group-sm">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Document No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentNo, new { @class = "form-control input-sm", @readonly = "readonly" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Document Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentDate, new { @class = "form-control input-sm datepicker" })
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Remarks</label>
+                        <div class="col-md-6">
+                            @Html.TextBoxFor(m => m.Remark, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <fieldset class="form-horizontal">
+                    <legend>Add Item</legend>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label input-sm">Account Code :</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "", new { @class = "form-control input-sm" })
+                        </div>
+                        <label class="col-md-2 control-label input-sm">Debit/Credit:</label>
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(m => m.DebitCredit, Model.DebitCreditList, "", new { @class = "form-control input-sm" })
+                        </div>
+
+
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label input-sm">Remarks :</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.DetailRemark, new { @class = "form-control input-sm" })
+			     <input type="hidden" id="hdnDetailRemark" name="hdnDetailRemark" />
+                        </div>
+
+                        <label class="col-md-2 control-label input-sm">Amount :</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.Amount, new { @class = "form-control input-sm decimalCss", data_a_sep = "", aPad = "false", data_a_sign = "" })
+
+                        </div>
+
+                        <a href="#" class="btn btn-social btn-success" onclick="AddDataToTable()" id="btnSearch">
+                            <i class="fa fa-plus-circle"></i>
+                            Add Details
+                        </a>
+                    </div>
+                </fieldset>
+
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="tbDetails" data-toggle="tab">Journal Details</a>
+                        </li>
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tbDetails">
+                            <table id="tblGLJournalDetails" class="table table-striped table-hover table-bordered table-responsive ">
+                                <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                    <tr>
+                                        <th>Account Code</th>
+                                        <th>Description</th>
+                                        <th>Remarks</th>
+                                        <th>Credit Amt</th>
+                                        <th>Debit Amt</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size: 12px;">
+
+
+                                    @{
+    for (int i = 0; i < Model.GLJournalDetails.Count; i++)
+    {
+                                        <tr id="tr_@i">
+                                            <td name="AccountCode">
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].ItemNo)
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].AccountCode)
+                                                @Html.DisplayFor(m => m.GLJournalDetails[i].AccountCode)
+                                            </td>
+                                            <td name="AccountCodeDescription">
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].AccountCodeDescription)
+                                                @Html.DisplayFor(m => m.GLJournalDetails[i].AccountCodeDescription)
+                                            </td>
+
+                                            <td name="LocalAmount">
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].Remark)
+                                                @Html.DisplayFor(m => m.GLJournalDetails[i].Remark)
+                                                <input type="hidden" id="GLJournalDetails_@(i)__DebitCredit" />
+                                            </td>
+
+                                            <td name="Discount">
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].BaseCreditAmount)
+                                                @Html.DisplayFor(m => m.GLJournalDetails[i].BaseCreditAmount)
+                                            </td>
+                                            <td name="TotalAmount">
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].BaseDebitAmount)
+                                                @Html.DisplayFor(m => m.GLJournalDetails[i].BaseDebitAmount)
+                                                @Html.HiddenFor(m => m.GLJournalDetails[i].Status)
+                                            </td>
+                                            <td name="Action">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                        Action
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                        <li><a class="cursorCss" id="Edit_@i" onclick="EditGLJournalDetails('@(i)')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                        <li><a class="cursorCss" onclick="DeleteGLJournalDetails('@(i)')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+    }
+                                    }
+
+                                </tbody>
+                                <tfoot id="tblFoot" style="display: none;">
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td id="crdtSum"></td>
+                                        <td id="dbtSum"></td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                    <a href="@Url.Content("~/GL/JVManual")" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+                        New
+                    </a>
+                    <button type="button" id="btnSave" class="btn btn-social btn-success" onclick="SaveData();">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+
+                    <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <a href="#" id="btnDelete" onclick="DeleteJVData();" class="btn btn-social btn-danger">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </a>
+
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>
+                    </div>
+                    <a href="@Url.Content("~/GL/JVManualList")" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+    </div>
+
+}
+
+@section Scripts{
+
+
+    <script type="text/javascript">
+
+        $("#AccountCode").select2();
+
+        $(document).ready(function () {
+
+
+            $('#tblGLJournalDetails').DataTable({
+                'bFilter': false,
+                'bPaginate': false,
+                'bInfo': false,
+                'aoColumnDefs': [
+                  {
+                      bSortable: false,
+                      aTargets: [-1]
+                  }],
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    nRow.id = 'GLJournalDetails_' + iDisplayIndex;
+                    nRow.className = 'glJournalDetailsCss';
+                    return nRow;
+                }
+            });
+
+            if ($('#DocumentNo').val() == "") {
+                $('#btnDelete').prop('disabled', true);
+            }
+
+            $('.datepicker').datetimepicker({
+                useCurrent: false,
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+
+            $('#myForm').validate({
+                rules: {
+                    AccountCode: {
+                        required: true
+                    },
+                    DocumentDate: {
+                        required: true
+                    }
+                },
+                messages: {
+                    AccountCode: {
+                        required: "Account Code is required"
+                    },
+                    DocumentDate: {
+                        required: "Document Date is required"
+                    }
+                }
+            });
+
+        });
+
+        function btnClear() {
+            location.href = '@Url.Content("~/GL/JVManual")';
+        }
+
+        function AddDataToTable() {
+
+            if ($('#myForm').valid()) {
+                var accountCode = $("#AccountCode").val();
+                var amount = $("#Amount").val();
+                var remarks = $("#DetailRemark").val();
+                var debitcredit = $('#DebitCredit').val();
+		$("#hdnDetailRemark").val(remarks);
+                if (accountCode != "" || accountCode != null && amount != "" || amount != null) {
+                    var rooturl = '@Url.Action("AddJVManualDetails", "GL", new { area = "GL" })';
+                    var url = rooturl + "?accountCode=" + accountCode + "&amount=" + amount + "&remarks=" + remarks + "&debitcredit=" + debitcredit;
+
+                    $.post(url, null, function (data) {
+                        debugger;
+                        var hdnFlag = $('#hdnFlag').val();
+                        var debitcredit = $('#DebitCredit').val();
+                        if (hdnFlag == '-1') {
+                            var _index = $('.glJournalDetailsCss').length;
+                            var Obj = {
+                                Index: _index,
+                                ItemNo: data.GLJournalDetails.ItemNo,
+                                AccountCode: data.GLJournalDetails.AccountCode,
+                                AccountCodeDescription: data.GLJournalDetails.AccountCodeDescription,
+                                Remark: $("#hdnDetailRemark").val(),
+                                BaseCreditAmount: data.GLJournalDetails.BaseCreditAmount,
+                                BaseDebitAmount: data.GLJournalDetails.BaseDebitAmount,
+                                BaseDebitCredit: data.DebitCredit
+                            };
+
+                            //var rowCount = 0;
+                            //if ($('#tblGLJournalDetails').dataTable().fnSettings().aoData.length > 0) {
+                            //    rowCount = $('#tblGLJournalDetails tr').length - 1;;
+                            //}
+
+                            var rowData = [
+                              '<input class="hidden" id="GLJournalDetails_' + Obj.Index + '__ItemNo" name="GLJournalDetails[' + Obj.Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' + (parseInt(Obj.ItemNo) + 1) +
+                                '<input id="GLJournalDetails_' + Obj.Index + '__AccountCode" name="GLJournalDetails[' + Obj.Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '"><span id="GLJournalDetails_' + Obj.Index + '__AccountCode_span">' + Obj.AccountCode + '</span>',
+
+                                '<input id="GLJournalDetails_' + Obj.Index + '__AccountCodeDescription" name="GLJournalDetails[' + Obj.Index + '].AccountCodeDescription" type="hidden" value="' + Obj.AccountCodeDescription + '"><span id="GLJournalDetails_' + Obj.Index + '__AccountCodeDescription_span">' + Obj.AccountCodeDescription + '</span>',
+
+                                '<input id="GLJournalDetails_' + Obj.Index + '__Remark" name="GLJournalDetails[' + Obj.Index + '].Remark" type="hidden" value="' + Obj.Remark + '"><span id="GLJournalDetails_' + Obj.Index + '__Remark_span">' + Obj.Remark + '</span>',
+
+                                '<input id="GLJournalDetails_' + Obj.Index + '__BaseCreditAmount" name="GLJournalDetails[' + Obj.Index + '].BaseCreditAmount" type="hidden" value="' + (Obj.BaseDebitCredit == 'CREDIT' ? Obj.BaseCreditAmount.toFixed(2) : 0.00) + '"><input id="GLJournalDetails_' + Obj.Index + '__BaseDebitCredit" name="GLJournalDetails[' + Obj.Index + '].BaseDebitCredit" type="hidden" value="' + (Obj.BaseDebitCredit == 'CREDIT' ? Obj.BaseCreditAmount.toFixed(2) : 0.00) + '"><span id="GLJournalDetails_' + Obj.Index + '__BaseCreditAmount_span">' + Obj.BaseCreditAmount.toFixed(2) + '</span>',
+
+                                '<input id="GLJournalDetails_' + Obj.Index + '__BaseDebitAmount" name="GLJournalDetails[' + Obj.Index + '].BaseDebitAmount" type="hidden" value="' + (Obj.BaseDebitCredit == 'DEBIT' ? Obj.BaseDebitAmount.toFixed(2) : 0.00) + '"><span id="GLJournalDetails_' + Obj.Index + '__BaseDebitAmount_span">' + (Obj.BaseDebitCredit == 'DEBIT' ? Obj.BaseDebitAmount.toFixed(2) : 0.00) + '</span><input id="GLJournalDetails_' + Obj.Index + '__Status" name="GLJournalDetails[' + Obj.Index + '].Status" type="hidden" value="True">',
+                                '<div class="dropdown">' +
+                            '<button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Action<span class="caret"></span></button>' +
+                            '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+                                '<li><a class="cursorCss" id="Edit_' + Obj.index + '" onclick="EditGLJournalDetails(' + Obj.Index + ')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>' +
+                                '<li><a class="cursorCss" onclick="DeleteGLJournalDetails(' + Obj.Index + ')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>' +
+                            '</ul></div>'];
+                            $('#tblGLJournalDetails').dataTable().fnAddData(rowData);
+                            //$('tr td:nth-child(1)').hide()
+
+                        } else {
+                            $('#GLJournalDetails_' + hdnFlag + '__AccountCode').val(data.GLJournalDetails.AccountCode);
+                            $('#GLJournalDetails_' + hdnFlag + '__AccountCodeDescription').val(data.GLJournalDetails.AccountCode);
+                            $('#GLJournalDetails_' + hdnFlag + '__AccountCodeDescription_span').text(data.GLJournalDetails.AccountCodeDescription);
+                            $('#GLJournalDetails_' + hdnFlag + '__Remark').val($("#hdnDetailRemark").val());
+                            $('#GLJournalDetails_' + hdnFlag + '__Remark_span').text($("#hdnDetailRemark").val());
+                            $('#GLJournalDetails_' + hdnFlag + '__BaseCreditAmount').val(data.GLJournalDetails.BaseCreditAmount);
+                            $('#GLJournalDetails_' + hdnFlag + '__BaseCreditAmount_span').text(data.GLJournalDetails.BaseCreditAmount.toFixed(2));
+                            $('#GLJournalDetails_' + hdnFlag + '__BaseDebitAmount').val(data.GLJournalDetails.BaseDebitAmount);
+                            $('#GLJournalDetails_' + hdnFlag + '__BaseDebitAmount_span').text(data.GLJournalDetails.BaseDebitAmount.toFixed(2));
+
+                            $('#btnClearDiv').fadeOut();
+                            $('#btnAddDetailsSpan').html('&nbsp;Add Details');
+                        }
+                        var rowsCount = $('.glJournalDetailsCss').length;
+                        var creditAmount = 0.00;
+                        var debitAmount = 0.00;
+                        var crd = 0.00;
+                        var dbt = 0.00;
+                        for (var x = 0; x < rowsCount; x++) {
+                            if ($('#GLJournalDetails_' + x + '__Status').val() == 'True') {
+                                crd = ($('#GLJournalDetails_' + x + '__BaseCreditAmount').val());
+                                dbt = ($('#GLJournalDetails_' + x + '__BaseDebitAmount').val());
+                                creditAmount = creditAmount + parseFloat($('#GLJournalDetails_' + x + '__BaseCreditAmount').val());
+                                debitAmount = debitAmount + parseFloat($('#GLJournalDetails_' + x + '__BaseDebitAmount').val());
+                            }
+                        }
+
+                        $('#crdtSum').html("<b>Total</b>:&nbsp;" + commaSeparateNumber(creditAmount.toFixed(2)));
+                        $('#dbtSum').html("<b>Total</b>:&nbsp;" + commaSeparateNumber(debitAmount.toFixed(2)));
+
+                        $('#hdnFlag').val('-1');
+                    });
+                    $('#AccountCode').select2('val', '');
+                    $('#DetailRemark').val("");
+                    $('#DebitCredit').val()
+                    $('#Amount').val("");
+                    $('#tblFoot').fadeIn();
+                }
+                return false;
+            }
+        }
+        function commaSeparateNumber(val) {
+            while (/(\d+)(\d{3})/.test(val.toString())) {
+                val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+            return val;
+        }
+
+        var documentNo;
+
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+            DocumentNo = result.Data.DocumentNo;
+        }
+
+        var rooturl = "@Url.Action("JVManualList", "GL", new { area = "GL" })"
+    var url = rooturl ;
+
+
+    function BtnOK() {
+        if (ActionType == "Save") {
+            location.href = url;
+        }
+    }
+    function EditGLJournalDetails(index) {
+        debugger;
+        var val = $('#GLJournalDetails_' + index + '__BaseDebitCredit').val();
+        $('#AccountCode').select2('val', $('#GLJournalDetails_' + index + '__AccountCode').val());
+        $('#DetailRemark').val($('#GLJournalDetails_' + index + '__Remark').val());
+	$("#hdnDetailRemark").val($('#GLJournalDetails_' + index + '__Remark').val());
+
+        if ($('#GLJournalDetails_' + index + '__BaseDebitCredit').val() == "DEBIT") {
+            $('#Amount').val($('#GLJournalDetails_' + index + '__BaseDebitAmount').val());
+        } else {
+            $('#Amount').val($('#GLJournalDetails_' + index + '__BaseCreditAmount').val());
+        }
+
+        $('#btnAddDetailsSpan').text('Update');
+        $('#btnClearDiv').fadeIn();
+
+        $('#hdnFlag').val(index);
+    }
+
+    function DeleteGLJournalDetails(rowId) {
+        debugger;
+        if (!confirm("Do you want to DELETE selected item?")) {
+            return false;
+        }
+
+        /*
+        nRow = $("#tr_" + rowId).parent();$('#GLJournalDetails_' + x).hasClass('deleteCss')
+        table = $('#tblGLJournalDetails').dataTable();
+        table.fnDeleteRow(table.fnGetPosition(document.getElementById("#tr_" + rowId)));*/
+        $('#GLJournalDetails_' + rowId).addClass('deleteCss');
+        $('#GLJournalDetails_' + (rowId)).css({
+            'text-decoration': 'line-through',
+            'color': 'red',
+            'font-style': 'italic'
+        });
+
+        $('#GLJournalDetails_' + rowId + '__Status').val('False');
+        var rowsCount = $('.glJournalDetailsCss').length;
+        var creditAmount = 0.00;
+        var debitAmount = 0.00;
+        var crd = 0.00;
+        var dbt = 0.00;
+        for (var x = 0; x < rowsCount; x++) {
+            if ($('#GLJournalDetails_' + x + '__Status').val() == 'True') {
+                crd = ($('#GLJournalDetails_' + x + '__BaseCreditAmount').val());
+                dbt = ($('#GLJournalDetails_' + x + '__BaseDebitAmount').val());
+                creditAmount = creditAmount + parseFloat($('#GLJournalDetails_' + x + '__BaseCreditAmount').val());
+                debitAmount = debitAmount + parseFloat($('#GLJournalDetails_' + x + '__BaseDebitAmount').val());
+            }
+        }
+
+        $('#crdtSum').html("<b>Total</b>:&nbsp;" + commaSeparateNumber(creditAmount.toFixed(2)));
+        $('#dbtSum').html("<b>Total</b>:&nbsp;" + commaSeparateNumber(debitAmount.toFixed(2)));
+    }
+
+    function btnClearDetailsClick() {
+        $('#AccountCode').select2('val', '');
+        $('#Amount').val('');
+        $('#DetailRemark').val("");
+        $('#hdnFlag').val('-1');
+        $('#btnAddDetailsSpan').text('Add Details');
+        $('#btnClearDiv').fadeOut();
+    }
+
+    function SaveData() {
+        var itemsCount = $('.glJournalDetailsCss').length;
+        if (itemsCount > 0) {
+            $('#overlayDiv').fadeIn();
+            $('#myForm').validate().cancelSubmit = true;
+            $('#myForm').attr('action','@Url.Content("~/GL/SaveJVManualDetails")')
+            $('#myForm').submit();
+        }
+        else {
+            alert('Please add atleast one journal item');
+        }
+    }
+
+
+        function DeleteJVData() {
+            var itemsCount = $('.glJournalDetailsCss').length;
+            if (itemsCount > 0) {
+                $('#overlayDiv').fadeIn();
+                $('#myForm').validate().cancelSubmit = true;
+                $('#myForm').attr('action', '@Url.Content("~/GL/DeleteJVManualDetails")')
+            $('#myForm').submit();
+        }
+        else {
+            alert('Please add atleast one journal item');
+        }
+    }
+
+    </script>
+}

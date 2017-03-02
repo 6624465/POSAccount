@@ -1,0 +1,328 @@
+﻿@{
+    ViewBag.Title = "Uploaded Invoices";
+}
+<style type="text/css">
+    hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #808080;
+    border-top: 1px solid #808080;
+}
+</style>
+<div class="box box-solid box-default">
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Upload a file</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="file" id="uploadFile" name="uploadFile" />
+                </div>
+            </div>
+            <div class="row" style="padding-top:10px;">
+                <div class="col-md-1">
+                    <button class="btn btn-primary btn-sm" data-loading-text="Processing..." id="btnSubmit" name="btnSubmit" onclick="btnProcess();">Submit</button>                    
+                </div>                
+            </div>         
+               
+            <div id="uploadData" style="display:none;">
+                <div class="row"><div class="col-md-12"><hr /></div></div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Invoice No</label>
+                        <div class="col-md-2">
+                            <input class="form-control input-sm " id="txtDocumentNo" name="DocumentNo" placeholder="DocumentNo" readonly="readonly" type="text" value="APINTX1160400007">
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Invoice Date</label>
+                        <div class="col-md-2">
+                            <input class="form-control input-sm datepicker" data-val="true" data-val-date="The field DocumentDate must be a date." data-val-required="The DocumentDate field is required." id="txtDocumentDate" name="DocumentDate" placeholder="DocumentDate" type="text" value="18/04/2016 00:00:00">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Creditor Code</label>
+                        <div class="col-md-6">
+                            <select class="form-control select2 select2-hidden-accessible; select2-hidden-accessible" id="ddlCreditorCode" name="CreditorCode" tabindex="-1" aria-hidden="true">
+                                <option value=""></option>
+                                <option value="asdf">asdf (asdf)</option>
+                                <option value="BIO">BIO GREEN SUPPLIERS (BIO)</option>
+                                <option selected="selected" value="seagate">SEAGATE TECHNO (seagate)</option>
+                                <option value="TOSHIBA">TOSHIBA COMPUTERS (TOSHIBA)</option>
+                            </select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 280px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-ddlCreditorCode-container"><span class="select2-selection__rendered" id="select2-ddlCreditorCode-container" title="SEAGATE TECHNO (seagate)">SEAGATE TECHNO (seagate)</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Credit Term</label>
+                        <div class="col-md-2">
+                            <input class="form-control input-sm " id="CreditTerm" name="CreditTerm" placeholder="CreditTerm" type="text" value="0">
+                        </div>
+                        <label for="txtCompany" class="col-md-2 control-label">Reference No.</label>
+                        <div class="col-md-2">
+                            <input class="form-control input-sm " id="ReferenceNo" name="ReferenceNo" placeholder="ReferenceNo" type="text" value="123">
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tbDetails" data-toggle="tab">Invoice Details</a>
+                        </li>
+                        
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <!-- Details -->
+                        <div class="tab-pane active" id="tbDetails">
+
+                             
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <div id="tblItem_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                                    <div class="row"><div class="col-sm-6"></div><div class="col-sm-6"></div></div><div class="row">
+                                        <div class="col-sm-12">
+                                            <table id="tblItem" class="table table-striped table-hover table-bordered table-responsive  dataTable no-footer" role="grid">
+                                                <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                                    <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="tblItem" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Account Code: activate to sort column descending" style="width: 145px;">Account Code</th><th class="sorting" tabindex="0" aria-controls="tblItem" rowspan="1" colspan="1" aria-label="Account Description: activate to sort column ascending" style="width: 201px;">Account Description</th><th class="sorting" tabindex="0" aria-controls="tblItem" rowspan="1" colspan="1" aria-label="Base Amount: activate to sort column ascending" style="width: 141px;">Base Amount</th><th class="sorting" tabindex="0" aria-controls="tblItem" rowspan="1" colspan="1" aria-label="Currency Code: activate to sort column ascending" style="width: 154px;">Currency Code</th><th class="sorting" tabindex="0" aria-controls="tblItem" rowspan="1" colspan="1" aria-label="Local Amt: activate to sort column ascending" style="width: 110px;">Local Amt</th><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Action" style="width: 91px;">Action</th></tr>
+                                                </thead>
+                                                <tbody style="font-size: 12px;">
+
+
+                                                    <tr id="tblAPInvoiceDetails_0" class="apInvoiceDetailsCss" role="row">
+                                                        <td name="AccountCode" class="sorting_1">
+                                                            <input data-val="true" data-val-number="The field ItemNo must be a number." data-val-required="The ItemNo field is required." id="APInvoiceDetails_0__ItemNo" name="APInvoiceDetails[0].ItemNo" type="hidden" value="1">
+                                                            <input id="APInvoiceDetails_0__AccountCode" name="APInvoiceDetails[0].AccountCode" type="hidden" value="500100">
+                                                            500100
+                                                        </td>
+                                                        <td name="AccountCode">
+                                                            <input id="APInvoiceDetails_0__AccountCodeDescription" name="APInvoiceDetails[0].AccountCodeDescription" type="hidden" value="">
+
+                                                        </td>
+                                                        <td name="BaseAmount">
+                                                            <input data-val="true" data-val-number="The field BaseAmount must be a number." data-val-required="The BaseAmount field is required." id="APInvoiceDetails_0__BaseAmount" name="APInvoiceDetails[0].BaseAmount" type="hidden" value="1000.0000">
+                                                            1000.00
+                                                        </td>
+                                                        <td name="CurrencyCode">
+                                                            <input id="APInvoiceDetails_0__CurrencyCode" name="APInvoiceDetails[0].CurrencyCode" type="hidden" value="THB">
+                                                            THB
+                                                        </td>
+                                                        <td name="LocalAmount">
+                                                            <input data-val="true" data-val-number="The field LocalAmount must be a number." data-val-required="The LocalAmount field is required." id="APInvoiceDetails_0__LocalAmount" name="APInvoiceDetails[0].LocalAmount" type="hidden" value="1000.0000">
+                                                            1000.00
+                                                            <input data-val="true" data-val-required="The Status field is required." id="APInvoiceDetails_0__Status" name="APInvoiceDetails[0].Status" type="hidden" value="True">
+                                                        </td>
+                                                        <td name="Action">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Action
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a class="cursorCss" id="Edit_0" onclick="EditAPInvoiceDetails('0')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                                    <li><a class="cursorCss" onclick="DeleteAPInvoiceDetails('0')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="tblAPInvoiceDetails_0" class="apInvoiceDetailsCss" role="row">
+                                                        <td name="AccountCode" class="sorting_1">
+                                                            <input data-val="true" data-val-number="The field ItemNo must be a number." data-val-required="The ItemNo field is required." id="APInvoiceDetails_0__ItemNo" name="APInvoiceDetails[0].ItemNo" type="hidden" value="1">
+                                                            <input id="APInvoiceDetails_0__AccountCode" name="APInvoiceDetails[0].AccountCode" type="hidden" value="500100">
+                                                            500100
+                                                        </td>
+                                                        <td name="AccountCode">
+                                                            <input id="APInvoiceDetails_0__AccountCodeDescription" name="APInvoiceDetails[0].AccountCodeDescription" type="hidden" value="">
+
+                                                        </td>
+                                                        <td name="BaseAmount">
+                                                            <input data-val="true" data-val-number="The field BaseAmount must be a number." data-val-required="The BaseAmount field is required." id="APInvoiceDetails_0__BaseAmount" name="APInvoiceDetails[0].BaseAmount" type="hidden" value="1000.0000">
+                                                            2000.00
+                                                        </td>
+                                                        <td name="CurrencyCode">
+                                                            <input id="APInvoiceDetails_0__CurrencyCode" name="APInvoiceDetails[0].CurrencyCode" type="hidden" value="THB">
+                                                            THB
+                                                        </td>
+                                                        <td name="LocalAmount">
+                                                            <input data-val="true" data-val-number="The field LocalAmount must be a number." data-val-required="The LocalAmount field is required." id="APInvoiceDetails_0__LocalAmount" name="APInvoiceDetails[0].LocalAmount" type="hidden" value="1000.0000">
+                                                            2000.00
+                                                            <input data-val="true" data-val-required="The Status field is required." id="APInvoiceDetails_0__Status" name="APInvoiceDetails[0].Status" type="hidden" value="True">
+                                                        </td>
+                                                        <td name="Action">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Action
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a class="cursorCss" id="Edit_0" onclick="EditAPInvoiceDetails('0')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                                    <li><a class="cursorCss" onclick="DeleteAPInvoiceDetails('0')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="tblAPInvoiceDetails_0" class="apInvoiceDetailsCss" role="row">
+                                                        <td name="AccountCode" class="sorting_1">
+                                                            <input data-val="true" data-val-number="The field ItemNo must be a number." data-val-required="The ItemNo field is required." id="APInvoiceDetails_0__ItemNo" name="APInvoiceDetails[0].ItemNo" type="hidden" value="1">
+                                                            <input id="APInvoiceDetails_0__AccountCode" name="APInvoiceDetails[0].AccountCode" type="hidden" value="500100">
+                                                            500100
+                                                        </td>
+                                                        <td name="AccountCode">
+                                                            <input id="APInvoiceDetails_0__AccountCodeDescription" name="APInvoiceDetails[0].AccountCodeDescription" type="hidden" value="">
+
+                                                        </td>
+                                                        <td name="BaseAmount">
+                                                            <input data-val="true" data-val-number="The field BaseAmount must be a number." data-val-required="The BaseAmount field is required." id="APInvoiceDetails_0__BaseAmount" name="APInvoiceDetails[0].BaseAmount" type="hidden" value="1000.0000">
+                                                            3000.00
+                                                        </td>
+                                                        <td name="CurrencyCode">
+                                                            <input id="APInvoiceDetails_0__CurrencyCode" name="APInvoiceDetails[0].CurrencyCode" type="hidden" value="THB">
+                                                            THB
+                                                        </td>
+                                                        <td name="LocalAmount">
+                                                            <input data-val="true" data-val-number="The field LocalAmount must be a number." data-val-required="The LocalAmount field is required." id="APInvoiceDetails_0__LocalAmount" name="APInvoiceDetails[0].LocalAmount" type="hidden" value="1000.0000">
+                                                            3000.00
+                                                            <input data-val="true" data-val-required="The Status field is required." id="APInvoiceDetails_0__Status" name="APInvoiceDetails[0].Status" type="hidden" value="True">
+                                                        </td>
+                                                        <td name="Action">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                    Action
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                    <li><a class="cursorCss" id="Edit_0" onclick="EditAPInvoiceDetails('0')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                                    <li><a class="cursorCss" onclick="DeleteAPInvoiceDetails('0')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <button class="btn btn-primary btn-sm" onclick="alert('The AP INVOICE successfully posted.');location.href = '@Url.Content("~/AP/EDIAPInvoiceList")'">Confirm</button>
+                                        </div>
+                                    <div class="col-sm-6"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--GLDetails-->
+                        <div id="tbGLDetailsTab" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="tblGLDetails_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                                        <div class="row"><div class="col-sm-6"></div><div class="col-sm-6"></div></div><div class="row">
+                                            <div class="col-sm-12">
+                                                <table id="tblGLDetails" class="table table-striped table-hover table-bordered table-responsive  dataTable no-footer" role="grid">
+                                                    <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                                        <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="tblGLDetails" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Account Code: activate to sort column descending" style="width: 0px;">Account Code</th><th class="sorting" tabindex="0" aria-controls="tblGLDetails" rowspan="1" colspan="1" aria-label="Credit Amount: activate to sort column ascending" style="width: 0px;">Credit Amount</th><th class="sorting" tabindex="0" aria-controls="tblGLDetails" rowspan="1" colspan="1" aria-label="Debit Amount: activate to sort column ascending" style="width: 0px;">Debit Amount</th><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Total Amount" style="width: 0px;">Total Amount</th></tr>
+                                                    </thead>
+                                                    <tbody style="font-size: 12px;">
+                                                        <tr class="odd"><td valign="top" colspan="4" class="dataTables_empty">No data available in table</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div><div class="row"><div class="col-sm-6"></div><div class="col-sm-6"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="whRow">
+
+                            </div>
+                        </div>
+                        <!--Set Off Details-->
+                        <div id="tbSetOffDetails" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control valid" placeholder="Search" name="srch-term" id="srch-term" onkeypress="srchTerm_KeyPress(event)">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default" type="button" onclick="btnSearchClick()"><i class="glyphicon glyphicon-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-top: 5px;">
+                                    <label id="lblErrMsg" style="color: red; font-weight: bold;"></label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblSetoffItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                <th class="hidden">#</th>
+                                                <th class="hidden">Account Code</th>
+                                                <th>Account Description</th>
+                                                <th>Base Amount</th>
+                                                <th>Currency Code</th>
+                                                <th>Local Amt</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 12px;">
+                                            <tr id="tr_0">
+                                                <td class="hidden">
+                                                    <input id="APInvoiceDetails_0__ItemNo" name="APInvoiceDetails[0].ItemNo" type="hidden" value="1">
+                                                </td>
+                                                <td class="hidden">
+                                                    <input id="APInvoiceDetails_0__AccountCode" name="APInvoiceDetails[0].AccountCode" type="hidden" value="500100">
+                                                </td>
+                                                <td name="AccountCode">
+                                                    <input id="APInvoiceDetails_0__AccountCode" name="APInvoiceDetails[0].AccountCode" type="hidden" value="500100">
+                                                    500100
+                                                </td>
+                                                <td name="BaseAmount">
+                                                    <input id="APInvoiceDetails_0__BaseAmount" name="APInvoiceDetails[0].BaseAmount" type="hidden" value="1000.0000">
+                                                    1000.00
+                                                </td>
+                                                <td name="CurrencyCode">
+                                                    <input id="APInvoiceDetails_0__CurrencyCode" name="APInvoiceDetails[0].CurrencyCode" type="hidden" value="THB">
+                                                    THB
+                                                </td>
+                                                <td name="LocalAmount">
+                                                    <input id="APInvoiceDetails_0__LocalAmount" name="APInvoiceDetails[0].LocalAmount" type="hidden" value="1000.0000">
+                                                    1000.00
+                                                </td>
+                                                <td name="Action"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+<script type="text/javascript">
+    function btnProcess() {
+        var fileObj = document.getElementById('uploadFile').files;
+        
+        if (fileObj.length > 0) {
+            var btn = $('#btnSubmit');
+            btn.button('loading');
+            setTimeout(function () {
+                btn.button('reset');
+                $('#uploadData').css('display', 'block');
+            }, 5000);
+        }
+        else
+            alert('Please upload a file to process.');
+    }
+</script>

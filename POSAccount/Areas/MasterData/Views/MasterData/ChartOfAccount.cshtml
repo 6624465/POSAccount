@@ -1,0 +1,85 @@
+﻿@model POSAccount.Contract.ChartOfAccount
+@using (Html.BeginForm("EditChartOfAccount", "MasterData", FormMethod.Post, new { id = "frmChartOfAccount", name = "frmChartOfAccount" }))
+{
+    <div class="row">
+        <div class="box box-default">
+            <div class="box-header">
+                <h3 class="box-title">Add/Edit Chart Of Account</h3>
+            </div>
+            <div class="box-body">
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.AccountCode, new { @class = "control-label input-sm col-md-3" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.AccountCode, new { @class = "form-control input-sm", required = "required" })
+                                @Html.ValidationMessageFor(m => m.AccountCode, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.Description, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.Description, new { @class = "form-control input-sm", required = "required" })
+                                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.Description2, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.Description2, new { @class = "form-control input-sm" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.AccountGroup, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.AccountGroup, Model.AccountGroupList, "SELECT ACCOUNT GROUP", new { @class = "form-control input-sm", required = "required" })
+                                @Html.ValidationMessageFor(m => m.AccountGroup, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.DebitCredit, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.DebitCredit, Model.DebitCreditList, "SELECT DEBIT/CREDIT", new { @class = "form-control input-sm", required = "required" })
+                                @Html.ValidationMessageFor(m => m.DebitCredit, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.CurrencyCode, new { @class = "col-md-3 control-label input-sm" })
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.CurrencyCode, Model.CurrencyCodeList, "SELECT CURRENCY", new { @class = "form-control input-sm", required = "required" })
+                                @Html.HiddenFor(m => m.Sequence)
+                                @Html.HiddenFor(m => m.Status)
+                                @Html.HiddenFor(m => m.BranchID)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer pull-left">
+                <button class="btn btn-primary btn-sm" type="button" onclick="btnEditChartOfAccountSave()"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Save</button>
+                <button class="btn btn-success btn-sm" type="button" onclick="btnAddNew()"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New</button>
+                <button class="btn btn-warning btn-sm" type="button" onclick="btnRemoveCOA()"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Remove</button>
+                <button class="btn btn-sm" data-dismiss="modal" type="button" onclick="location.href = '@Url.Content("~/Home/Index")'"><i class="fa fa-undo" aria-hidden="true"></i>&nbsp;Back</button>
+            </div>
+            <div class="overlay" style="opacity:0.8;display:none;" id="overlayDiv">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
+        </div>
+    </div>
+    
+}
+
+
+

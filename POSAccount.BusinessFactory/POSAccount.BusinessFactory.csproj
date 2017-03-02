@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{307E4877-F05B-4B1B-AA60-06F9DEBB38F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>POSAccount.BusinessFactory</RootNamespace>
+    <AssemblyName>POSAccount.BusinessFactory</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft Enterprise Library 5.0\Bin\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Data, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft Enterprise Library 5.0\Bin\Microsoft.Practices.EnterpriseLibrary.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET MVC 4\Assemblies\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountGroupBO.cs" />
+    <Compile Include="APCreditNoteBO.cs" />
+    <Compile Include="APCreditNoteDetailBO.cs" />
+    <Compile Include="APDebitNoteBO.cs" />
+    <Compile Include="APDebitNoteDetailBO.cs" />
+    <Compile Include="APFileDetailBO.cs" />
+    <Compile Include="APFileUploadBO.cs" />
+    <Compile Include="APInvoiceBO.cs" />
+    <Compile Include="APInvoiceDetailBO.cs" />
+    <Compile Include="ARCreditNoteBO.cs" />
+    <Compile Include="ARCreditNoteDetailBO.cs" />
+    <Compile Include="ARDebitNoteBO.cs" />
+    <Compile Include="ARDebitNoteDetailBO.cs" />
+    <Compile Include="ARInvoiceBO.cs" />
+    <Compile Include="ARInvoiceDetailBO.cs" />
+    <Compile Include="AssetHeaderBO.cs" />
+    <Compile Include="BankBO.cs" />
+    <Compile Include="BranchBO.cs" />
+    <Compile Include="CBBankTransferBO.cs" />
+    <Compile Include="CBPaymentBO.cs" />
+    <Compile Include="CBPaymentDetailBO.cs" />
+    <Compile Include="CBPaymentSetOffDetailBO.cs" />
+    <Compile Include="CBReceiptBO.cs" />
+    <Compile Include="CBReceiptDetailBO.cs" />
+    <Compile Include="CBReceiptSetOffDetailBO.cs" />
+    <Compile Include="ChargeCodeBO.cs" />
+    <Compile Include="ChartOfAccountBO.cs" />
+    <Compile Include="CompanyBO.cs" />
+    <Compile Include="CreditorBO.cs" />
+    <Compile Include="DebtorBO.cs" />
+    <Compile Include="GLFinancialPeriodBO.cs" />
+    <Compile Include="GLJournalBO.cs" />
+    <Compile Include="GLJournalDetailBO.cs" />
+    <Compile Include="GLOpeningBO.cs" />
+    <Compile Include="GLOpeningDetailBO.cs" />
+    <Compile Include="GLTransactionBO.cs" />
+    <Compile Include="LookUpBO.cs" />
+    <Compile Include="CustomerBO.cs" />
+    <Compile Include="CurrencyBO.cs" />
+    <Compile Include="CountryBO.cs" />
+    <Compile Include="OrderDetailsBO.cs" />
+    <Compile Include="OrderHeaderBO.cs" />
+    <Compile Include="ProductImageBO.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuotationBO.cs" />
+    <Compile Include="QuotationItemBO.cs" />
+    <Compile Include="RoleRightsBO.cs" />
+    <Compile Include="RolesBO.cs" />
+    <Compile Include="SearchColumnBO.cs" />
+    <Compile Include="SystemWideConfigurationBO.cs" />
+    <Compile Include="UsersBO.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\POSAccount.Contract\POSAccount.Contract.csproj">
+      <Project>{16781035-c84a-4e41-a56d-e475e6d75296}</Project>
+      <Name>POSAccount.Contract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\POSAccount.DataFactory\POSAccount.DataFactory.csproj">
+      <Project>{3c67f7b2-611a-4a2d-9337-731337e4646d}</Project>
+      <Name>POSAccount.DataFactory</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{16781035-C84A-4E41-A56D-E475E6D75296}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>POSAccount.Contract</RootNamespace>
+    <AssemblyName>POSAccount.Contract</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft Enterprise Library 5.0\Bin\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Data, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft Enterprise Library 5.0\Bin\Microsoft.Practices.EnterpriseLibrary.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountGroup.cs" />
+    <Compile Include="Address.cs" />
+    <Compile Include="APCreditNote.cs" />
+    <Compile Include="APCreditNoteDetail.cs" />
+    <Compile Include="APDebitNote.cs" />
+    <Compile Include="APDebitNoteDetail.cs" />
+    <Compile Include="APFileDetail.cs" />
+    <Compile Include="APFileUpload.cs" />
+    <Compile Include="APInvoice.cs" />
+    <Compile Include="APInvoiceDetail.cs" />
+    <Compile Include="ARCreditNote.cs" />
+    <Compile Include="ARCreditNoteDetail.cs" />
+    <Compile Include="ARDebitNote.cs" />
+    <Compile Include="ARDebitNoteDetail.cs" />
+    <Compile Include="ARInvoice.cs" />
+    <Compile Include="ARInvoiceDetail.cs" />
+    <Compile Include="AssetHeader.cs" />
+    <Compile Include="Bank.cs" />
+    <Compile Include="BankRecon.cs" />
+    <Compile Include="Branch.cs" />
+    <Compile Include="CBBankTransfer.cs" />
+    <Compile Include="CBPayment.cs" />
+    <Compile Include="CBPaymentDetail.cs" />
+    <Compile Include="CBPaymentGlDetail.cs" />
+    <Compile Include="CBPaymentSetOffDetail.cs" />
+    <Compile Include="CBReceipt.cs" />
+    <Compile Include="CBReceiptDetail.cs" />
+    <Compile Include="CBReceiptGlDetail.cs" />
+    <Compile Include="CBReceiptSetOffDetail.cs" />
+    <Compile Include="ChargeCode.cs" />
+    <Compile Include="ChartOfAccount.cs" />
+    <Compile Include="Company.cs" />
+    <Compile Include="Country.cs" />
+    <Compile Include="Creditor.cs" />
+    <Compile Include="Currency.cs" />
+    <Compile Include="Customer.cs" />
+    <Compile Include="Debtor.cs" />
+    <Compile Include="GLFinancialPeriod.cs" />
+    <Compile Include="GLJournal.cs" />
+    <Compile Include="GLJournalDetail.cs" />
+    <Compile Include="GLOpening.cs" />
+    <Compile Include="GLOpeningDetail.cs" />
+    <Compile Include="GLTransaction.cs" />
+    <Compile Include="IContract.cs" />
+    <Compile Include="LookUp.cs" />
+    <Compile Include="OrderDetails.cs" />
+    <Compile Include="OrderHeader.cs" />
+    <Compile Include="ProductImage.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quotation.cs" />
+    <Compile Include="QuotationItem.cs" />
+    <Compile Include="ReportParams.cs" />
+    <Compile Include="RoleRights.cs" />
+    <Compile Include="Roles.cs" />
+    <Compile Include="searchColumn.cs" />
+    <Compile Include="Securables.cs" />
+    <Compile Include="SystemWideConfiguration.cs" />
+    <Compile Include="Users.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

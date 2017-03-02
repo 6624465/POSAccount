@@ -1,0 +1,548 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - POS &nbsp; Accounting Application</title>
+    <link href="@Url.Content("~/Content/bootstrap.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/bootstrap-datetimepicker.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/AdminLTE.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/_all-skins.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/font-awesome-4.5.0/css/font-awesome.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/datatables.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/select2.min.css")" rel="stylesheet" />
+    <style type="text/css">
+        a:hover {
+            text-decoration: none;
+        }
+
+        .class_checkbox {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            *display: inline;
+            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+            width: 18px;
+            height: 18px;
+            background: url(../images/blue.png) no-repeat;
+            border: none;
+            cursor: pointer;
+        }
+
+            .class_checkbox.checked {
+                display: inline-block;
+                *display: inline;
+                vertical-align: middle;
+                margin: 0;
+                padding: 0;
+                width: 18px;
+                height: 18px;
+                background-position: -40px 0 !important;
+                border: none;
+                cursor: pointer;
+                background-position: -80px 0;
+            }
+
+        .rdoCss {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            *display: inline;
+            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+            width: 18px;
+            height: 18px;
+            background: url(../images/blue.png) no-repeat;
+            border: none;
+            cursor: pointer;
+            background-position: -120px 0 !important;
+        }
+
+            .rdoCss.checked {
+                display: inline-block;
+                *display: inline;
+                vertical-align: middle;
+                margin: 0;
+                padding: 0;
+                width: 18px;
+                height: 18px;
+                background-position: -40px 0 !important;
+                border: none;
+                cursor: pointer;
+                background-position: -140px 0 !important;
+            }
+
+        .select2-selection, .select2-selection--single {
+            padding-top: 5px !important;
+            border-bottom-width: 1px !important;
+            border-top-width: 1px !important;
+            padding-left: 0px !important;
+            border-color: #D2D6DE !important;
+            height: 30px !important;
+            line-height: 30px !important;
+        }
+
+        /*@@font-face {
+          font-family: 'FontAwesome';
+          src: url('../fonts/fontawesome-webfont.eot?v=4.5.0');
+          src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'),
+               url('../fonts/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
+          font-weight: normal;
+          font-style: normal;
+        }*/
+
+        @@font-face {
+            font-family: 'proximanovalight';
+            src: url('../fonts/proximanovalight.eot');
+            src: local('proximanovalight'), url('../fonts/proximanovalight.woff') format('woff'), url('../fonts/proximanovalight.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'proximanovalight';
+        }
+
+        .fontsforweb_fontid_12950 {
+            font-family: 'proximanovalight' !important;
+        }
+
+        select {
+            padding-bottom: 0px;
+            padding-left: 0px;
+            height: 30px;
+            width: 216px;
+            padding-top: 0px;
+            padding-right: 0px;
+            border-right-width: 1px;
+            border-left-width: 1px;
+        }
+    </style>
+    <style type="text/css">
+        input[type=text].error, input[type=password].error, textarea.error, select.error {
+            border: 1px solid red;
+        }
+
+        label.error {
+            display: none !important;
+        }
+    </style>
+
+    @RenderSection("CssSection", required: false)
+    @using Newtonsoft.Json
+    @{        
+        bool isMenuOpened = false;
+        if (Request.Cookies["POSAccountMenuCookie"] != null)
+        {
+            isMenuOpened = Convert.ToBoolean(JsonConvert.DeserializeObject(Request.Cookies["POSAccountMenuCookie"].Value));
+        }
+        else
+        {
+            HttpCookie cookie = new HttpCookie("POSAccountMenuCookie", "false");
+            Response.Cookies.Add(cookie);
+        }
+
+        var roleRights = new POSAccount.BusinessFactory.RoleRightsBO()
+                                .GetList(Utility.USERROLE);
+
+        var securablesAll = (List<POSAccount.Contract.Securables>)System.Web.HttpContext.Current.Application["AppSecurables"];
+
+        var securables = securablesAll.Join(roleRights,
+                            sec => sec.SecurableItem,
+                            rig => rig.SecurableItem,
+                            (sec, rig) => new { a = sec, b = rig })
+                        .Select(x => new POSAccount.Contract.Securables()
+                            {
+                                SecurableItem = x.a.SecurableItem,
+                                GroupID = x.a.GroupID,
+                                Description = x.a.Description,
+                                ActionType = x.a.ActionType,
+                                Link = x.a.Link,
+                                Icon = x.a.Icon
+                            }).ToList<POSAccount.Contract.Securables>();
+
+        var menuItems = securablesAll.Where(x => x.ActionType == "TopMenu")
+                            .Select(x => new { securableItem = x.SecurableItem, Icon = x.Icon, GroupId = x.GroupID, Sequence = x.Sequence }).Distinct().ToList().OrderBy(x => x.Sequence).ToList();
+
+
+        List<POSAccount.ViewModals.Search.LayoutMenu> lstMenu = new List<POSAccount.ViewModals.Search.LayoutMenu>();
+        for (var i = 0; i < menuItems.Count; i++)
+        {
+            POSAccount.ViewModals.Search.LayoutMenu item = new POSAccount.ViewModals.Search.LayoutMenu();
+            item.MenuName = menuItems[i].securableItem;
+            item.Icon = menuItems[i].Icon;
+            item.securablesLst = securables.Where(x => x.GroupID == menuItems[i].securableItem && x.ActionType == "Menu")
+                                           .ToList<POSAccount.Contract.Securables>();
+
+            if (item.securablesLst.Count > 0)
+            {
+                lstMenu.Add(item);
+            }
+        }
+    }
+
+</head>
+
+<body class="skin-green sidebar-mini @if (isMenuOpened)
+                                     { <text>sidebar-collapse</text> }">
+    <div class="wrapper">
+        <header class="main-header">
+            <a href="index2.html" class="logo">
+                <span class="logo-mini"><b>POS</b></span>
+                <span class="logo-lg">POS&nbsp;Accounting</span>
+            </a>
+            <nav class="navbar navbar-static-top" role="navigation" onclick="LeftMenuClick();">
+                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <span class="hidden-xs">
+                                    <img src="@Url.Content("~/Images/avatar.png")" class="user-image" alt="User Image" />@Utility.DEFAULTUSER.ToString()</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="user-header">
+                                    <img src="@Url.Content("~/Images/avatar.png")" class="img-circle" alt="User Image" />
+                                    <p>
+                                        @Utility.DEFAULTUSER - @Utility.DEFAULTUSERNAME
+                                        <small>Member since June. 2015</small>
+                                    </p>
+                                </li>
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="@Url.Action("LogOff", "Account", new { area = string.Empty }, null)" id="ancLogOut" class="btn btn-default btn-flat">Sign out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <aside class="main-sidebar">
+            <section class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-dashboard"></i><span>Dashboard</span> <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="@Url.Action("DashBoard", "MasterData", new { area = "MasterData" }, null)">
+                                    <i class="fa fa-calculator"></i>Activity Summary
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-files-o"></i><span>Master Data</span> <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li class="active"><a href="@Url.Action("CompanyProfile", "MasterData", new { area = "MasterData" }, null)"><i class="fa fa-files-o"></i>Company Profile</a></li>
+                            <li><a href="@Url.Action("ChartOfAccountMaster", "MasterData", new { area = "MasterData" }, null)"><i class="fa fa-link"></i>Chart Of Accounts</a></li>
+                            <li><a href="@Url.Action("ChargeCodeMaster", "MasterData", new { area = "MasterData" }, null)"><i class="fa fa-circle-o"></i>Charge Code</a></li>
+                            <li><a href="@Url.Action("AssetMaster", "MasterData", new { area = "MasterData" }, null)"><i class="fa fa-tags"></i>Assets </a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#"><i class="fa fa-ship" aria-hidden="true"></i><span>Quotation</span><i class="fa fa-angle-left pull-right"></i></a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("StandardRateProfile", "Quotation", new { area = "Quotation", quotationNo = "STANDARD", isLink = true }, null)"><i class="fa fa-rebel" aria-hidden="true"></i>&nbsp;Standard Rate Profile</a></li>
+                            <li><a href="@Url.Action("CustomerQuotations", "Quotation", new { area = "Quotation" }, null)"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Customer Rate Profile</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-th" aria-hidden="true"></i><span>POS Transaction</span><i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("Orders", "POS", new { area = "POS" }, null)"><i class="fa fa-money" aria-hidden="true"></i>&nbsp;Sales-Orders </a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-pencil" aria-hidden="true"></i><span>EDI File Upload</span><i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("EDIAPInvoiceList", "AP", new { area = "AP" }, null)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>EDI AP Invoices </a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-pie-chart"></i>
+                            <span>Accounts Payable</span>
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("SupplierList", "AP", new { area = "AP" }, null)"><i class="fa fa-male" aria-hidden="true"></i>&nbsp;Supplier Profile (Creditor)</a></li>
+                            <li><a href="@Url.Action("APInvoiceList", "AP", new { area = "AP" }, null)"><i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;AP - Invoice List</a></li>
+                            <li><a href="@Url.Action("APDebitNote", "AP", new { area = "AP" }, null)"><i class="fa fa-credit-card" aria-hidden="true"></i>&nbsp;AP - Debit Note</a></li>
+                            <li><a href="@Url.Action("APCreditNote", "AP", new { area = "AP" }, null)"><i class="fa fa-credit-card-alt" aria-hidden="true"></i>&nbsp;AP - Credit Note</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-laptop"></i>
+                            <span>Accounts Receivable</span>
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("CustomerList", "AR", new { area = "AR" }, null)"><i class="fa fa-male" aria-hidden="true"></i>&nbsp;Customer Profile (Debtor)</a></li>
+                            <li><a href="@Url.Action("ARInvoiceList", "AR", new { area = "AR" }, null)"><i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;AR - Invoice List</a></li>
+                            <li><a href="@Url.Action("ARDebitNote", "AR", new { area = "AR" }, null)"><i class="fa fa-credit-card" aria-hidden="true"></i>&nbsp;AR - Debit Note</a></li>
+                            <li><a href="@Url.Action("ARCreditNote", "AR", new { area = "AR" }, null)"><i class="fa fa-credit-card-alt" aria-hidden="true"></i>&nbsp;AR - Credit Note</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-edit"></i><span>CB Transaction</span>
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("BankProfileList", "CB", new { area = "CB" }, null)"><i class="fa fa-university" aria-hidden="true"></i>&nbsp;Bank Profile</a></li>
+                            <li><a href="@Url.Action("CBBankReconciliation", "CB", new { area = "CB" }, null)"><i class="fa fa-university" aria-hidden="true"></i>&nbsp;Bank Recon</a></li>
+                            
+                            <li><a href="@Url.Action("CBReceiptList", "CB", new { area = "CB" }, null)"><i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;Receipts</a></li>
+                            <li><a href="@Url.Action("CBPaymentList", "CB", new { area = "CB" }, null)"><i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;Payments</a></li>
+
+
+                            @*<li><a href="@Url.Action("CBReceipt", "CB", new { area = "CB", CBReceiptType = "", DocumentNo = "NEW" },null)"><i class="fa fa-money" aria-hidden="true"></i>&nbsp;CB - Receipts</a></li>
+                            <li><a href="@Url.Action("CBPayment", "CB", new { area = "CB", CBPaymentType = "", DocumentNo = "NEW" }, null)"><i class="fa fa-shopping-cart" aria-hidden="true"></i>&nbsp;CB - Payments</a></li>*@
+                            <li><a href="@Url.Action("BankTransfer", "CB", new { area = "CB" }, null)"><i class="fa fa-exchange" aria-hidden="true"></i>&nbsp;Bank Transfer</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-table"></i><span>G L</span>
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <!-- treeview-menu active menu-open -->
+                            <li><a href="@Url.Action("GLFinancialPeriod", "GL", new { area = "GL" }, null)"><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;Financial Period</a></li>
+                            <li><a href="@Url.Action("GLOpening", "GL", new { area = "GL" }, null)"><i class="fa fa-external-link" aria-hidden="true"></i>&nbsp;G L - Opening</a></li>
+                            <li><a href="@Url.Action("GLJournalList", "GL", new { area = "GL" }, null)"><i class="fa fa-openid" aria-hidden="true"></i>&nbsp;G L - Journal</a></li>
+                            <li><a href="@Url.Action("JVManualList", "GL", new { area = "GL" }, null)"><i class="fa fa-openid" aria-hidden="true"></i>&nbsp;J V - Manual</a></li>
+                            @*<li><a href="@Url.Action("GLJournalEntry", "GL", new { area = "GL" }, null)"><i class="fa fa-openid" aria-hidden="true"></i>&nbsp;G L - Journal</a></li>
+                            <li><a href="@Url.Action("JVManual", "GL", new { area = "GL" }, null)"><i class="fa fa-openid" aria-hidden="true"></i>&nbsp;J V - Manual</a></li>*@
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-bar-chart" aria-hidden="true"></i><span>Reports</span>
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("BalanceSheet", "POSReport", new { area = "POSReport" }, null)"><i class="fa fa-balance-scale" aria-hidden="true"></i>&nbsp;Balance Sheet</a></li>
+                            <li><a href="@Url.Action("TrailBalance", "POSReport", new { area = "POSReport" }, null)"><i class="fa fa-black-tie" aria-hidden="true"></i>&nbsp;Trail Balance</a></li>
+                            <li><a href="@Url.Action("GeneralLedgerListing", "POSReport", new { area = "POSReport" }, null)"><i class="fa fa-gavel" aria-hidden="true"></i>&nbsp;General Ledger Listing</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="pages/mailbox/mailbox.html">
+                            <i class="fa fa-envelope"></i><span>Set Up</span>
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="@Url.Action("UserList", "User", new { area = "User" }, null)"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;Users</a></li>
+                            <li><a href="@Url.Action("RoleRights", "User", new { area = "User" }, null)"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;Role Rights</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </aside>
+        <div class="content-wrapper">
+            <section class="content">
+                @RenderBody()
+            </section>
+        </div>
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0.0
+            </div>
+            <p>&copy; @DateTime.Now.Year - <a href="#">Virgo-Leo Solutions</a> </p>
+        </footer>
+    </div>
+
+    @Html.Partial("_ShowAlertPartial")
+    <script src="@Url.Content("~/Scripts/jquery-1.10.2.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui.js")"></script>
+    <script src="@Url.Content("~/Scripts/moment.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.js")"></script>
+    @*<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.js")"></script>*@
+    <script src="@Url.Content("~/Scripts/app.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/dataTables.bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/select2.min.js")"></script>
+    <script type="text/javascript">
+        var ActionType;
+        function ModalShow(Message, ResponseType, actionType) {
+            $('#myModalTest').modal({
+                keyboard: false
+            }, 'show');
+            if (ResponseType == "Failure") {
+                $('#myModalTestInnerDiv').removeClass("modal-success").addClass("modal-danger");
+            }
+            else {
+                $('#myModalTestInnerDiv').removeClass("modal-danger").addClass("modal-success");
+            }
+
+            ActionType = actionType
+            $("#modalHeader").text(ResponseType);
+            $("#pmodalid").text(Message);
+            $('#myModalTestInnerDiv').show();
+        }
+
+        $(function () {
+            $("input ,select, textarea,hidden, a").not($(":button,a")).keypress(function (evt) {
+                if (evt.keyCode == 13) {
+                    evt.preventDefault();
+                    return false;
+                }
+            });
+
+            $("#txtSearch").keypress(function (evt) {
+                if (evt.keyCode == 13) {
+                    $("#btnSearch").click();
+                    window.location = $('#btnSearch').attr('href');
+                }
+            });
+
+            var CurrentUrl = '@Request.RawUrl';
+
+            if (CurrentUrl != '/MasterData/ChartOfAccountMaster') {
+                sessionStorage.removeItem('SsnAccountDesc');
+            }
+
+
+
+            /* JS Utility Functions */
+            $(document).on('keypress', '.numOnlyCss', function (evt) {
+                var text = $('#txtChequeNo').val();
+                evt = (evt) ? evt : window.event;
+                var charCode = (evt.which) ? evt.which : evt.keyCode;
+                if (text.length >= 10) {
+                    if (charCode == 8 || charCode == 9)
+                        return true;
+                    return false;
+                }
+
+                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                    return false;
+                }
+                return true;
+            });
+
+            $(document).on('keypress', '.datepicker', function (evt) {
+                return false;
+            });
+
+            $(document).on('keypress', '.alphaNumCss', function (evt) {
+                evt = (evt) ? evt : window.event;
+                var charCode = parseInt((evt.which) ? evt.which : evt.keyCode);
+                if ((charCode >= 48 && charCode <= 57) || (charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122))
+                    return true;
+                else
+                    return false;
+            });
+
+            $(document).on('keypress', '.decimalCss', function (evt) {
+
+                var charCode = (evt.which) ? evt.which : event.keyCode;
+                if (charCode != 46 && charCode > 31
+                  && (charCode < 48 || charCode > 57))
+                    return false;
+
+                return true;
+            });
+
+            $(document).on('keypress', '.numCss', function (evt) {
+                var charCode = (evt.which) ? evt.which : event.keyCode;
+                if (charCode >= 48 && charCode <= 57)
+                    return true;
+                else
+                    return false;
+            });
+
+
+
+         @*   $('#ancSignOut').on('click', function () {
+                debugger;
+                var url = '@Url.Action("LogOff","Account")';
+                location.href = url;
+            });*@
+            /* JS Utility Functions */
+        });
+
+
+
+        $("#btnBack").click(function (event) {
+            event.preventDefault();
+            history.back(1);
+        });
+
+
+
+        function LeftMenuClick() {
+            var cookieVal = JSON.parse(getCookie('POSAccountMenuCookie')) == 'true' ? true : false;
+            setCookie('POSAccountMenuCookie', !cookieVal ? 'true' : 'false', 1)
+        }
+
+        function setCookie(cname, cvalue, exdays) {
+            var today = new Date();
+            var d = new Date();
+            d.setTime(today.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + JSON.stringify(cvalue) + "; " + expires + ";path=/"
+        }
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1);
+                if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+            }
+            return "";
+        }
+
+        var _isModalOpen = true;
+        function ShowNotifyMessage(Title, Message, Type) {
+            $.notify({
+                title: "<strong>" + Title + "</strong> ",
+                message: Message
+            },
+            {
+                // settings
+                type: Type,
+                placement: {
+                    from: "bottom",
+                    align: "right"
+                },
+                delay: 10000
+            });
+        }
+        /*
+        $(function () {
+            $(".NumberAutonumeric").autoNumeric('init');
+        })*/
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+
+
+

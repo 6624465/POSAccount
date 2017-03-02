@@ -1,0 +1,106 @@
+﻿@model List<POSAccount.Contract.AssetHeader>
+
+@{
+    ViewBag.Title = "List Of Assets";
+}
+
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="box box-solid box-default">
+    <!--Dispaly Header Information-->
+    <div class="box-header with-border">
+        <h3 class="box-title">Asset Master</h3>
+
+    </div>
+    <!--END OF Dispaly Header Information-->
+    <!--Body-->
+    <div class="box-body">      
+
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="tbDetails" data-toggle="tab">Asset Master</a>
+                </li>
+                <li class="pull-right">                                        
+                        <div class="btn-group btn-primary">
+                            <a class="btn btn-small btn-primary" href="@Url.Content("~/MasterData/EditAsset")" id="btnCreate"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Asset</a>
+                        </div>                  
+                </li>
+            </ul>
+            <!-- Display List Section -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="tbDetails">
+                    <div class="box">
+                        <div class="box-body">
+                            <table id="tblAssetMaster" class="table table-striped table-hover table-bordered table-responsive ">
+                                <thead style="background-color:steelblue;color:white;font-size:12px;">
+                                    <tr>
+                                        <th>Asset Code</th>
+                                        <th>Description</th>
+                                        <th>BuyingDate</th>
+                                        <th>Price</th>
+                                        <th>Rate</th>                                                                            
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size:12px;">
+                                    @foreach (POSAccount.Contract.AssetHeader item in Model)
+                                    {
+                                        <tr>
+                                            <td>@Html.ActionLink(@item.AssetCode, "EditAsset", "MasterData", new { assetCode = @item.AssetCode }, new { id = "btnCreate", @class = "btn btn-link btn-small" })</td>
+                                            <td> @item.Description </td>
+                                            <td> @item.BuyingDate.ToString("dd-MM-yyyy") </td>                                            
+                                            <td> @item.Price.ToString("###,###.00")</td>
+                                            <td> @item.Rate.ToString("###,###.00") </td>                                           
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Display List Section -->
+        
+    </div>
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+    
+    @Scripts.Render("~/bundles/modalform")   
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tblAssetMaster').DataTable({
+                responsive: true
+            });
+            var table = $('#tblAssetMaster').DataTable();
+            $('#tblQuotationItem tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+
+
+        });
+
+    </script>
+}

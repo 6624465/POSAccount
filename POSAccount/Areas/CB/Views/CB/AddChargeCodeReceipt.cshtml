@@ -1,0 +1,62 @@
+﻿@model POSAccount.Contract.CBReceiptDetail
+
+
+<div class="modal-body form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        <div>
+            @Html.LabelFor(m => m.AccountCode, new { @class = "col-md-2 control-label input-sm" })
+            <div class="col-md-6">
+                @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "", new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.AccountCode, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div>
+            @Html.LabelFor(m => m.Remark, new { @class = "control-label input-sm col-md-2" })
+            <div class="col-md-6">
+                @Html.TextAreaFor(m => m.Remark, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div>
+            @Html.LabelFor(m => m.CurrencyCode, new { @class = "col-md-2 control-label input-sm" })
+            <div class="col-md-6">
+                @Html.DropDownListFor(m => m.CurrencyCode, Model.CurrencyList, "", new { @class = "form-control input-sm" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" style="display:none;">
+        <div>
+            @Html.LabelFor(m => m.BaseAmount, new { @class = "col-md-2 control-label input-sm" })
+            <div class="col-md-4">
+                @Html.TextBoxFor(m => m.BaseAmount, new { @class = "form-control input-sm " })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div>
+            @Html.LabelFor(m => m.LocalAmount, new { @class = "col-md-2 control-label input-sm" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.LocalAmount, new { @class = "form-control input-sm " })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div>
+            @Html.LabelFor(m => m.SetOffDate, new { @class = "col-md-2 control-label input-sm" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.SetOffDate, new { @class = "form-control input-sm datepicker" })
+            </div>
+        </div>
+    </div>
+</div>
+
+

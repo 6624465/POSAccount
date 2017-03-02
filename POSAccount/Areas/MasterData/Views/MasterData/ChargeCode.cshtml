@@ -1,0 +1,114 @@
+﻿@model List<POSAccount.Contract.ChargeCodeMaster>
+
+@{
+    ViewBag.Title = "List Of Charge Codes";
+}
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="box box-solid box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">Charge Codes</h3>
+
+    </div>
+    <div class="box-body">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="tbDetails" data-toggle="tab">Charge Code List</a>
+                </li>
+                <li class="pull-right">
+                    <div class="btn-group btn-primary">                        
+                        <div class="btn-group btn-primary">
+                            <a class="btn btn-small btn-primary" href="@Url.Content("~/MasterData/EditChargeCode")" id="btnCreate"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Charge Code</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!-- Display List Section -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="tbDetails">
+                    <div class="box">
+                        <div class="box-body">
+                            <table id="tblChargeCode" class="table table-striped table-hover table-bordered table-responsive ">
+                                <thead style="background-color:steelblue;color:white;font-size:12px;">
+                                    <tr>
+                                        <th>Charge Code</th>
+                                        <th>Description</th>
+                                        <th>Billing Unit</th>
+                                        <th>Credit Term</th>
+                                        <th>Payment Term</th>
+                                        <th>Account Desc</th>
+                                        <th>VAT</th>
+                                        <th>VAT Account Code</th>
+                                        <th>W/H Tax Rate</th>
+                                        <th>W/H Account Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size:12px;">
+                                    @foreach (POSAccount.Contract.ChargeCodeMaster item in Model)
+                                    {
+                                        <tr>
+                                            <td>@Html.ActionLink(item.ChargeCode, "EditChargeCode", "MasterData", new { chargeCode = @item.ChargeCode }, new { id = "btnCreate" })</td>
+                                            <td> @item.Description </td>
+                                            <td> @item.BillingUnit </td>
+                                            <td> @item.CreditTerm</td>
+                                            <td> @item.PaymentTerm</td>
+                                            <td> @item.AccountDescription </td>
+                                            <td> @item.VAT </td>
+                                            <td> @item.VATAccountDescription </td>
+                                            <td> @item.WithHoldingTaxRate</td>
+                                            <td> @item.WHAccountDescription </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Display List Section -->
+        
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+    
+    @Scripts.Render("~/bundles/modalform")
+    
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#tblChargeCode').DataTable({
+                responsive: true
+            });
+            var table = $('#tblChargeCode').DataTable();
+            $('#tblQuotationItem tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+            $('.sidebar-mini').addClass('sidebar-collapse');
+
+        });
+
+    </script>
+}

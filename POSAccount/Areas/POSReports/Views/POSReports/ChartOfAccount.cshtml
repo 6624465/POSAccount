@@ -1,0 +1,18 @@
+﻿@using System.Drawing;
+@using System.Web.UI.WebControls;
+@using MvcReportViewer;
+
+    @{
+        var settings = new ControlSettings
+            {
+                ShowParameterPrompts = true,
+                ShowFindControls = true,
+                BackColor = Color.Orange,
+                KeepSessionAlive = true,
+                Width = new Unit("100%"),
+                Height = new Unit("800px"),
+                AsyncRendering = false
+            };
+    }
+    @Html.MvcReportViewerFluent("/POSReports/ChartOfAccount").ControlSettings(settings).Attributes(new { Height = 500, Width = 900, style = "border: none" }).Method(FormMethod.Post)
+

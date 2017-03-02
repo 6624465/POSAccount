@@ -1,0 +1,391 @@
+﻿@model POSAccount.Contract.Creditor
+
+@{
+    ViewBag.Title = "CreditorProfile";
+}
+@section CssSection
+{
+    <style>
+        input[type=text].error, select.error {
+            border-color: red;
+            font-size: 12px;
+        }
+
+        label.error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+}
+@using (Ajax.BeginForm("SaveCreditor", "AP", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid box-default">
+        <div class="box-header">
+            <h3 class="box-title">Supplier Profile</h3>
+            <div class="box-tools pull-right">
+                <div class="has-feedback">
+                    <div class="input-group input-group-sm">
+                        <input id="txtSearch" class="form-control" type="text" placeholder="Search Supplier" />
+                        <span class="input-group-btn" style="width: 70px">
+                            <div class="btn-group">
+                                <a href="@Url.Action("SearchCreditor", "AP", new { area = "AP", creditorCode = 0 }, null)" class="btn btn-info btn-flat" onclick="return Search()" id="btnSearch"><i class="fa fa-search"></i></a>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Body Information-->
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label class="col-md-2 control-label input-sm">Supplier Code</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditorCode, new { placeholder = "CreditorCode", required = "required", id = "txtCreditorCode", @class = "form-control input-sm", @readonly = "readonly" })
+
+                        </div>
+                        <label for="txtRegistrationNo" class="col-md-2 control-label input-sm">Regirstration No.</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.RegistrationNo, new { @placeholder = "RegistrationNo", @id = "txtRegistrationNo", @class = "form-control input-sm" })
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtCreditorName" class="col-md-2 control-label input-sm">Name</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.CreditorName, new { @placeholder = "CreditorName", @id = "txtCreditorName", @class = "form-control input-sm" })
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label class="col-md-2 control-label input-sm">Creditor Account</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.CreditorAccount, Model.CreditorAccountList, "", new { @id = "ddlAccountCode", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtCreditTerm" class="col-md-2 control-label input-sm">Credit Term/ Payment Type</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditTerm, new { @placeholder = "CreditTerm", @id = "txtCreditTerm", @class = "form-control input-sm" })
+                        </div>
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(m => m.PaymentType, Model.PaymentTypeList, "PAYMENT TYPE", new { @class = "form-control input-sm" })
+                        </div>
+                        <div class="col-md-1">
+                            @Html.CheckBoxFor(x => x.IsAutoSendInvoice, new { @class = "pull-right" })
+                        </div>
+                        <label for="IsAutoSendInvoice">Auto send Invoice</label>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="form-horizontal">
+                <legend>Address</legend>
+                <div class="form-group">
+                    <div>
+                        <label for="txtAddress1" class="col-md-2 control-label input-sm">Address 1</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.CreditorAddress.Address1, new { @placeholder = "Address1", @id = "txtAddress1", @class = "form-control input-sm" })
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtAddress2" class="col-md-2 control-label input-sm">Address 2</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.CreditorAddress.Address2, new { @placeholder = "Address2", @id = "txtAddress2", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtCityName" class="col-md-2 control-label input-sm">City</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditorAddress.CityName, new { @placeholder = "CityName", @id = "txtCityName", @class = "form-control input-sm" })
+
+                        </div>
+                        <label for="txtStateName" class="col-md-2 control-label input-sm">State</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.CreditorAddress.StateName, new { @placeholder = "StateName", @id = "txtStateName", @class = "form-control input-sm" })
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtZipCode" class="col-md-2 control-label input-sm">ZIP Code</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditorAddress.ZipCode, new { @placeholder = "ZipCode", @id = "txtZipCode", @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtCountryCode" class="col-md-2 control-label input-sm">Country</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.CreditorAddress.CountryCode, Model.CountryList, "Select Country", new { @id = "txtCountryCode", @class = "form-control chosen-select input-sm" })
+
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtTelNo" class="col-md-2 control-label input-sm">Phone No.</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditorAddress.TelNo, new { @placeholder = "TelNo", @id = "txtTelNo", @class = "form-control input-sm" })
+
+                        </div>
+                        <label for="txtFaxNo" class="col-md-2 control-label input-sm">Fax</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.CreditorAddress.FaxNo, new { @placeholder = "FaxNo", @id = "txtFaxNo", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtWebSite" class="col-md-2 control-label input-sm">Email</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.CreditorAddress.WebSite, new { placeholder = "Email", @id = "txtWebSite", @class = "form-control input-sm" })
+                            @Html.HiddenFor(m => m.CreditorAddress.AddressType)
+                            @Html.HiddenFor(m => m.AddressID)
+                        </div>
+                    </div>
+                </div>
+
+
+            </fieldset>
+        </div>
+
+        <!--Footer Information-->
+        <div class="box-footer">
+            <div class="row ">
+                <div class="col-xs-12">
+                    @*<a href="#" type="submit" class="btn btn-primary">Save</a>*@
+                    <a href="@Url.Action("CreditorProfile", "AP", new { area = "AP", creditorCode = "NEW" }, null)" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+
+                        New Supplier
+                    </a>
+
+                    <button type="button" id="btnSave" class="btn btn-social btn-success" onclick="SaveData();">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+
+                    <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <button type="button" onclick="DeleteCreditor('@Model.CreditorCode')" class="btn btn-social btn-danger" id="btnDelete">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </button>
+
+                    <a href="@Url.Action("SupplierList", "AP", new { area = "AP" }, null)" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+
+}
+
+
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+
+        var _selectedCreditorCode;
+        var creditorCode;
+
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+
+            creditorCode = result.Creditor.CreditorCode;
+        }
+
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = "../AP/SupplierProfile?CreditorCode=" + creditorCode;
+            }
+        }
+
+        function btnClear() {
+            $('.form-control').val('');
+        }
+
+        function SaveData() {
+            if ($('#myForm').valid()) {
+                $('#overlayDiv').fadeIn();
+                $('#myForm').submit();
+            }
+        }
+
+        function DeleteCreditor() {
+            var Creditorcode = $("#txtCreditorCode").val();
+            $.ajax({
+                url: "/AP/DeleteCreditor", type: "POST", dataType: "json",
+                data: { CreditorCode: Creditorcode },
+                async: true,
+                success: function (response) {
+                    if (response.result) {
+                        ModalShow(response.Message, "Success", "Delete");
+                        $("#txtCreditorCode").addClass("StrikeOut")
+                        $("#btnSave").attr("disabled", " disabled")
+
+
+                    } else {
+                        ModalShow(response.Message, "Failure", "Delete");
+                    }
+                }
+            })
+        }
+
+
+        $(function () {
+
+            if ('@Model.CreditorCode' == '') {
+                $('input[name="CreditorCode"]').prop('readonly', false);
+                $('#btnDelete').prop('disabled', true);
+            }
+
+
+
+            $('#myForm').validate({
+                rules: {
+                    CreditorCode: {
+                        required: true,                        
+                        maxlength: 10
+                    },
+                    RegistrationNo: {
+                        required: true
+                    },
+                    CreditorName: {
+                        required: true
+                    },
+                    CreditorAccount: {
+                        required: true
+                    },
+                    CreditTerm: {
+
+                        required: true
+                    },
+                    PaymentType: {
+                        required: true
+                    }
+                },
+                messages: {
+                    CreditorCode: {
+                        required: "Creditor Code is required",
+                        minlength: "minimum length 10 character",
+                        maxlength: "minimum length 10 character"
+                    },
+                    RegistrationNo: {
+                        required: "Registration No is required"
+                    },
+                    CreditorName: {
+                        required: "Creditor Name is required"
+                    },
+                    CreditorAccount: {
+                        required: "Creditor Account is required"
+                    },
+                    CreditTerm: {
+
+                        required: "Credit Term is required"
+                    },
+                    PaymentType: {
+                        required: "Payment Type is required"
+                    }
+                }
+            });
+
+
+            $("#txtSearch").autocomplete({
+                minLength: 2,
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Content("~/AP/SearchCreditorList")',
+                        type: "GET", dataType: "json",
+                        data: { searchText: request.term, limitRecords: -1, source: "Creditor" },
+                        async: true,
+                        success: function (data) {
+
+
+                            $.each(data, function (a, b) {
+
+                                response($.each(data, function (a, b) {
+                                    return { label: b.CreditorCode, value: b.CreditorCode }
+                                }))
+
+
+                                response($.map(data, function (item) {
+                                    return { label: item[0].CreditorCode, value: item[0].CreditorCode }
+
+                                }))
+                            })
+
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    _selectedCreditorCode = ui.item.value;
+
+
+                    $("#btnSearch").href = "/AP/SearchCreditor?CreditorCode=" + _selectedCreditorCode;
+                    $("#btnSearch").attr("href", "/AP/SearchCreditor?CreditorCode=" + _selectedCreditorCode)
+                    //$("#btnSearch").href
+                    setTimeout(function () {
+                        $("#txtSearch").val(ui.item.label);
+                    }, 100)
+
+                    return false;
+
+                }
+            });
+
+            if ('@Model.Status' == 'False') {
+                $("#txtCreditorCode").addClass("StrikeOut")
+                $("#btnSave").attr("disabled", " disabled")
+
+            }
+        });
+
+        function Search() {
+            var _selectedCreditorCode = $("#txtSearch").val();
+            $("#btnSearch").href = "/AP/SearchCreditor?CreditorCode=" + _selectedCreditorCode;
+            $("#btnSearch").attr("href", "/AP/SearchCreditor?CreditorCode=" + _selectedCreditorCode)
+
+            return true;
+        }
+
+
+
+
+    </script>
+
+}

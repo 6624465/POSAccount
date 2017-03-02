@@ -1,0 +1,273 @@
+﻿@model POSAccount.Contract.Company
+
+@{
+    ViewBag.Title = "CompanyProfile";
+}
+<div class="row">
+    <div class="col-md-4">
+        @{ Html.RenderAction("GetCompanies", "MasterData"); }
+    </div>
+    <div class="col-md-8">
+        @using (Html.BeginForm("SaveCompanyProfile", "MasterData", FormMethod.Post, new { id = "frmCompanyProfile", name = "frmCompanyProfile" }))
+        {
+            <div class="box box-solid box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Company Profile</h3>
+
+                </div>
+                <div class="box-body">
+                    <fieldset class="form-horizontal">
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Company Code</label>
+                                <div class="col-sm-2">
+                                    @Html.TextBoxFor(m => m.CompanyCode, new { @placeholder = "Company Code", @class = "form-control input-sm"})
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Name</label>
+                                <div class="col-sm-4">
+                                    @Html.TextBoxFor(m => m.CompanyName, new { @placeholder = "Company Name", @class = "form-control input-sm" })
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Registration No.</label>
+                                <div class="col-md-10">
+                                    @Html.TextBoxFor(m => m.RegNo, new { @placeholder = "RegNo", @class = "form-control input-sm" })
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </fieldset>
+                    <fieldset class="form-horizontal">
+                        <legend>Address</legend>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 1</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.Address1, new { @placeholder = "Address1", @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 2</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.Address2, new { @placeholder = "Address2", @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">City</label>
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.CityName, new { @placeholder = "City Name", @class = "form-control input-sm" })
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">State</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.StateName, new { @placeholder = "State Name", @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">ZIP Code</label>
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.ZipCode, new { @placeholder = "Zip Code", @class = "form-control input-sm" })
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Country</label>
+                                <div class="col-md-4">
+                                    @Html.DropDownListFor(m => m.CompanyAddress.CountryCode, Model.CountryList, "Select Country", new { @placeholder = "Country Code", @class = "form-control chosen-select input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Phone No.</label>
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.TelNo, new { @placeholder = "TelNo", @class = "form-control input-sm" })
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Fax</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.FaxNo, new { @placeholder = "FaxNo", @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Web Site</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.CompanyAddress.WebSite, new { @placeholder = "WebSite", @class = "form-control input-sm" })
+                                    @Html.HiddenFor(m => m.CompanyAddress.AddressType)
+                                    @Html.HiddenFor(m => m.AddressID)
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="box-footer">
+                    <div class="row  no-print">
+                        <div class="col-xs-12">
+                            <button type="button" class="btn btn-social btn-success" id="btnSubmit" onclick="SaveData();">
+                                <i class="fa fa-save"></i>
+                                Save
+                            </button>
+
+                            <button type="button" class="btn btn-social btn-default" onclick="ClearFields();" id="btnClear">
+                                <i class="fa fa-close"></i>
+                                Clear
+                            </button>
+
+                            <button class="btn btn-social btn-primary" type="button" id="btnNewBranch" onclick="NewBranch();">
+                                <i class="fa fa-location-arrow"></i>
+                                New Branch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+                    <i class="fa fa-refresh fa-spin"></i>
+                </div>
+            </div> 
+                      
+        }
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#btnSubmit').prop("disabled", true);
+            $('#btnClear').prop("disabled", true);
+
+
+
+            if ('@Model.CompanyCode' != '') {
+                $('#CompanyCode').prop("readonly", true);
+                $('#btnSubmit').prop("disabled", false);
+                $('#btnClear').prop("disabled", false);
+            }
+
+            if ($('#CompanyCode').val() == '') {
+                $('#btnNewBranch').hide();
+            }
+            else {
+                $('#btnNewBranch').show();
+            }
+
+            $('#frmCompanyProfile').validate({
+                rules: {
+                    CompanyCode: {
+                        required: true
+                    },
+                    CompanyName: {
+                        required: true
+                    },
+                    RegNo: {
+                        required: true
+                    },
+                    CompanyAddress_Address1: {
+                        required: true
+                    },
+                    CompanyAddress_Address2: {
+                        required: true
+                    },
+                    CompanyAddress_CityName: {
+                        required: true
+                    },
+                    CompanyAddress_StateName: {
+                        required: true
+                    },
+                    CompanyAddress_ZipCode: {
+                        required: true
+                    },
+                    CompanyAddress_CountryCode: {
+                        required: true
+                    },
+                    CompanyAddress_TelNo: {
+                        required: true
+                    },
+                    CompanyAddress_FaxNo: {
+                        required: true
+                    }
+                },
+                messages: {
+                    CompanyCode: {
+                        required: "is required"
+                    },
+                    CompanyName: {
+                        required: "is required"
+                    },
+                    RegNo: {
+                        required: "is required"
+                    },
+                    CompanyAddress_Address1: {
+                        required: "is required"
+                    },
+                    CompanyAddress_Address2: {
+                        required: "is required"
+                    },
+                    CompanyAddress_CityName: {
+                        required: "is required"
+                    },
+                    CompanyAddress_StateName: {
+                        required: "is required"
+                    },
+                    CompanyAddress_ZipCode: {
+                        required: "is required"
+                    },
+                    CompanyAddress_CountryCode: {
+                        required: "is required"
+                    },
+                    CompanyAddress_TelNo: {
+                        required: "is required"
+                    },
+                    CompanyAddress_FaxNo: {
+                        required: "is required"
+                    }
+                }
+            });
+
+        });
+
+        function ClearFields() {
+            debugger;
+            $('input[type=text], select').val('');
+            $('#CompanyCode').prop("disabled", false);
+            //$('#overlayDiv').fadeIn()
+        }
+
+        function SaveData() {
+
+            $('#overlayDiv').fadeIn();
+            if ($('#frmCompanyProfile').valid()) {
+                $('#frmCompanyProfile').submit();
+            }
+        }
+
+        function NewBranch() {
+            
+            $('#overlayDiv').fadeIn();
+            var companyCode = $('#CompanyCode').val();
+            location.href = '@Url.Content("~/MasterData/Branch")' + '?companyCode=' + companyCode + '&branchCode=NEW';
+        }
+
+        function CompanyList() {
+            
+            $('#overlayDiv').fadeIn();
+            location.href = '@Url.Content("~/MasterData/CompanyProfile")';
+        }
+    </script>
+}
+
+
+
+
+

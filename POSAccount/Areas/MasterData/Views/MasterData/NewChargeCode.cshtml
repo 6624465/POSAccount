@@ -1,0 +1,268 @@
+﻿@model POSAccount.Contract.ChargeCodeMaster
+
+@using (Ajax.BeginForm("", "", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid box-default">
+        <!--Header Information-->
+        <div class="box-header">
+            <h3 class="box-title">Charge Code Master</h3>
+
+        </div>
+        <!--Body Information-->
+        <div class="box-body">
+            <fieldset class="form-horizontal">                
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.ChargeCode, new { @class = "control-label input-sm col-md-2" })
+                        <div class="col-md-4">
+
+                            @Html.TextBoxFor(m => m.ChargeCode, new { @placeholder = "ChargeCode", @class = "form-control input-sm" })
+                         
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Description, new { @placeholder = "Description", @class = "form-control input-sm " })
+                          
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.AccountCode, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "SELECT ACCOUNT TERM", new { @class = "form-control select2 select2-hidden-accessible;" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.BillingUnit, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.BillingUnit, Model.BillingUnitList, "SELECT BILLING UNIT", new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.CreditTerm, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                @Html.DropDownListFor(m => m.CreditTerm, Model.CreditTermList, "SELECT CREDIT TERM", new { @class = "form-control input-sm" })
+                             
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        @Html.LabelFor(m => m.PaymentTerm, new { @class = "col-md-2 control-label input-sm" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.PaymentTerm, Model.PaymentTermList, "SELECT PAYMENT TERM", new { @class = "form-control input-sm" })
+                          
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label class="col-md-2 control-label input-sm" for="VAT">VAT</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.VAT, new { @placeholder = "VAT", @class = "form-control input-sm decimalCss" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.DropDownListFor(m => m.VATAccountCode, Model.VATAccountCodeList, "SELECT ACCOUNT CODE", new { @class = "form-control select2 select2-hidden-accessible;" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label class="col-md-2 control-label input-sm" for="WithHoldingTaxRate">W/T Tax</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.WithHoldingTaxRate, new { @placeholder = "W/H Tax", @class = "form-control input-sm decimalCss" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.DropDownListFor(m => m.WHAccountCode, Model.WHAccountCodeList, "SELECT ACCOUNT CODE", new { @class = "form-control select2 select2-hidden-accessible;" })
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <!--Footer Information-->
+        <div class="box-footer">
+            <div class="row ">
+                <div class="col-xs-12">
+                    <button type="button" id="btnSave" class="btn btn-social btn-success" onclick="SaveData();">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+                    <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <button type="button" onclick="DeleteChargeCode();" class="btn btn-social btn-danger" id="btnDelete">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </button>
+                    <a href="@Url.Action("ChargeCodeMaster", "MasterData", new { area = "MasterData" }, null)" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+          <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+}
+
+
+@section Scripts{    
+    
+    
+    <script type="text/javascript">
+
+        $(function () {
+           
+            $("#AccountCode").select2();
+            $("#VATAccountCode").select2();
+            $("#WHAccountCode").select2();
+
+            if ($('#ChargeCode').val()!="")
+            {
+                $('#ChargeCode').prop('readonly', true);
+                $('#btnDelete').prop("disabled", false);
+            }
+
+            $('#myForm').validate({
+                rules: {
+                    ChargeCode: {
+                        required: true
+                    },
+                    Description: {
+                        required: true
+                    },
+                    BranchID: {
+                        required: true
+                    },
+                    AccountCode: {
+                        required: true
+                    },
+                    BillingUnit: {
+                        required: true
+                    },
+                    CreditTerm: {
+                        required: true
+                    },
+                    PaymentTerm: {
+                        required: true
+                    },
+                  
+                    VATAccountCode: {
+                        required: function (element) {
+                            return $("#VAT").val() > 0;
+                        }
+                    },                  
+                    WHAccountCode: {
+                        required: function (element) {
+                            return $("#WithHoldingTaxRate").val() > 0;
+                        }
+                    }
+                },
+                messages: {
+                    ChargeCode: {
+                        required: "Charge Code is requiredd"
+                    },
+                    Description: {
+                        required: "Description is required"
+                    },
+                    BranchID: {
+                        required: "Branch ID is required"
+                    },
+                    AccountCode: {
+                        required: "Account Code is required"
+                    },
+                    BillingUnit: {
+                        required: "Billing Unit is required"
+                    },
+                    CreditTerm: {
+                        required: "Credit Term is required"
+                    },
+                    PaymentTerm: {
+                        required: "Payment Term is required"
+                    },                   
+                    VATAccountCode: {
+                        required: "VATAccount Code is required"
+                    },                   
+                    WHAccountCode: {
+                        required: "WHAccount Code is required"
+                    }
+                }
+            });
+
+
+
+        });
+        var chargeCode;
+
+        function SaveData() {
+            $('.select2-hidden-accessible').next().next().css('border', '');
+
+            if ($('#myForm').valid()) {
+                $('#overlayDiv').fadeIn();
+                $('#myForm').attr('action', '@Url.Content("~/MasterData/SaveChargeCode")')
+                $('#myForm').submit();
+            } else {
+                if ($('.select2-hidden-accessible').hasClass('error')) {
+                    $('.select2-hidden-accessible.error').next().next().css('border', 'solid 1px red');
+                }
+                return false;
+            }
+        }
+
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+            chargeCode = result.ChargeCodeMaster.ChargeCode;
+        }
+
+        var urlList = "@Url.Action("ChargeCodeMaster", "MasterData", new { area = "MasterData" })"
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = urlList;
+            }
+        }
+
+        function btnClear() {
+            $('.form-control').val('');
+            $('#AccountCode').select2('val', '');
+            $('#VATAccountCode').select2('val', '');
+            $('#WHAccountCode').select2('val', '');
+            $('#btnDelete').prop("disabled", true);
+            $('#ChargeCode').prop('readonly', false);
+        }
+
+        function DeleteChargeCode()
+        {
+            confirm("Are you want to delete charge code?")
+            {
+                if ($('#myForm').valid()) {
+                    $('#overlayDiv').fadeIn();
+                    $('#myForm').attr('action', '@Url.Content("~/MasterData/DeleteChargeCode")');
+                    $('#myForm').submit();
+                }
+            }
+            return false;
+        }
+    </script>
+}
+
+
+
+

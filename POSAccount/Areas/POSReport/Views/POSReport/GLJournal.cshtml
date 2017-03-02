@@ -1,0 +1,85 @@
+﻿@model POSAccount.Contract.ReportParams
+
+@{
+    ViewBag.Title = "GL Journal";
+}
+
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="box box-solid box-default">
+    <div class="box-header with-border">
+        <h3 class="box-title">GL Journal </h3>
+
+    </div>
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Year</label>
+                    <div class="col-md-2">
+                        @Html.DropDownListFor(m => m.Year, Model.YearList, "", new { @class = "form-control select2 select2-hidden-accessible;" })
+
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div>
+                    <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Period</label>
+                    <div class="col-md-2">
+                        @Html.DropDownListFor(m => m.Period, Model.PeriodList, "", new { @class = "form-control select2 select2-hidden-accessible;" })
+
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+
+    <div class="box-footer">
+        <div class="row  no-print">
+            <div class="col-xs-12">
+                <div class="btn-group dropup">
+                    @Html.ActionLink("Print", "ViewReport", "POSReport", new { area = "POSReport", URL = "/POSReports/CBReceipt" }, new { data_modal = "test", id = "btnViewReport", @class = "btn btn-small btn-primary" })
+                    @*<button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>*@
+                </div>
+                <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                    <i class="fa fa-arrow-circle-o-left"></i>
+                    Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/modalform")
+    @Scripts.Render("~/bundles/dataTable")
+    
+    <script type="text/javascript">
+        $(".datepicker").datetimepicker({
+            format: "DD/MM/YYYY",
+            minDate: '1900/01/01'
+        });
+    </script>
+}
+

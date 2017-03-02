@@ -1,0 +1,111 @@
+﻿@model POSAccount.Contract.CBPaymentDetail
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<div class="row" style="margin-top:10px;">
+    <div>
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.AccountCode, new { @class = "control-label input-sm pull-right" })
+        </div>
+        <div class="col-md-8">
+            @*@Html.TextBoxFor(m => m.AccountCode, new { @class = "form-control input-sm " })*@
+            @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "", new { @class = "form-control input-sm" })
+
+            @Html.ValidationMessageFor(m => m.AccountCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div>
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.ChargeCode, new { @class = "control-label input-sm pull-right" })
+        </div>
+        <div class="col-md-8">
+            @*@Html.TextBoxFor(m => m.ChargeCode, new { @class = "form-control input-sm" })*@
+            @Html.DropDownListFor(m => m.ChargeCode, Model.ChargeCodeList, "", new { @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.ChargeCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div>
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.Remark, new { @class = "control-label input-sm pull-right" })
+        </div>
+        <div class="col-md-8">
+            @Html.TextAreaFor(m => m.Remark, new { @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div>
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.CurrencyCode, new { @class = "pull-right control-label input-sm" })
+        </div>
+        <div class="col-md-8">
+            @Html.DropDownListFor(m => m.CurrencyCode, Model.CurrencyList, "", new { @class = "form-control input-sm" })
+            @*@Html.TextBoxFor(m => m.CurrencyCode, new { @class = "form-control input-sm " })*@
+        </div>
+    </div>
+</div>
+<div class="row" style="display:none;">
+    <div>
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.BaseAmount, new { @class = "pull-right control-label input-sm" })
+        </div>
+        <div class="col-md-8">
+            @Html.TextBoxFor(m => m.BaseAmount, new { @class = "form-control input-sm", onkeypress = "return isNumber(event);" })
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div>
+        <div class="col-md-2">
+            <label class="control-label input-sm pull-right">Amount</label>
+        </div>
+        <div class="col-md-8">
+            @Html.TextBoxFor(m => m.LocalAmount, new { @class = "form-control input-sm", onkeypress = "return isNumber(event);", onblur = "localAmountBlur(this);" })
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div class="col-md-2">
+        @Html.LabelFor(m => m.WHPercent, new { @class = "pull-right control-label" })
+    </div>
+    <div class="col-md-8">
+        @{
+            List<SelectListItem> WhPercentOptions = new List<SelectListItem>() {
+                new SelectListItem { Value = "1", Text = "TRANSPORT" },
+                new SelectListItem { Value = "2", Text = "ADVERTISEMENT" },
+                new SelectListItem { Value = "3", Text = "SERVICE" },
+                new SelectListItem { Value = "5", Text = "RENTAL" }
+            };
+        }
+        @Html.DropDownListFor(m => m.WHPercent, new SelectList(WhPercentOptions, "Value", "Text", 1), "", new { @class = "form-control input-sm", onchange = "WHPercentDetailChange(this);", disabled = "disabled" })
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div class="col-md-2">
+        @Html.LabelFor(m => m.WHAmount, new { @class = "pull-right control-label" })
+    </div>
+    <div class="col-md-8">
+        @Html.TextBoxFor(m => m.WHAmount, new { @class = "form-control input-sm", id = "dWHAmount", disabled = "disabled" })
+    </div>
+</div>
+<div class="row" style="margin-top:10px;">
+    <div>
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.SetOffDate, new { @class = "pull-right control-label input-sm" })
+        </div>
+        <div class="col-md-8">
+            @Html.TextBoxFor(m => m.SetOffDate, new { @class = "form-control input-sm datepicker" })
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+

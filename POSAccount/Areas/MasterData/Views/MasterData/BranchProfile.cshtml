@@ -1,0 +1,227 @@
+﻿@model POSAccount.Contract.Branch
+
+@{
+    ViewBag.Title = "BranchProfile";
+}
+
+<style type="text/css">
+    input[type=text].error, select.error {
+        border-color: red;
+    }
+
+    label.error {
+        color: red;
+    }
+</style>
+<div class="row">
+    <div class="col-md-4">
+        @{ Html.RenderAction("GetCompanies", "MasterData"); }
+    </div>
+    <div class="col-md-8">
+        @using (Html.BeginForm("SaveBranchProfile", "MasterData", FormMethod.Post, new { id = "frmBranchProfile", name = "frmBranchProfile" }))
+        {
+            
+            <div class="box box-solid box-default">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Branch Profile</h3>
+                </div>
+
+                <div class="box-body">
+                    <fieldset class="form-horizontal">
+                        <div class="form-group">
+                            <div>
+                                <label for="BranchCode" class="col-md-2 control-label input-sm">Branch Code</label>
+                                <div class="col-md-2">
+                                    @Html.HiddenFor(m => m.BranchID)
+                                    @Html.TextBoxFor(m => m.BranchCode, new { @class = "form-control input-sm" })
+                                </div>
+                                <label for="RegNo" class="col-md-2 control-label input-sm">Registration No.</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.RegNo, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Branch Name</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.BranchName, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtCompany" class="col-md-2 control-label input-sm">Company Code</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.CompanyCode, new { @class = "form-control  input-sm", @readonly = "readonly" })
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-horizontal">
+                        <legend>Address</legend>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 1</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.BranchAddress.Address1, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 2</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.BranchAddress.Address2, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">City</label>
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(m => m.BranchAddress.CityName, new { @class = "form-control input-sm" })
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">State</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.BranchAddress.StateName, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">ZIP Code</label>
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(m => m.BranchAddress.ZipCode, new { @class = "form-control input-sm" })
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Country</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.BranchAddress.CountryCode, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Phone No.</label>
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(m => m.BranchAddress.TelNo, new { @class = "form-control input-sm" })
+                                </div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Fax</label>
+                                <div class="col-md-4">
+                                    @Html.TextBoxFor(m => m.BranchAddress.FaxNo, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Web Site</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.BranchAddress.WebSite, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </div>
+                <div class="box-footer">
+                    <div class="row  no-print">
+                        <div class="col-xs-12">
+                            <button type="button" class="btn btn-primary" onclick="btnSave()">
+                                <i class="fa fa-save"></i>
+                                Save
+                            </button>
+
+                            <button type="button" class="btn btn-default" onclick="btnClear()">
+                                <i class="fa fa-close"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+                    <i class="fa fa-refresh fa-spin"></i>
+                </div>
+            </div> 
+           
+
+        }
+    </div>
+</div>
+
+@section scripts
+{
+    
+    <script type="text/javascript">
+        $(function () {
+            
+            if ('@Model.BranchCode' != '') {
+                $('#BranchCode').prop("readonly", true);
+            }
+        });
+
+        function btnClear() {
+            var companyCode = $("#CompanyCode").val();
+
+            $('input[type=text], select').val('');
+            $('#BranchCode').prop("readonly", false);
+            $("#CompanyCode").val(companyCode);
+            $("#BranchID").val('0');
+        }
+        function btnDelete() {
+
+        }
+
+        //function btnSave() {
+        //    var regNo = $('#RegNo').val();
+        //    if (regNo != null && regNo != '')
+        //        $('#frmBranchProfile').submit();
+        //    else {
+        //        $('#RegNo').css('border-color', 'red');
+        //        //alert('please enter reg no');
+        //    }
+        //}
+
+        $(function () {
+            $('#frmBranchProfile').validate({
+                rules: {
+                    BranchCode: {
+                        required: true
+                    },
+                    RegNo: {
+                        required: true
+                    },
+                    BranchName: {
+                        required: true
+                    },
+                    'BranchAddress.Address1': {
+                        required: true
+                    }
+                },
+                messages: {
+                    BranchCode: {
+                        required: 'Branch Code required.'
+                    },
+                    RegNo: {
+                        required: 'Description required.'
+                    },
+                    BranchName: {
+                        required: 'Account Group required.'
+                    },
+                    'BranchAddress.Address1': {
+                        required: 'Address Is required.'
+
+                    }
+                }
+            });
+
+        });
+        function btnSave() {
+         
+            if ($('#frmBranchProfile').valid()) {
+                $('#overlayDiv').fadeIn();
+                $('#frmBranchProfile').submit();
+            }
+        }
+
+    </script>
+}

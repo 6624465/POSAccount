@@ -1,0 +1,484 @@
+﻿@model POSAccount.Contract.GLOpening
+
+@{
+    ViewBag.Title = "GLOpening";
+}
+
+@section CssSection
+{
+    <style>
+        input[type=text].error, select.error {
+            border-color: red;
+            font-size: 12px;
+        }
+
+        label.error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+}
+
+
+@using (Ajax.BeginForm("", "", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid  box-default">
+
+        <div class="box-header with-border">
+            <h3 class="box-title">GL Opening Entry</h3>
+
+        </div>
+        <div class="panel-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label">Year</label>
+                        <div class="col-md-2">
+                            @{
+    List<SelectListItem> Yearlist = new List<SelectListItem>();
+    var newItem = new SelectListItem { Text = "", Value = "" };
+    Yearlist.Add(newItem);
+    newItem = new SelectListItem { Text = "2016", Value = "2016" };
+    Yearlist.Add(newItem);
+    newItem = new SelectListItem { Text = "2015", Value = "2015" };
+    Yearlist.Add(newItem);
+
+    newItem = new SelectListItem { Text = "2014", Value = "2014" };
+    Yearlist.Add(newItem);
+    newItem = new SelectListItem { Text = "2013", Value = "2013" };
+    Yearlist.Add(newItem);
+                            }
+                            @Html.DropDownListFor(m => m.FinancialYear, Yearlist, new { @class = "form-control input-sm", @id = "ddlYear" })
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <fieldset class="form-horizontal">
+                    <legend>Add Item</legend>
+                    <div class="form-group">
+                        <label class="col-md-1 control-label input-sm">Account Code :</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.AccountCode, Model.AccountCodeList, "Select Account Code", new { @class = "form-control input-sm", @id = "AccountCode" })
+                            @Html.HiddenFor(m => m.DebitCredit)
+                        </div>
+
+                        <label class="col-md-1 control-label input-sm">Amount :</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.Amount, new { @id = "Amount", @class = "form-control input-sm decimalCss", data_a_sep = "", aPad = "false", data_a_sign = "" })
+
+                        </div>
+
+
+                        <div class="col-md-2">
+                            <a href="#" class="btn btn-social btn-success" onclick="AddGLJournalDetails();" id="btnSearch">
+                                <i class="fa fa-plus-circle"></i>
+                                <span id="btnAddDetailsSpan">&nbsp;Add Details</span>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="col-md-1" style="display: none" id="btnClearDiv">
+                                <button id="btnClearDetails" onclick="btnClearDetailsClick()" type="button" class="btn btn-social btn-warning">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="tbDetails" data-toggle="tab">Journal Details</a>
+                        </li>
+
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tbDetails">
+                            <table id="tblGLJournalDetails" class="table table-striped table-hover table-bordered table-responsive ">
+                                <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                    <tr>
+                                        <th>Account Code</th>
+                                        <th>Description</th>
+                                        <th>Credit Amt</th>
+                                        <th>Debit Amt</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size: 12px;">
+                                    @{
+    for (int i = 0; i < Model.GLOpenDetails.Count; i++)
+    {
+                                        <tr id="tr_@i" class="glJournalDetailsCss">
+
+
+                                            <td name="TRAccountCode" class="hidden">
+                                                @Html.HiddenFor(m => m.GLOpenDetails[i].AccountCode)
+                                                @Html.DisplayFor(m => m.GLOpenDetails[i].AccountCode)
+                                            </td>
+                                            <td name="TRAccountCodeDescription">
+                                                @Html.HiddenFor(m => m.GLOpenDetails[i].AccountCodeDescription)
+                                                @Html.DisplayFor(m => m.GLOpenDetails[i].AccountCodeDescription)
+                                                <input type="hidden" id="GLJournalDetails_@(i)__DebitCredit" />
+                                            </td>
+                                            <td name="TRCreditAmount">
+                                                @Html.HiddenFor(m => m.GLOpenDetails[i].CreditAmount)
+                                                @Html.DisplayFor(m => m.GLOpenDetails[i].CreditAmount)
+                                            </td>
+                                            <td name="TRDebitAmount">
+                                                @Html.HiddenFor(m => m.GLOpenDetails[i].DebitAmount)
+                                                @Html.DisplayFor(m => m.GLOpenDetails[i].DebitAmount)
+                                            </td>
+                                            <td name="Action">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                        Action
+                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                        <li><a class="cursorCss" id="Edit_@i" onclick="EditGLJournalDetails('@(i)')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                        <li><a class="cursorCss" onclick="DeleteGLJournalDetails('@(i)')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+    }
+                                    }
+
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td id="crdtSum"></td>
+                                        <td id="dbtSum"></td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                    <a href="#" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+                        New
+                    </a>
+                    <button type="button" id="btnSave" class="btn btn-social btn-success">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+                    <a href="#" class="btn btn-social btn-default">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <a href="#" id="btnDelete" class="btn btn-social btn-danger">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </a>
+
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>
+                    </div>
+                    <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+         <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
+    <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+}
+
+@section Scripts{
+
+
+    <script type="text/javascript">
+
+        $("#AccountCode").select2();
+
+        $(document).ready(function () {
+
+
+            $('#myForm').validate({
+                rules: {
+                    FinancialYear: {
+                        required: true
+                    }                   
+                },
+                messages: {
+                    FinancialYear: {
+                        required: "Please select year"
+                    }                    
+                }
+            });
+
+
+
+            $("#AccountCode").on('change', function () {
+                $('#DebitCredit').val('');
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("~/GL/GetCreditType")',
+                    data: { accountCode: $('#AccountCode').val() },
+                    success: function (data) {
+                        $('#DebitCredit').val(data.DebitCredit);
+                    }
+                });
+            });
+
+            $('#tblGLJournalDetails').DataTable({
+                'bFilter': false,
+                'bPaginate': false,
+                'bInfo': false,
+                'aoColumnDefs': [
+                  {
+                      bSortable: false,
+                      aTargets: [-1]
+                  }],
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.className = "gradeX odd";
+                    nRow.id = 'GLOpenDetails_' + iDisplayIndex;
+                    nRow.className = 'glJournalDetailsCss';
+                    return nRow;
+                }
+            });
+
+
+            $('#btnSave').on('click', function () {
+                //
+                if ($('#myForm').valid()) {
+                  
+                    if ($('.glJournalDetailsCss').length > 0) {
+                        $('#overlayDiv').fadeIn();
+                        $('myForm').attr('action', '@Url.Content("~/GL/SaveGLOpening")');
+                          $('myForm').submit();
+                      }
+                      else {
+                          alert('Atleast 1 GL Opening details are required to proceed!');
+                      }
+                  }
+            });
+
+
+            $('#btnDelete').on('click', function () {
+                //
+                if ($('#myForm').valid()) {
+                    
+                    if ($('.glJournalDetailsCss').length > 0) {
+                        $('#overlayDiv').fadeIn();
+                        $('myForm').attr('action', '@Url.Content("~/GL/DeleteGLOpening")');
+                        $('myForm').submit();
+                    }
+                    else {
+                        alert('Atleast 1 GL Opening details are required to proceed!');
+                    }
+                }
+              });
+
+
+            $('.datepicker').datetimepicker({
+                useCurrent: false,
+                maxDate: moment('@DateTime.Now.ToString("dd/MM/yyyy")'),
+                format: 'DD/MM/YYYY',
+                inline: false
+            });
+
+
+
+        });
+
+
+        function AddGLJournalDetails() {
+            debugger;
+            if ($('#myForm').valid()) {
+                var accountCode = $("#AccountCode").val();
+                var amount = $("#Amount").val();
+                if ((accountCode != null && accountCode != "") && (amount != null && amount != "")) {
+                    var debitcredit = $('#DebitCredit').val();
+                    var accountCodeDescription = $("#AccountCode option:selected").text();
+                    var rooturl = '@Url.Action("AddGLOpeningDetails", "GL", new { area = "GL" })';
+                    var url = rooturl + "?accountCode=" + accountCode + "&amount=" + amount;//+ "&debitcredit=" + debitcredit;
+
+                    $.post(url, null, function (data) {
+                        debugger;
+                        var hdnFlag = $('#hdnFlag').val();
+                        var debitcredit = $('#DebitCredit').val();
+                        if (hdnFlag == '-1') {
+                            var _index = $('.glJournalDetailsCss').length;
+                            var Obj = {
+                                Index: _index,
+                                AccountCode: data.GLOpeningDetails.AccountCode,
+                                AccountCodeDescription: data.GLOpeningDetails.accountCodeDescription,
+                                CreditAmount: data.GLOpeningDetails.CreditAmount,
+                                DebitAmount: data.GLOpeningDetails.DebitAmount,
+                                DebitCredit: data.DebitCredit
+                            };
+                            var rowData = [
+                                '<input id="GLOpenDetails_' + Obj.Index + '__AccountCode" name="GLOpenDetails[' + Obj.Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '"><span id="GLOpenDetails_' + Obj.Index + '__AccountCode_span">' + Obj.AccountCode + '</span>',
+
+                                '<input id="GLOpenDetails_' + Obj.Index + '__AccountCodeDescription" name="GLOpenDetails[' + Obj.Index + '].AccountCodeDescription" type="hidden" value="' + Obj.AccountCodeDescription + '"><span id="GLOpenDetails_' + Obj.Index + '__AccountCodeDescription_span">' + Obj.AccountCodeDescription + '</span>',
+
+
+                                '<input id="GLOpenDetails_' + Obj.Index + '__CreditAmount" name="GLOpenDetails[' + Obj.Index + '].CreditAmount" type="hidden" value="' + (Obj.BaseDebitCredit == 'CREDIT' ? Obj.CreditAmount.toFixed(2) : 0.00) + '"><input id="GLOpenDetails_' + Obj.Index + '__DebitCredit" name="GLOpenDetails[' + Obj.Index + '].DebitCredit" type="hidden" value="' + (Obj.BaseDebitCredit == 'CREDIT' ? Obj.CreditAmount.toFixed(2) : 0.00) + '"><span id="GLOpenDetails_' + Obj.Index + '__CreditAmount_span">' + Obj.CreditAmount.toFixed(2) + '</span>',
+
+                                '<input id="GLOpenDetails_' + Obj.Index + '__DebitAmount" name="GLOpenDetails[' + Obj.Index + '].DebitAmount" type="hidden" value="' + (Obj.BaseDebitCredit == 'DEBIT' ? Obj.DebitAmount.toFixed(2) : 0.00) + '"><span id="GLOpenDetails_' + Obj.Index + '__DebitAmount_span">' + (Obj.BaseDebitCredit == 'DEBIT' ? Obj.DebitAmount.toFixed(2) : 0.00) + '</span>',
+                                '<div class="dropdown">' +
+                            '<button class="btn btn-warning btn-sm dropdown-toggle" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Action<span class="caret"></span></button>' +
+                            '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+                                '<li><a class="cursorCss" id="Edit_' + Obj.index + '" onclick="EditGLJournalDetails(' + Obj.Index + ')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>' +
+                                '<li><a class="cursorCss" onclick="DeleteGLJournalDetails(' + Obj.Index + ')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>' +
+                            '</ul></div>'];
+                            $('#tblGLJournalDetails').dataTable().fnAddData(rowData);
+                        }
+                        else {
+                            $('#GLOpenDetails_' + hdnFlag + '__AccountCode').val(data.GLOpeningDetails.AccountCode);
+                            $('#GLOpenDetails_' + hdnFlag + '__AccountCodeDescription').val(data.GLOpeningDetails.AccountCode);
+                            $('#GLOpenDetails_' + hdnFlag + '__AccountCodeDescription_span').text(data.GLOpeningDetails.AccountCodeDescription);
+                            $('#GLOpenDetails_' + hdnFlag + '__CreditAmount').val(data.GLOpeningDetails.CreditAmount);
+                            $('#GLOpenDetails_' + hdnFlag + '__CreditAmount_span').text(data.GLOpeningDetails.CreditAmount);
+                            $('#GLOpenDetails_' + hdnFlag + '__DebitAmount').val(data.GLOpeningDetails.DebitAmount);
+                            $('#GLOpenDetails_' + hdnFlag + '__DebitAmount_span').text(data.GLOpeningDetails.DebitAmount);
+                        }
+
+                        var rowsCount = $('.glJournalDetailsCss').length;
+                        var creditAmount = 0.00;
+                        var debitAmount = 0.00;
+                        var crd = 0.00;
+                        var dbt = 0.00;
+                        for (var x = 0; x < rowsCount; x++) {
+
+                            crd = ($('#GLOpenDetails_' + x + '__CreditAmount').val());
+                            dbt = ($('#GLOpenDetails_' + x + '__DebitAmount').val());
+                            creditAmount = creditAmount + parseFloat($('#GLOpenDetails_' + x + '__CreditAmount').val());
+                            debitAmount = debitAmount + parseFloat($('#GLOpenDetails_' + x + '__DebitAmount').val());
+                        }
+
+                        $('#crdtSum').text("Total:" + commaSeparateNumber(creditAmount.toFixed(2)));
+                        $('#dbtSum').text("Total:" + commaSeparateNumber(debitAmount.toFixed(2)));
+
+                        $('#hdnFlag').val('-1');
+                    });
+                    $('#AccountCode').val("");
+                    //$('#AccountCode').select2("val", "");
+                    $('#txtDetailRemark').val("");
+                    $('#Amount').val("");
+                   
+                }
+            }
+            return false;
+        }
+
+
+        function commaSeparateNumber(val) {
+            while (/(\d+)(\d{3})/.test(val.toString())) {
+                val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+            }
+            return val;
+        }
+
+
+
+        var documentNo;
+
+        function OnSaveFailure(result) {
+         
+            if (typeof result.Message != 'undefined') {
+                ModalShow(result.Message, "Failure", "Save");
+            }
+
+
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+            DocumentNo = result.Data.DocumentNo;
+        }
+
+        var rooturl = "@Url.Action("GLEntry", "GL", new { area = "GL" })"
+        var url = rooturl + "?documentNo=" + documentNo;
+
+
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = url;
+            }
+        }
+
+        function Reset() {
+            $('#txtDocumentNo').val("");
+            $('#txtDetailRemark').val("");
+            $('#Amount').val("");
+            $('#AccountCode').val("");
+        }
+
+        function EditGLJournalDetails(index) {
+            debugger;
+            var val = $('#GLOpenDetails_' + index + '__DebitCredit').val();
+            $('#AccountCode').val($('#GLOpenDetails_' + index + '__AccountCode').val());
+
+            if ($('#GLOpenDetails_' + index + '__DebitCredit').val() == "DEBIT") {
+                $('#Amount').val($('#GLOpenDetails_' + index + '__DebitAmount').val());
+            } else if ($('#GLOpenDetails_' + index + '__DebitCredit').val() == "CREDIT") {
+                $('#Amount').val($('#GLOpenDetails_' + index + '__CreditAmount').val());
+            }
+
+            $('#btnAddDetailsSpan').text('Update');
+            $('#btnClearDiv').fadeIn();
+
+            $('#hdnFlag').val(index);
+
+        }
+
+        function DeleteGLJournalDetails(rowId) {
+            if (!confirm("Do you want to DELETE selected item?")) {
+                return false;
+            }
+
+            nRow = $("#tr_" + rowId).parent();
+
+            table = $('#tblGLJournalDetails').dataTable();
+
+            //oTable.fnDeleteRow(
+            //    oTable.fnGetPosition(
+            //        document.getElementById('#row'+id+'-tr')));
+            table.fnDeleteRow(table.fnGetPosition(
+                    document.getElementById("#tr_" + rowId)));
+
+        }
+
+
+        function btnClearDetailsClick() {
+            $('#AccountCode').val("");
+            $('#Amount').val('');
+
+            $('#hdnFlag').val('-1');
+            $('#btnAddDetailsSpan').text('Add Details');
+            $('#btnClearDiv').fadeOut();
+        }
+
+    </script>
+}

@@ -1,0 +1,328 @@
+﻿@model POSAccount.Contract.CBBankTransfer
+@{
+    ViewBag.Title = "Bank";
+}
+
+@section CssSection
+{
+<link href="@Url.Content("~/ThemeAdminLTE-2.2.0/plugins/select2/select2.min.css")" rel="stylesheet" />
+<link href="@Url.Content("~/Content/formValidation.css")" rel="stylesheet" />
+}
+@using (Html.BeginForm("SaveBankTransfer", "CB", FormMethod.Post, new { area = "CB", id = "frmBankTransfer", @class = "form-horizontal" }))
+{
+    <div class="form-content">
+        <div class="box box-solid box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title">Bank Transfer</h3>
+                
+            </div>
+            <div class="box-body">
+
+                <!-- <fieldset class="form-horizontal">-->
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Document No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(x => x.DocumentNo, new { @class = "form-control input-sm", @readonly = "readonly" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Document Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(x => x.DocumentDate, new { @class = "form-control input-sm datepicker", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Cheque No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(x => x.ChequeNo, new { @class = "form-control input-sm", @required = "required" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Cheque Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(x => x.ChequeDate, new { @class = "form-control input-sm datepicker", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Remark</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(x => x.Remarks, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <fieldset class="form-horizontal">
+                    <legend>From Bank</legend>
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Bank Code</label>
+                            <div class="col-md-2">
+                                @Html.DropDownListFor(x => x.FromBankCode, Model.BankCodeList, "Select Bankcode", new { @class = "form-control input-sm", @required = "required" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Bank Account</label>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.FromBankAccount, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Withdraw Amount</label>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.WithDrawAmount, new { @class = "form-control input-sm", @required = "required" })
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-horizontal">
+                    <legend>To Bank</legend>
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Bank Code</label>
+                            <div class="col-md-2">
+                                @Html.DropDownListFor(x => x.ToBankCode, Model.BankCodeList, "Select Bankcode", new { @class = "form-control input-sm", @required = "required" })
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Bank Account</label>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.ToBankAccount, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Diposit Amount</label>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.DepositAmount, new { @class = "form-control input-sm", @required = "required" })
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- </fieldset>-->
+            </div>
+            <div class="box-footer">
+                <div class="row  no-print">
+                    <div class="col-xs-12">
+                        <a href="@Url.Action("BankTransfer", "CB", new { area = "CB" }, null)" class="btn btn-social btn-primary">
+                            <i class="fa fa-file-o"></i>
+                            New
+                        </a>
+                        <button type="submit" id="btnsave" class="btn btn-social btn-success">
+                            <i class="fa fa-save"></i>
+                            save
+                        </button>
+                        <a href="@Url.Action("BankTransfer", "CB", new { area = "CB" }, null)" class="btn btn-social btn-default">
+                            <i class="fa fa-close"></i>
+                            Clear
+                        </a>
+                        <a href="#" id="btnDelete" class="btn btn-social btn-danger">
+                            <i class="fa fa-times-circle"></i>
+                            Delete
+                        </a>
+
+                        <div class="btn-group dropup">
+                            <button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                                <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                                <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                            </ul>
+                        </div>
+                        <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                            <i class="fa fa-arrow-circle-o-left"></i>
+                            Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<link href="~/Content/chosen.css" rel="stylesheet" />
+
+@section Scripts{
+    
+    <script src="@Url.Content("~/ThemeAdminLTE-2.2.0/plugins/select2/select2.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/formValidation.js")"></script>
+    <script src="@Url.Content("~/Scripts/framework/bootstrap.js")"></script>
+
+
+    <script type="text/javascript">
+        $(function () {
+
+
+
+            $("#ToBankCode").select2();
+
+            $("#FromBankCode").select2();
+
+
+            $('.datepicker').datetimepicker({
+                useCurrent: false,
+                maxDate: moment('@DateTime.Now.ToString("MM/dd/yyyy")'),
+                format: 'MM/DD/YYYY',
+                minDate: '1990/01/01'
+            });
+
+
+            $("#ToBankCode").on('change', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("~/CB/GetBankAccount")',
+                    data: { bankcode: $("#ToBankCode").val() },
+                    success: function (data) {
+                        $('#ToBankAccount').val(data);
+                    }
+                });
+            });
+
+
+            $("#FromBankCode").on('change', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Content("~/CB/GetBankAccount")',
+                    data: { bankcode: $("#FromBankCode").val() },
+                    success: function (data) {
+                        $('#FromBankAccount').val(data);
+                    }
+                });
+            });
+
+
+            $('#ChequeDate').datetimepicker({
+                format: 'mm/dd/yyyy'
+            }).on('changeDate', function (e) {
+                $('#frmBankTransfer').formValidation('revalidateField', 'ChequeDate');
+            });
+
+            $('#DocumentDate').datetimepicker({
+                format: 'mm/dd/yyyy'
+            }).on('changeDate', function (e) {
+                $('#frmBankTransfer').formValidation('revalidateField', 'DocumentDate');
+            });
+
+
+            $('#frmBankTransfer').formValidation({
+                message: 'This value is not valid',
+                icon: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    ChequeNo: {
+                        message: 'The Cheque No is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                {
+                                    message: 'The Cheque No is required'
+                                }
+                        }
+                    },
+                    ChequeDate: {
+                        message: 'The Cheque Date  is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                {
+                                    message: 'The Cheque Date is required'
+                                },
+                            date: {
+                                format: 'MM/DD/YYYY',                                
+                                message: 'The Cheque Date is not a valid'
+                            }
+                        }
+                    },
+                    DocumentDate: {
+                        message: 'The Document Date is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                {
+                                    message: 'The Document Date is required'
+                                },
+                            date: {
+                                format: 'MM/DD/YYYY',
+                                message: 'The Document Date is not a valid'
+                            }
+                        }
+                    },
+                    FromBankCode: {
+                        message: 'The From Bank Code is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                 {
+                                     message: 'The To From Bank Code is required'
+                                 }
+                        }
+                    },
+                    ToBankCode: {
+                        message: 'The To Bank Code is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                {
+                                    message: 'The  To Bank Code is required'
+                                }
+                        }
+                    },
+                    WithDrawAmount: {
+                        message: 'The WithDraw amount is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                 {
+                                     message: 'The WithDraw amount is required'
+                                 },
+                            numeric: {
+                                message: 'The value is not an integer',
+                                // The default separators
+                                thousandsSeparator: '',
+                                decimalSeparator: '.'
+                            }
+                        }
+                    },
+                    DepositAmount: {
+                        message: 'The Deposit amount is not valid',
+                        row: '.col-md-2',
+                        validators: {
+                            notEmpty:
+                                {
+                                    message: 'The Deposit amount is required'
+                                },
+                            numericss: {
+                                message: 'The value is not an integer',
+                                // The default separators
+                                thousandsSeparator: '',
+                                decimalSeparator: '.'
+                            }
+                        }
+                    }
+
+                }
+
+            });
+
+        });
+
+    </script>
+}

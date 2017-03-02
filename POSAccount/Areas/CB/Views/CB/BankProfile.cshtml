@@ -1,0 +1,315 @@
+﻿@model POSAccount.Contract.Bank
+
+@{
+    ViewBag.Title = "BankProfile";
+}
+
+@section CssSection
+{
+    <style>
+        input[type=text].error, select.error {
+            border-color: red;
+            font-size: 12px;
+        }
+
+        label.error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+}
+
+<link href="~/Content/bootstrap-datetimepicker.css" rel="stylesheet" />
+
+@*@using (Html.BeginForm("SaveBankProfile", "CBController", FormMethod.Post,new { area = "CB", id = "frmBankProfile", @class = "form-horizontal" }))
+{
+    *@
+    @using (Ajax.BeginForm("SaveBankProfile", "CB", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "frmBankProfile" }))
+{
+
+    <div class="box box-solid box-default">
+        <div class="box-header">
+        <h3 class="box-title">Bank List</h3>
+    </div>
+        <div class="box-body">
+
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Bank Code</label>
+                        <div class="col-sm-2">
+                            @Html.TextBoxFor(m => m.BankCode, new { @class = "form-control input-sm",@readonly="readonly" })
+                           
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Name</label>
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-sm"})
+                           
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Account No.</label>
+                        <div class="col-sm-2">
+                            @Html.TextBoxFor(m => m.AccountNo, new { @class = "form-control input-sm"})
+                            
+                        </div>
+
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Bank Account</label>
+                        <div class="col-sm-4">
+                            @Html.DropDownListFor(m => m.BankAccount, Model.BankAccountList, "Select Bank Account", new { @class = "form-control select2 select2-hidden-accessible;", @required = "required" })
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Over Draft Limit</label>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                <span class="input-group-addon">$</span>
+                                @Html.TextBoxFor(m => m.OverdraftLimit, new { @class = "form-control input-sm" })
+                            </div>
+                        </div>
+
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Current Balance</label>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                <span class="input-group-addon">$</span>
+                                @Html.TextBoxFor(m => m.CurrentBalance, new { @class = "form-control input-sm", @readonly = "readonly" })
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </fieldset>
+            <fieldset class="form-horizontal">
+                <legend>Address</legend>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 1</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.BankAddress.Address1, new { @class = "form-control input-sm"})                          
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 2</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.BankAddress.Address2, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">City</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.BankAddress.CityName, new { @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">State</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.BankAddress.StateName, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">ZIP Code</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.BankAddress.ZipCode, new { @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Country</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.BankAddress.CountryCode, Model.CountryList, "Select Country", new { @class = "form-control chosen-select input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Phone No.</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.BankAddress.TelNo, new { @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Fax</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.BankAddress.FaxNo, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Web Site</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.BankAddress.WebSite, new { @class = "form-control input-sm" })
+                            @Html.HiddenFor(m => m.BankAddress.AddressType)
+                            @Html.HiddenFor(m => m.AddressId)
+                        </div>
+                    </div>
+                </div>
+
+
+            </fieldset>
+        </div>
+
+        @*<div class="box-footer">
+                <input type="submit" class="btn btn-primary" value="Save" />
+                <a href="#" class="btn btn-default">Clear</a>
+                <a href="#" class="btn btn-danger">Delete</a>
+                <a href="#" id="btnBack"  class="btn btn-default">Back</a>
+                <a href="@Url.Action("BankProfile", "CB", new { area = "CB", bankCode = "NEW" }, null)" class="btn btn-default">New</a>
+
+            </div>*@
+
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                    <a href="@Url.Action("BankProfile", "CB", new { area = "CB", bankCode = "NEW" }, null)" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+                        New
+                    </a>
+                    <button type="submit" id="btnSave" class="btn btn-social btn-success">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+
+                    <a href="@Url.Action("BankProfile", "CB", new { area = "CB", bankCode = "NEW" }, null)" class="btn btn-social btn-default">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <a href="#" id="btnDelete" class="btn btn-social btn-danger">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </a>
+
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-social btn-primary"><i class="fa fa-print"></i>Print</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="fa fa-file-pdf-o"></i>Pdf</a> </li>
+                            <li><a href="#"><i class="fa fa-file-excel-o"></i>Excel</a> </li>
+                            <li><a href="#"><i class="fa fa-file-word-o"></i>Word</a> </li>
+
+                        </ul>
+                    </div>
+                    <a href="#" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<link href="~/Content/chosen.css" rel="stylesheet" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+@section Scripts{
+
+    <script src="~/Scripts/moment.js"></script>
+    <script src="~/Scripts/bootstrap-datetimepicker.js"></script>
+    
+
+    <script type="text/javascript">
+        $(function () {          
+
+            if ('@Model.BankCode' == '')
+            {
+                $('input[name="BankCode"]').prop('readonly', false);
+            }
+
+            $.validator.addMethod("CodeRequire", function (value, element, param) {              
+                if (value == "NEW" ) {
+                    return false;
+                }
+                return true;
+            });
+
+            $('#frmBankProfile').validate({
+                rules: {
+                    BankCode: {
+                        required: true,
+                        CodeRequire:true
+                    },
+                    Name: {
+                        required: true
+                    },
+                    AccountNo: {
+                        required: true
+                    },
+                    BankAccount: {
+                        required: true
+                    },
+                    OverdraftLimit: {
+
+                        required: true
+                    },
+                    CurrentBalance: {
+                        required: true
+                    }
+                },
+                messages: {
+                    BankCode: {
+                        required: "Bank Code is required",
+                        CodeRequire:"Bank Code must not be NEW"
+                    },
+                    Name: {
+                        required: "Name is required"
+                    },
+                    AccountNo: {
+                        required: "Account No is required"
+                    },
+                    BankAccount: {
+                        required: "BankAccount is required"
+                    },
+                    OverdraftLimit: {
+
+                        required: "Overdraft Limit is required"
+                    },
+                    CurrentBalance: {
+                        required: "Current Balance is required"
+                    }
+                }
+            
+                });
+
+                $('.datepicker').datetimepicker({
+                    useCurrent: false,
+                    maxDate: moment('@DateTime.Now.ToString("MM/dd/yyyy")'),
+                format: 'MM/DD/YYYY',
+                inline: false
+            });
+           });
+
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+            //
+            //creditorCode = result.Creditor.CreditorCode;
+        }
+
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = "../CB/BankProfileList";
+            }
+        }
+    </script>
+}

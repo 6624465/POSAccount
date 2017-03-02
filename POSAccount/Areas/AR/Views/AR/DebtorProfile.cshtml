@@ -1,0 +1,388 @@
+﻿@model POSAccount.Contract.Debtor
+
+@{
+    ViewBag.Title = "DebtorProfile";
+}
+
+@section CssSection
+{
+    <style>
+        input[type=text].error, select.error {
+            border-color: red;
+            font-size: 12px;
+        }
+
+        label.error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+}
+
+
+@using (Ajax.BeginForm("SaveDebtor", "AR", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnSaveFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+
+    <div class="box box-solid box-default">
+
+        <!--Header Information-->
+        <div class="box-header">
+            <h3 class="box-title">Customer Profile</h3>
+            <div class="box-tools pull-right">
+                <div class="has-feedback">
+                    <div class="input-group input-group-sm">
+                        <input id="txtSearch" class="form-control" type="text" placeholder="Search Customer" />
+                        <span class="input-group-btn" style="width: 70px">
+                            @*<a href="@Url.Action("CBSearchReceipt", "CB", new { area = "CB", DocumentNo = 0 }, null)" class="btn btn-info btn-flat" onclick="return Search()" id="btnSearch"></a>*@
+
+                            <div class="btn-group">
+                                @*<button type="button" class="btn btn-primary  btn-flat">Go!</button>*@
+                                <a href="@Url.Action("SearchDebtor", "AR", new { area = "AR", debtorCode = 0 }, null)" class="btn btn-info btn-flat" onclick="return Search()" id="btnSearch"><i class="fa fa-search"></i></a>
+                                @*<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Advanced Search</a></li>
+                                </ul>*@
+                            </div>
+
+
+                            @*<button class="btn btn-info btn-flat">
+
+                        <i class="fa fa-search"></i>
+                    </button>*@
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--Body Information-->
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Customer Code</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DebtorCode, new { @placeholder = "DebtorCode", @id = "txtDebtorCode", @class = "form-control input-sm", @readonly="readonly" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Regirstration No.</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.RegistrationNo, new { @placeholder = "RegistrationNo", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Name</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.DebtorName, new { @placeholder = "DebtorName", @class = "form-control input-sm" })
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Debtor Account</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.DebtorAccount, Model.DebtorAccountList, "", new { @id = "ddlAccountCode", @class = "form-control input-sm;" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtCreditTerm" class="col-md-2 control-label input-sm">Credit Term/ Payment Type</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.CreditTerm, new { @placeholder = "CreditTerm", @id = "txtCreditTerm", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.CreditTerm, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(m => m.PaymentType, Model.PaymentTypeList, "PAYMENT TYPE", new { @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.PaymentType, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-1">
+                            @Html.CheckBoxFor(x => x.IsAutoSendInvoice, new { @class = "pull-right" })
+                        </div>
+                        <label for="IsAutoSendInvoice">Auto send Invoice</label>
+                    </div>
+                </div>
+
+            </fieldset>
+            <fieldset class="form-horizontal">
+                <legend>Address</legend>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 1</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.DebtorAddress.Address1, new { @placeholder = "Address1", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Address 2</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.DebtorAddress.Address2, new { @placeholder = "Address2", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">City</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DebtorAddress.CityName, new { @placeholder = "CityName", @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">State</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.DebtorAddress.StateName, new { @placeholder = "StateName", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">ZIP Code</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DebtorAddress.ZipCode, new { @placeholder = "ZipCode", @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Country</label>
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(m => m.DebtorAddress.CountryCode, Model.CountryList, "Select Country", new { @class = "form-control chosen-select input-sm" })
+
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Phone No.</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DebtorAddress.TelNo, new { @placeholder = "TelNo", @class = "form-control input-sm" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Fax</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.DebtorAddress.FaxNo, new { @placeholder = "FaxNo", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Email</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.DebtorAddress.WebSite, new { @placeholder = "Email", @class = "form-control input-sm" })
+                            @Html.HiddenFor(m => m.DebtorAddress.AddressType)
+                            @Html.HiddenFor(m => m.AddressID)
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        <!--Footer Information-->
+        <div class="box-footer">
+            <div class="row ">
+                <div class="col-xs-12">
+                    @*<a href="#" type="submit" class="btn btn-primary">Save</a>*@
+                    <a href="@Url.Action("DebtorProfile", "AR", new { area = "AR", debtorCode = "NEW" }, null)" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+                        New Customer
+                    </a>
+                    <button type="submit" id="btnSave" class="btn btn-social btn-success">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+                    <a href="#" class="btn btn-social btn-default" onclick="btnClear();">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <button type="button" onclick="DeleteDebtor('@Model.DebtorCode')" class="btn btn-social btn-danger" id="btnDelete">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </button>
+                    <a href="@Url.Action("CustomerList", "AR", new { area = "AR" }, null)" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/modalform")
+    @Scripts.Render("~/bundles/dataTable")
+
+    <script type="text/javascript">
+        var _selectedDebtorCode;
+        var DebtorCode;
+
+        function OnSaveFailure(result) {
+            ModalShow(result.Message, "Failure", "Save");
+        }
+
+        function OnSaveSuccess(result) {
+            ModalShow(result.Message, "Success", "Save");
+
+            DebtorCode = result.Debtor.DebtorCode;
+        }
+
+        function BtnOK() {
+            if (ActionType == "Save") {
+                location.href = '@Url.Action("CustomerList", "AR", new { area = "AR" }, null)';
+            }
+        }
+
+        function btnClear() {
+            $('.form-control').val('');
+        }
+
+        function DeleteDebtor() {
+            var debtorcode = $("#txtDebtorCode").val();
+            $.ajax({
+                url: "/AR/DeleteDebtor", type: "POST", dataType: "json",
+                data: { DebtorCode: debtorcode },
+                async: true,
+                success: function (response) {
+                    if (response.result) {
+                        ModalShow(response.Message, "Success", "Delete");
+                        $("#txtDebtorCode").addClass("StrikeOut")
+                        $("#btnSave").attr("disabled", " disabled")
+
+
+                    } else {
+                        ModalShow(response.Message, "Failure", "Delete");
+                    }
+                }
+            })
+        }
+
+
+        $(function () {
+
+            if ('@Model.DebtorCode' == '') {
+                $('input[name="DebtorCode"]').prop('readonly', false);
+                $('#btnDelete').prop('disabled', false);
+            }
+
+            $('#myForm').validate({
+                rules: {
+                    DebtorCode: {
+                        required: false,
+                        maxlength:10
+                    },
+                    RegistrationNo: {
+                        required: true
+                    },
+                    DebtorName: {
+                        required: true
+                    },
+                    DebtorAccount: {
+                        required: true
+                    },
+                    CreditTerm: {
+
+                        required: true
+                    },
+                    PaymentType: {
+                        required: true
+                    }
+                },
+                messages: {
+                    DebtorCode: {
+                        required: "Customer Code is required",
+                        minlength: "minimum length 10 character",
+                        maxlength: "minimum length 10 character"
+                    },
+                    RegistrationNo: {
+                        required: "Registration No is required"
+                    },
+                    DebtorName: {
+                        required: "Customer Name is required"
+                    },
+                    DebtorAccount: {
+                        required: "Debtor Account is required"
+                    },
+                    CreditTerm: {
+
+                        required: "Credit Term is required"
+                    },
+                    PaymentType: {
+                        required: "Payment Type is required"
+                    }
+                }
+            });
+
+
+
+            $("#txtSearch").autocomplete({
+                minLength: 2,
+                source: function (request, response) {
+                    $.ajax({
+                        url: "/AR/SearchDebtorList", type: "GET", dataType: "json",
+                        data: { searchText: request.term, limitRecords: -1, source: "Debtor" },
+                        async: true,
+                        success: function (data) {
+
+
+                            $.each(data, function (a, b) {
+
+                                response($.each(data, function (a, b) {
+                                    return { label: b.DebtorCode, value: b.DebtorCode }
+                                }))
+
+
+                                response($.map(data, function (item) {
+                                    return { label: item[0].DebtorCode, value: item[0].DebtorCode }
+
+                                }))
+                            })
+
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    _selectedDebtorCode = ui.item.value;
+
+
+                    $("#btnSearch").href = "/AR/SearchDebtor?debtorCode=" + _selectedDebtorCode;
+                    $("#btnSearch").attr("href", "/AR/SearchDebtor?debtorCode=" + _selectedDebtorCode)
+                    //$("#btnSearch").href
+                    setTimeout(function () {
+                        $("#txtSearch").val(ui.item.label);
+                    }, 100)
+
+                    return false;
+
+                }
+            });
+        });
+
+            function Search() {
+                var _selectedDebtorCode = $("#txtSearch").val();
+                $("#btnSearch").href = "/AR/SearchDebtor?debtorCode=" + _selectedDebtorCode;
+                $("#btnSearch").attr("href", "/AR/SearchDebtor?debtorCode=" + _selectedDebtorCode)
+
+                return true;
+            }
+
+
+            $(document).ready(function () {
+                if ('@Model.Status' == 'False') {
+                    $("#txtDebtorCode").addClass("StrikeOut")
+                    $("#btnSave").attr("disabled", " disabled")
+
+                }
+
+
+            });
+
+    </script>
+
+}

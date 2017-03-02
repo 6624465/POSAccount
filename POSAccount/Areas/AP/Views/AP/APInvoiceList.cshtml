@@ -1,0 +1,79 @@
+﻿@model List<POSAccount.Contract.APInvoice>
+
+@{
+    ViewBag.Title = "List Of AP-Invoices";
+}
+
+<div class="box box-solid box-default ">
+     <div class="box-header with-border">
+            <h3 class="box-title">List Of AP - Invoices
+            </h3>
+        </div>
+   
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+            <div class="row pull-right" style="padding-bottom: 10px;">
+                <div class="col-md-12">
+                    <a class="btn btn-small btn-primary" data-modal="" href="@Url.Content("~/AP/Invoice")" id="btnCreate"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New Invoice</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblList" class="table table-striped table-hover table-bordered table-responsive setting-table">
+                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+                            <tr>
+                                <th>Invoice No.</th>
+                                <th>Invoice Date</th>
+                                <th>Reference No</th>
+                                <th>Total Amount</th>
+
+                            </tr>
+                        </thead>
+                        <tbody style="font-size: 12px;">
+                            @if (Model != null)
+                            {
+                                foreach (POSAccount.Contract.APInvoice item in Model)
+                                {
+                                <tr>
+                                    <td>@Html.ActionLink(@item.DocumentNo, "APInvoice", "AP", new { invoiceType = "APINV", documentNo = @item.DocumentNo }, new { data_modal = "", id = "btnCreate" })</td>
+                                    <td>@item.DocumentDate.ToString("dd-MM-yyyy") </td>
+                                    <td>@item.ReferenceNo</td>
+                                    <td>@item.TotalAmount </td>
+                                </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+        </fieldset>
+    </div>
+
+</div>
+
+@section Scripts {
+
+    
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#tblList').DataTable({
+                responsive: true
+            });
+            var table = $('#tblList').DataTable();
+            $('#tblList tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+        });
+
+    </script>
+}

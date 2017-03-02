@@ -1,0 +1,2047 @@
+﻿@model POSAccount.Contract.CBReceipt
+
+@{
+    ViewBag.Title = "CBReceipt";
+}
+@section CssSection
+{
+
+
+    <style type="text/css">
+        #tblQuotationItem_filter input {
+            width: 70%;
+        }
+
+        #tblQuotationItem_filter, #tblQuotationItem_paginate {
+            float: right;
+        }
+
+        #tblQuotationItem_length select.input-sm {
+            width: 40%;
+        }
+
+        /*.DisableBackground {
+        background: transparent none repeat scroll 0 0;
+        border: none;
+    }*/
+    </style>
+    <style type="text/css">
+        .bootstrap-datetimepicker-widget.dropdown-menu {
+            background-color: #fff;
+            color: #333;
+            margin: 2px 0;
+            padding: 3px;
+            width: 15em;
+            border-color: #d0cfcf;
+        }
+
+        .cursorCss {
+            cursor: pointer;
+        }
+    </style>
+}
+<div class="modal fade in" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="mySearch">
+    <div class="modal-dialog modal-lg generated_frm">
+        <div class="modal-content form-horizontal">
+            <div class="modal-header">
+                <button aria-label="Close" data-dismiss="modal" class="close" type="button"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title">Search&nbsp;&nbsp;<span id="modalAni"><i class="fa fa-refresh fa-spin"></i></span></h4>
+            </div>
+            <div id="modalBody" style="display: none;"></div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" class="btn btn-default" type="button"><i class="fa fa-times"></i>&nbsp;Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*@using (Html.BeginForm("SaveCBReceipt", "CB", new { area = "CB" }, FormMethod.Post, new { id = "frmCBPayment" }))*@
+@using (Ajax.BeginForm("SaveCBReceipt", "CB", new AjaxOptions { HttpMethod = "POST", OnSuccess = "OnSaveSuccess", OnFailure = "OnMethodFailure" }, new { enctype = "multipart/form-data", id = "myForm" }))
+{
+    <div class="box box-solid box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">CB Receipt</h3>
+             
+        </div>
+        <div class="box-body">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Receipt Type</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(m => m.ReceiptType, Model.ReceiptTypeList, new { @class = "form-control input-sm", @onchange = "OnReceiptTypeChange()" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-1 input-sm control-label">Receipt Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentDate, new { @placeholder = "Document Date", @id = "txtDocumentDate", @class = "form-control input-sm datepicker" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-1 input-sm control-label">Receipt No.</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.DocumentNo, new { @id = "txtDocumentNo", @class = "form-control input-sm", @readonly = "readonly" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Debtor Code</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(m => m.DebtorCode, Model.DebtorList, "", new { @class = "form-control input-sm", @id = "ddlDebtor" })
+                            <input type="hidden" id="hdnDebtorAccount" value="" />
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-1 input-sm control-label">Cheque Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.ChequeDate, new { @placeholder = "Cheque Date", @id = "txtChequeDate", @class = "form-control input-sm datepicker" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-1 input-sm control-label" style="display:none;">Account Date</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.AccountDate, new { @placeholder = "Account Date", @id = "txtAccountDate", @class = "form-control input-sm datepicker", style = "display:none;" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label for="txtInvoiceNo" class="col-md-2 input-sm control-label">Bank Code</label>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(m => m.BankCode, Model.BankCodeList, "", new { @placeholder = "Bank Code", @class = "form-control input-sm" })
+                            <input type="hidden" id="hdnBankAccount" value="" />
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-1 input-sm control-label">Cheque No</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.ChequeNo, new { @placeholder = "Cheque No", @id = "txtChequeNo", @class = "form-control input-sm alphaNumCss" })
+                        </div>
+                        <label for="txtInvoiceNo" class="col-md-1 input-sm control-label" style="white-space: nowrap;">Receipt Amount</label>
+                        <div class="col-md-2">
+                            @Html.TextBoxFor(m => m.LocalReceiptAmount, new { @placeholder = "Payment Amount", @id = "txtLocalReceiptAmount", @class = "form-control input-sm decimalCss" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txtRemark" class="col-md-2 input-sm control-label">Remark</label>
+                    <div class="col-md-3">
+                        @Html.TextAreaFor(m => m.Remark, new { @placeholder = "Remark", @id = "txtRemark", @class = "form-control input-sm", rows = "3", cols = "30", style = "width:89.8%" })
+                    </div>
+                    <label for="txtInvoiceNo" class="col-md-1 input-sm control-label">Bank Charges</label>
+                    <div class="col-md-2">
+                        @Html.TextBoxFor(m => m.LocalBankChargesAmount, new { @placeholder = "Local Bank Charges", @id = "txtLocalBankChargesAmount", @class = "form-control input-sm decimalCss", @readonly = "readonly" })
+                    </div>
+                </div>
+
+
+
+                <div id="MyTabSelector" class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tbDetails" data-toggle="tab">CBReceipt Details</a>
+                        </li>
+                        <li>
+                            <a href="#tbGLDetailsOthers" data-toggle="tab">GL Allocation</a>
+                        </li>
+                        <li class="">
+                            <a href="#tbSetOffDetails" data-toggle="tab">Set Off Details</a>
+                        </li>
+                        <li class="">
+                            <a href="#tbGLDetails" data-toggle="tab">GL Allocation</a>
+                        </li>
+                        <li class="pull-right">
+                            <div class="btn-group btn-primary">
+                                @*<a class="btn btn-small btn-primary" data-modal="" href="@Url.Content("~/CB/AddCBReceiptItem?itemNo=-1")" id="btnCreate1"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Details</a>*@
+                                <button id="btnCreate1" class="btn btn-small btn-primary" style="display: none;" data-toggle="modal" data-target="#cbReceiptDetailsModal" onclick="EditCBReceiptDetails('-1')"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;Add Details</button>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- Display List Section -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tbDetails">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblQuotationItem" class="table table-striped table-hover table-bordered table-responsive ">
+
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                @*  <th class="hidden">DocumentNo</th>
+                                                <th class="hidden">ItemNo</th>
+                                                <th class="hidden">Charge Code</th>*@
+                                                <th>Account Code</th>
+                                                <th>Remark</th>
+                                                <th>Currency Code</th>
+                                                @*<th class="hidden">Base Amount</th>*@
+                                                <th>Local Amount</th>
+                                                <th>SetOff Date</th>
+                                                <th>Action</th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody style="font-size: 12px;">
+                                            @{for (int i = 0; i < Model.CBReceiptDetails.Count; i++)
+                                              {
+                                                
+                                                <tr id="tr_@i">
+                                                    <td name="AccountCode">
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].DocumentNo)
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].ItemNo)
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].AccountCode)
+                                                        @* @Html.HiddenFor(m => m.CBReceiptDetails[i].Status)*@
+                                                        <span id="CBReceiptDetails_@(i)__AccountCode_span" class="cbReceiptCss">@Model.CBReceiptDetails[i].AccountCode.Trim()</span>
+                                                    </td>
+                                                    <td name="Remark">
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].Remark)
+                                                        <span id="CBReceiptDetails_@(i)__Remark_span">@Model.CBReceiptDetails[i].Remark.Trim()</span>
+                                                    </td>
+                                                    <td name="CurrencyCode">
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].CurrencyCode)
+                                                        <span id="CBReceiptDetails_@(i)__CurrencyCode_span">@Model.CBReceiptDetails[i].CurrencyCode.Trim()</span>
+                                                    </td>
+                                                    @*<td name="BaseAmount" class="hidden">
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].BaseAmount)
+                                                        <span id="CBReceiptDetails_@(i)__BaseAmount_span">@Model.CBReceiptDetails[i].BaseAmount</span>
+                                                    </td>*@
+                                                    <td name="LocalAmount">
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].LocalAmount)
+                                                        <span id="CBReceiptDetails_@(i)__LocalAmount_span">@Model.CBReceiptDetails[i].LocalAmount</span>
+                                                    </td>
+                                                    <td name="SetOffDate">
+                                                        @Html.HiddenFor(m => m.CBReceiptDetails[i].SetOffDate)
+                                                        <span id="CBReceiptDetails_@(i)__SetOffDate_span">@Model.CBReceiptDetails[i].SetOffDate</span>
+                                                    </td>
+                                                    <td name="Action">
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-warning btn-sm dropdown-toggle" id="btnAction_@i" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                                Action
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                                <li><a class="cursorCss" id="Edit_@i" onclick="EditCBReceiptDetails('@(i)')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>
+                                                                <li><a class="cursorCss" id="Delete_@i" onclick="DeleteCBReceiptDetails('@(i)')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                              }
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8"></div>
+                                <div class="col-md-4">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-md-6">
+                                            <label class="control-label input-sm pull-right">Total Amount</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            @Html.TextBoxFor(m => m.LocalReceiptAmount, new { @class = "form-control input-sm", @readonly = "true", id = "NetTotalAmount" })
+                                            @Html.HiddenFor(m => m.LocalApplyAmount)
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-md-6">
+                                            <label class="control-label input-sm pull-right">WH Tax Percent</label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <span class="input-group-addon" style="padding-bottom: 0px; padding-top: 3px;">
+                                                    @Html.CheckBoxFor(m => m.IsWHTax, new { @class = "checkbox", onchange = "IsWHTaxOnChange();" })
+                                                    <input type="hidden" id="hdnWHTaxCode" name="hdnWHTaxCode" />
+                                                </span>
+                                                @{
+                                              List<SelectListItem> WHPercentOptions = new List<SelectListItem>() {
+                                                        new SelectListItem { Value = "1", Text = "1 %" },
+                                                        new SelectListItem { Value = "2", Text = "2 %" },
+                                                        new SelectListItem { Value = "3", Text = "3 %" },
+                                                        new SelectListItem { Value = "5", Text = "5 %" }
+                                                    };
+                                                }
+                                                @Html.DropDownListFor(m => m.WHPercent, new SelectList(WHPercentOptions, "Value", "Text", 1), "", new { @class = "form-control input-sm-red", onchange = "WHPercentChange(this);", @readonly = "true" })
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-md-6">
+                                            <label class="control-label input-sm pull-right">WH Tax Amount</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            @Html.TextBoxFor(m => m.WHAmount, new { @class = "form-control input-sm", @readonly = "true" })
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 10px">
+                                        <div class="col-md-6">
+                                            <label class="control-label input-sm pull-right">VAT 7%</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <span class="input-group-addon" style="padding-bottom: 0px; padding-top: 3px;">
+                                                    @Html.CheckBoxFor(m => m.IsVAT, new { @class = "checkbox", onchange = "IsVATOnChange(this);" })
+                                                    <input type="hidden" id="hdnVatHTaxCode" name="hdnVatHTaxCode" />
+                                                </span>
+                                                @Html.TextBoxFor(m => m.TaxAmount, "{0:###,##0.00}" ,new { @class = "form-control input-sm", onblur= "VATAmountOnBlur(this);" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-md-6">
+                                            <label class="control-label input-sm pull-right">Net Amount</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            @Html.TextBoxFor(m => m.TotalAmount, "{0:###,##0.00}", new { @class = "form-control input-sm", @readonly = "true" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tbGLDetailsOthers" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblGLDetailsOthers" class="table table-striped table-hover table-bordered table-responsive ">
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                <th>Account Code</th>
+                                                <th>Credit Amount</th>
+                                                <th>Debit Amount</th>
+                                                <th>Total Amount</th>
+                                                <th>Remark</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 12px;">
+                                            @if (Model.GLTransactionDetails != null)
+                                            {
+                                                for (int i = 0; i < Model.GLTransactionDetails.Count; i++)
+                                                {
+                                                <tr id="tblGLDetailstr_@i" class="tblGLDetailsCss">
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].DocumentNo)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].ItemNo)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].DocumentType)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].Status)
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].AccountCode)
+                                                        <span id="GLTransactionDetails_@(i)__AccountCode_span">@Model.GLTransactionDetails[i].AccountCode</span>
+
+                                                    </td>
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].CreditAmount)
+                                                        <span id="GLTransactionDetails_@(i)__CreditAmount_span">@Model.GLTransactionDetails[i].CreditAmount</span>
+                                                    </td>
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].DebitAmount)
+                                                        <span id="GLTransactionDetails_@(i)__DebitAmount_span">@Model.GLTransactionDetails[i].DebitAmount</span>
+                                                    </td>
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].Amount)
+                                                        <span id="GLTransactionDetails_@(i)__Amount_span">@Model.GLTransactionDetails[i].Amount.ToString("#####0.00")</span>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].Status)
+                                                    </td>
+                                                    <td>
+                                                        @Html.HiddenFor(m => m.GLTransactionDetails[i].Remark)
+                                                        <span id="GLTransactionDetails_@(i)__Remark_span">@Model.GLTransactionDetails[i].Remark</span>
+                                                    </td>
+                                                </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr id="whRow" style="display: none; background-color: azure;"></tr>
+                                            <tr id="vatRow" style="display: none; background-color: azure;"></tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!--Set Off Details-->
+                        <div id="tbSetOffDetails" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search" name="srch-term" id="srch-term" onkeypress="srchTerm_KeyPress(event)">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default" type="button" onclick="btnSearchClick()"><i class="glyphicon glyphicon-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-top: 5px;">
+                                    <label id="lblErrMsg" style="color: red; font-weight: bold;"></label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table id="tblSetoffItem" class="table table-striped table-hover table-bordered table-responsive ">
+                                        <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                            <tr>
+                                                <th class="hidden">DocumentNo</th>
+                                                <th class="hidden">ItemNo</th>
+                                                <th class="hidden">MatchDocumentType</th>
+                                                <th class="hidden">MatchDocumentDate</th>
+                                                <th>Document No</th>
+                                                <th>AR Amount</th>
+                                                <th>Apply Amount</th>
+                                                <th>SetOff Date</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 12px;">
+
+                                            @{
+                                            for (int i = 0; i < Model.CBReceiptSetOffDetails.Count; i++)
+                                            {
+                                                <tr id="tr_@i">
+                                                    <td class='hidden'>
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].DocumentNo)
+                                                    </td>
+                                                    <td class='hidden'>
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].ItemNo)
+                                                    </td>
+                                                    <td class='hidden'>
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].MatchDocumentType)
+                                                    </td>
+                                                    <td name="MatchDocumentDate">
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].MatchDocumentDate)
+                                                        @Html.DisplayFor(m => m.CBReceiptSetOffDetails[i].MatchDocumentDate)
+                                                    </td>
+                                                    <td name="MatchDocumentNo">
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].MatchDocumentNo)
+                                                        @Html.DisplayFor(m => m.CBReceiptSetOffDetails[i].MatchDocumentNo)
+                                                    </td>
+                                                    <td name="LocalAmount">
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].LocalAmount)
+                                                        @Html.DisplayFor(m => m.CBReceiptSetOffDetails[i].LocalAmount)
+                                                    </td>
+                                                    <td name="LocalApplyAmount">
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].LocalApplyAmount)
+                                                        @Html.DisplayFor(m => m.CBReceiptSetOffDetails[i].LocalApplyAmount)
+                                                    </td>
+                                                    <td name="SetOffDate">
+                                                        @Html.HiddenFor(m => m.CBReceiptSetOffDetails[i].SetOffDate)
+                                                        @Html.DisplayFor(m => m.CBReceiptSetOffDetails[i].SetOffDate)
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <input type="hidden" id="hdnCBPaymentCreditorDebitCredit" />
+                                <input type="hidden" id="hdnCBPaymentbankDebitCredit" />
+                                <input type="hidden" id="hdnIsVat" />
+                                <input type="hidden" id="hdnVatAmount" />
+                            </div>
+                        </div>
+
+                        <!--Set Off Details-->
+                        <div id="tbGLDetails" class="tab-pane">
+                            <table id="tblGLDetails" class="table table-striped table-hover table-bordered table-responsive ">
+                                <thead style="background-color: steelblue; color: white; font-size: 12px;">
+
+                                    <tr>
+                                        <th class="hidden">DocumentNo</th>
+                                        <th class="hidden">ItemNo</th>
+                                        <th class="hidden">TransactionType</th>
+                                        <th>Account Code</th>
+                                        <th>Debit Amount</th>
+                                        <th>Credit Amount</th>
+                                        <th>Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size: 12px;">
+
+                                    @{
+                                            for (int i = 0; i < Model.CBReceiptGLDetails.Count; i++)
+                                            {
+                                        <tr id="tr_@i">
+                                            <td class='hidden'>
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].DocumentNo)
+                                            </td>
+                                            <td class='hidden'>
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].ItemNo)
+                                            </td>
+                                            <td class='hidden'>
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].TransactionType)
+                                            </td>
+                                            <td name="AccountCode">
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].AccountCode)
+                                                @Html.DisplayFor(m => m.CBReceiptGLDetails[i].AccountCode)
+                                            </td>
+                                            <td name="LocalAmount">
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].LocalAmount)
+                                                @Html.DisplayFor(m => m.CBReceiptGLDetails[i].LocalAmount)
+                                            </td>
+                                            <td name="TaxAmount">
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].TaxAmount)
+                                                @Html.DisplayFor(m => m.CBReceiptGLDetails[i].TaxAmount)
+                                            </td>
+                                            <td name="TotalAmount">
+                                                @Html.HiddenFor(m => m.CBReceiptGLDetails[i].TotalAmount)
+                                                @Html.DisplayFor(m => m.CBReceiptGLDetails[i].TotalAmount)
+                                            </td>
+                                        </tr>
+                                            }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <input type="hidden" id="hdnFlag" name="hdnFlag" value="-1" />
+                    <input type="hidden" id="hdnBCFlag" name="hdnBCFlag" value="-1" />
+                    <input type="hidden" id="hdnIsWHTax" name="hdnIsWHTax" value="-1" />
+                    <input type="hidden" id="hdnVatTax" name="hdnVatTax" value="-1" />
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="box-footer">
+            <div class="row  no-print">
+                <div class="col-xs-12">
+                    <a href="@Url.Action("CBReceipt", "CB", new { area = "CB", CBReceiptType = "NEW" }, null)" class="btn btn-social btn-primary">
+                        <i class="fa fa-file-o"></i>
+                        New
+                    </a>
+                    <button type="submit" id="btnSave" class="btn btn-social btn-success">
+                        <i class="fa fa-save"></i>
+                        Save
+                    </button>
+
+
+                    <a href="#" class="btn btn-social btn-default">
+                        <i class="fa fa-close"></i>
+                        Clear
+                    </a>
+                    <a href="#" id="btnDelete" onclick="DeleteCBReceipt('@Model.DocumentNo')" class="btn btn-social btn-danger">
+                        <i class="fa fa-times-circle"></i>
+                        Delete
+                    </a>
+
+                    <div class="btn-group dropup">
+                        @Html.ActionLink("Print", "ViewCBReceipt", "POSReport", new { area = "POSReport", reportSource = "CBReceipt", DocumentId = Model.DocumentNo, URL = "/POSReports/JobTalents.CBReceipt" }, new { data_modal = "test", id = "btnViewReport", @class = "btn btn-small btn-primary" })
+                         
+                        
+                    </div>
+                    <a href="@Url.Action("CBReceiptList", "CB", new { area = "CB" }, null)" id="btnBack" class="btn btn-social btn-info pull-right">
+                        <i class="fa fa-arrow-circle-o-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="overlay" style="opacity: 0.8; display: none;" id="overlayDiv">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+        <input type="hidden" id="hdnCbReceiptFlag" name="hdnCbReceiptFlag" value="-1" />
+    </div>
+}
+
+<div class="modal fade" id="cbReceiptDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">CB Receipt</h4>
+            </div>
+            <div class="modal-body">
+                <form id="modalForm" name="modalForm">
+                    @{ Html.RenderAction("AddCBReceiptItem", "CB", new { documentNo = "", itemNo = -1 }); }
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddDataToTable()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+@section Scripts{
+@Scripts.Render("~/bundles/modalform")
+    <script type="text/javascript">
+
+    var searchBoxUrl = '@Url.Content("~/search/SearchBox")';
+    var _selectedDocumentNoId;
+    var DocumentNo;
+
+    $('.datepicker').datetimepicker({
+        useCurrent: false,
+        //maxDate: moment('DateTime.Now.ToString("dd/MM/yyyy")'),
+        format: 'DD/MM/YYYY',
+        inline: false
+    });
+
+    function ModalValidation() {
+        $('#modalForm').validate({
+            rules: {
+                AccountCode: {
+                    required: true
+                },
+                Remark: {
+                    required: true
+                },
+                CurrencyCode: {
+                    required: true
+                },
+                LocalAmount: {
+                    required: true,
+                    number: true
+                },
+                SetOffDate: {
+                    required: true
+                }
+            },
+            messages: {
+                AccountCode: {
+                    required: 'This is required'
+                },
+                Remark: {
+                    required: 'This is required'
+                },
+                CurrencyCode: {
+                    required: 'This is required'
+                },
+                LocalAmount: {
+                    required: 'This is required'
+                },
+                SetOffDate: {
+                    required: 'This is required'
+                }
+            }
+        });
+    }
+
+
+    $("#ddlDebtor").select2();
+
+    function isNumber(evt) {
+
+        var text = $('#txtChequeNo').val();
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (text.length >= 10) {
+            if (charCode == 8 || charCode == 9)
+                return true;
+            return false;
+        }
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    $(function () {
+        $("#txtSearch").autocomplete({
+            minLength: 2,
+            source: function (request, response) {
+                $.ajax({
+                    url: "/CB/SearchItem", type: "GET", dataType: "json",
+                    data: { searchText: request.term, limitRecords: -1, source: "ARInvoice" },
+                    async: true,
+                    success: function (data) {
+
+                        //
+                        //$.each(data, function (a, b) {
+                        //
+                        //response(  $.each(data, function (a, b) {
+                        //    return { label: b.DocumentNo, value: b.DocumentNo }
+                        //}))
+
+
+                        response($.map(data, function (item) {
+                            return { label: item[0].DocumentNo, value: item[0].DocumentNo }
+
+                        }))
+                        //})
+
+                    }
+                })
+            },
+            select: function (event, ui) {
+                _selectedDocumentNoId = ui.item.value;
+
+                $("#btnSearch").href = "/CB/CBReceipt?DocumentNo=" + _selectedDocumentNoId;
+                $("#btnSearch").attr("href", "/CB/CBReceipt?DocumentNo=" + _selectedDocumentNoId)
+                //$("#btnSearch").href
+                setTimeout(function () {
+                    $("#txtSearch").val(ui.item.label);
+                }, 100)
+
+                return false;
+
+            }
+        });
+    });
+
+    $(document).ready(function () {
+
+
+
+
+        if ('@Model.IsCancel' == 'True') {
+            $("#txtDocumentNo").addClass("StrikeOut")
+            $("#btnSave").attr("disabled", " disabled")
+            $("#btnApprove").attr("disabled", " disabled")
+        }
+
+        $('#tblGLDetailsOthers').DataTable({
+            'bFilter': false,
+            'bPaginate': false,
+            'bInfo': false,
+            'bSort': false,
+            'aoColumnDefs': [
+              {
+                  bSortable: false,
+                  aTargets: [-1]
+              }],
+            'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                //nRow.className = "gradeX odd";
+                nRow.id = 'tblGLDetailstr_' + iDisplayIndex;
+                nRow.className = 'tblGLDetailsCss';
+                return nRow;
+            }
+        });
+
+        $('#tblSetoffItem').DataTable({
+            'bFilter': false,
+            'bPaginate': false,
+            'bInfo': false,
+            'bSort': false,
+            "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                nRow.className = "tblSetoffItemtrCss123";
+                return nRow;
+            }
+        });
+
+        $('#tblGLDetails').DataTable({
+            'bFilter': false,
+            'bPaginate': false,
+            'bInfo': false,
+            'bSort': false,
+            "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                nRow.className = "tblGLDetailsCss123";
+                return nRow;
+            }
+        });
+
+        $('#txtDocumentNo').val('');
+        gCbReceiptTbl = $('#tblQuotationItem').DataTable({
+            'bFilter': false,
+            'bPaginate': false,
+            'bInfo': false,
+            'bSort': false,
+            'aoColumnDefs': [
+              {
+                  bSortable: false,
+                  aTargets: [-1]
+              },
+            ],
+            "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                nRow.className = "CBReceiptDetailsCss";
+                nRow.id = 'CBReceiptDetails_' + iDisplayIndex;
+                return nRow;
+            }
+        });
+
+
+        $('#txtLocalBankChargesAmount').on('keydown', function (e) {
+            if (e.keyCode == 9) {
+                if ($("#ReceiptType option:selected").text() == "OTHERS") {
+                    e.preventDefault();
+                    var localBankChargeAmt = parseFloat($('#txtLocalBankChargesAmount').val());
+                    $('[href="#tbGLDetailsOthers"]').tab('show');
+                    if (localBankChargeAmt > 0) {
+                        var customerCode = $('#ddlDebtor option:selected').val();
+                        var rooturl = '@Url.Action("GetBankChargeDBAccountCode", "CB", new { area = "CB" })';
+                        var url = rooturl + "?customerCode=" + customerCode;
+
+                        $.post(url, null, function (data) {
+                            //debtorAccount
+                            var Index = $('.tblGLDetailsCss').length;
+
+                            if ($('#hdnBCFlag').val() == -1) {
+
+                                var totalRow = [
+                           '<input id="GLTransactionDetails_' + Index + '__DocumentNo" class="payOthersCss" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                           '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="">' +
+                           '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                           '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + data.debtorAccount + '">' +
+                           '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + data.debtorAccount + '</span>',
+
+                           '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + localBankChargeAmt + '">' +
+                           '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + localBankChargeAmt + '</span>',
+
+                           '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + 0.00 + '">' +
+                           '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + 0.00 + '</span>',
+
+                           '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + localBankChargeAmt + '">' +
+                           '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + localBankChargeAmt + '</span>' +
+                           '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">',
+                            '<input id="GLTransactionDetails_' + Index + '__Remark" name="GLTransactionDetails[' + Index + '].Remark" type="hidden" value="Bank Charges">' +
+                           '<span id="GLTransactionDetails_' + Index + '__Remark_span">Bank Charges</span>'
+                                ];
+                                $('#tblGLDetailsOthers').dataTable().fnAddData(totalRow);
+
+                                $('#hdnBCFlag').val(Index);
+                                Index = Index + 1;
+
+                                var totalRow = [
+                                 '<input id="GLTransactionDetails_' + Index + '__DocumentNo" class="payOthersCss" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                                 '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="">' +
+                                 '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                                 '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + data.bankChargeAccount + '">' +
+                                 '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + data.bankChargeAccount + '</span>',
+
+                                 '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + 0.00 + '">' +
+                                 '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + 0.00 + '</span>',
+
+                                 '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + localBankChargeAmt + '">' +
+                                 '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + localBankChargeAmt + '</span>',
+
+                                 '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + localBankChargeAmt + '">' +
+                                 '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + localBankChargeAmt + '</span>' +
+                                 '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">',
+                                 '<input id="GLTransactionDetails_' + Index + '__Remark" name="GLTransactionDetails[' + Index + '].Remark" type="hidden" value="Bank Charges">' +
+                           '<span id="GLTransactionDetails_' + Index + '__Remark_span">Bank Charges</span>'
+                                ];
+
+                                $('#tblGLDetailsOthers').dataTable().fnAddData(totalRow);
+
+                            }
+                            else {
+                                Index = $('#hdnBCFlag').val();
+
+                                $('#GLTransactionDetails_' + Index + '__AccountCode').val(data.debtorAccount);
+                                $('#GLTransactionDetails_' + Index + '__AccountCode_span').text(data.debtorAccount);
+                                $('#GLTransactionDetails_' + Index + '__CreditAmount').val(localBankChargeAmt);
+                                $('#GLTransactionDetails_' + Index + '__CreditAmount_span').text(localBankChargeAmt);
+                                $('#GLTransactionDetails_' + Index + '__TotalAmount').val(localBankChargeAmt);
+                                $('#GLTransactionDetails_' + Index + '__TotalAmount_span').text(localBankChargeAmt);
+
+                                $('#GLTransactionDetails_' + (Index + 1) + '__AccountCode').val(data.bankChargeAccount);
+                                $('#GLTransactionDetails_' + (Index + 1) + '__AccountCode_span').text(data.bankChargeAccount);
+                                $('#GLTransactionDetails_' + (Index + 1) + '__DebitAmount').val(localBankChargeAmt);
+                                $('#GLTransactionDetails_' + (Index + 1) + '__DebitAmount_span').text(localBankChargeAmt);
+                                $('#GLTransactionDetails_' + (Index + 1) + '__TotalAmount').val(localBankChargeAmt);
+                                $('#GLTransactionDetails_' + (Index + 1) + '__TotalAmount_span').text(localBankChargeAmt);
+
+
+
+                                $('#hdnBCFlag').val(Index);
+                            }
+                        });
+                        //CalTotalPaymentAmountWithBankCharge();
+                    }
+                    else {
+                        Index = $('#hdnBCFlag').val();
+
+                        if (Index != -1) {
+                            deleteOthers();
+
+                            $('#hdnBCFlag').val(-1);
+                        }
+
+                    }
+                } else {
+                    var localBankChargeAmt = parseFloat($('#txtLocalBankChargesAmount').val());
+                    $('[href="#tbGLDetails"]').tab('show');
+                    if (true) {
+                        $('[href="#tbGLDetails"]').tab('show');
+                        if (localBankChargeAmt > 0) {
+                            var customerCode = $('#ddlDebtor option:selected').val();
+                            var rooturl = '@Url.Action("GetBankChargeDBAccountCode", "CB", new { area = "CB" })';
+                            var url = rooturl + "?customerCode=" + customerCode;
+
+                            $.post(url, null, function (data) {
+                                var rowCount = $('#tblGLDetails tr').length - 1;
+
+                                if ($('#hdnBCFlag').val() == -1) {
+                                    var rowData = [
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__DocumentNo" type="hidden" class="paydbtCss" value="" name="CBReceiptGLDetails[' + rowCount + '].DocumentNo">',
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__ItemNo" type="hidden" value="' + (rowCount + 1) + '" name="CBReceiptGLDetails[' + rowCount + '].ItemNo">',
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__TransactionType" type="hidden" value="PAY"  name="CBReceiptGLDetails[' + rowCount + '].TransactionType">',
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__AccountCode" type="hidden" value="' + data.debtorAccount + '" name="CBReceiptGLDetails[' + rowCount + '].AccountCode"><span id="CBReceiptGLDetails_' + rowCount + '__AccountCode_span">' + data.debtorAccount + '</span>',
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__DebitAmount" class="DisableBackground"  type="hidden" value="' + localBankChargeAmt + '" name="CBReceiptGLDetails[' + rowCount + '].DebitAmount"><span id="CBReceiptGLDetails_' + rowCount + '__DebitAmount_span">' + localBankChargeAmt + '</span>',
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__CreditAmount" class="DisableBackground"   type="hidden" value="' + 0.00 + '" name="CBReceiptGLDetails[' + rowCount + '].CreditAmount"><span id="CBReceiptGLDetails_' + rowCount + '__CreditAmount_span">' + 0.00 + '</span>', //+ data[i].LocalApplyAmount
+                    '<input id="CBReceiptGLDetails_' + rowCount + '__TotalAmount" type="hidden" class="DisableBackground"  value="' + localBankChargeAmt + '" name="CBReceiptGLDetails[' + rowCount + '].TotalAmount"><span id="CBReceiptGLDetails_' + rowCount + '__TotalAmount_span">' + localBankChargeAmt + '</span>'
+                                    ];
+
+                                    $('#tblGLDetails').dataTable().fnAddData(rowData);
+                                    $('tr td:nth-child(1)').hide()
+                                    $('tr td:nth-child(2)').hide()
+                                    $('tr td:nth-child(3)').hide()
+                                    //$('tr td:nth-child(4)').hide()
+
+                                    $('#hdnBCFlag').val(rowCount);
+                                    rowCount = rowCount + 1;
+                                    var rowData = [
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__DocumentNo" class="paydbtCss" type="hidden" value="" name="CBReceiptGLDetails[' + rowCount + '].DocumentNo">',
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__ItemNo" type="hidden" value="' + (rowCount + 1) + '" name="CBReceiptGLDetails[' + rowCount + '].ItemNo">',
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__TransactionType" type="hidden" value="PAY"  name="CBReceiptGLDetails[' + rowCount + '].TransactionType">',
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__AccountCode" type="hidden" value="' + data.bankChargeAccount + '" name="CBReceiptGLDetails[' + rowCount + '].AccountCode"><span id="CBReceiptGLDetails_' + rowCount + '__AccountCode_span">' + data.bankChargeAccount + '</span>',
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__DebitAmount" class="DisableBackground"  type="hidden" value="' + 0.00 + '" name="CBReceiptGLDetails[' + rowCount + '].DebitAmount"><span id="CBReceiptGLDetails_' + rowCount + '__DebitAmount_span">' + 0.00 + '</span>',
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__CreditAmount" class="DisableBackground"   type="hidden" value="' + localBankChargeAmt + '" name="CBReceiptGLDetails[' + rowCount + '].CreditAmount"><span id="CBReceiptGLDetails_' + rowCount + '__CreditAmount_span">' + localBankChargeAmt + '</span>', //+ data[i].LocalApplyAmount
+                  '<input id="CBReceiptGLDetails_' + rowCount + '__TotalAmount" type="hidden" class="DisableBackground"  value="' + localBankChargeAmt + '" name="CBReceiptGLDetails[' + rowCount + '].TotalAmount"><span id="CBReceiptGLDetails_' + rowCount + '__TotalAmount_span">' + localBankChargeAmt + '</span>'
+                                    ];
+
+                                    $('#tblGLDetails').dataTable().fnAddData(rowData);
+                                    $('tr td:nth-child(1)').hide()
+                                    $('tr td:nth-child(2)').hide()
+                                    $('tr td:nth-child(3)').hide()
+                                    //$('tr td:nth-child(4)').hide()
+                                } else {
+                                    rowCount = parseInt($('#hdnBCFlag').val());
+                                    $('#hdnBCFlag').val(rowCount);
+
+                                    $('#CBReceiptGLDetails_' + rowCount + '__AccountCode').val(data.debtorAccount);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__AccountCode_span').text(data.debtorAccount);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__DebitAmount').val(localBankChargeAmt);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__DebitAmount_span').text(localBankChargeAmt);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__TotalAmount').val(localBankChargeAmt);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__TotalAmount_span').text(localBankChargeAmt);
+
+                                    rowCount = rowCount + 1;
+
+                                    $('#CBReceiptGLDetails_' + rowCount + '__AccountCode').val(data.bankChargeAccount);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__AccountCode_span').text(data.bankChargeAccount);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__CreditAmount').val(localBankChargeAmt);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__CreditAmount_span').text(localBankChargeAmt);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__TotalAmount').val(localBankChargeAmt);
+                                    $('#CBReceiptGLDetails_' + rowCount + '__TotalAmount_span').text(localBankChargeAmt);
+
+                                    //CBReceiptGLDetails_3__CreditAmount_span
+                                    //CBReceiptGLDetails_2__DebitAmount
+
+
+                                }
+
+                            });
+                        }
+                        else {
+                            Index = parseInt($('#hdnBCFlag').val());
+
+                            if (Index != -1) {
+                                deleteDebitors();
+                                $('#hdnBCFlag').val(-1);
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+
+        });
+
+
+        OnReceiptTypeChange();
+
+    });
+
+
+    function deleteOthers() {
+        var trObj = $('td .payOthersCss').parent().parent();
+        $('#tblGLDetailsOthers').dataTable().fnDeleteRow(trObj);
+    }
+
+    function deleteDebitors() {
+
+        var trObj = $('td .paydbtCss').parent().parent();
+        $('#tblGLDetails').dataTable().fnDeleteRow(trObj);
+        //var x = "Bank Charges";
+        //$("tr:contains('" + x + "')").each(function () {
+        //    $('#tblGLDetailsOthers').dataTable().fnDeleteRow(this);
+        //});
+    };
+
+
+    function OnReceiptTypeChange() {
+
+        if ($("#ReceiptType option:selected").text() == "DEBTOR") {
+            $('[href="#tbDetails"]').closest('li').hide();
+            $('[href="#tbGLDetailsOthers"]').closest('li').hide();
+            $('[href="#tbSetOffDetails"]').closest('li').show();
+            $('a[href="#tbSetOffDetails"]').tab('show');
+
+            $('[href="#tbGLDetails"]').closest('li').show();
+
+            $('#btnCreate1').fadeOut();
+        }
+        else if ($("#ReceiptType option:selected").text() == "OTHERS") {
+
+            $('[href="#tbSetOffDetails"]').closest('li').hide();
+            $('a[href="#tbDetails"]').closest('li').show();
+            $('[href="#tbGLDetailsOthers"]').closest('li').show();
+            $('a[href="#tbDetails"]').tab('show');
+            $('[href="#tbGLDetails"]').closest('li').hide();
+
+            $('#btnCreate1').fadeIn();
+        }
+    }
+
+    $("#btnSave").on("click", function (e) {
+        //var oTable = $('#tblQuotationItem').dataTable();
+        //if (oTable.fnGetData().length <= 0) {
+        //    alert("Please add atleast one CBReceipt details.")
+        //    return false;
+        //}
+
+        var selectedValue = $('#ReceiptType').val();
+
+        if (selectedValue == 'DEBTOR') {
+            if (!$('.tblGLDetailsCss123').length > 0) {
+
+                alert("Please add atleast one CBReceipt details. OR Update the APPLY Amount.")
+                return false;
+            }
+
+
+        }
+        else if (selectedValue == 'REC-OTHERS') {
+            if (!$('.CBReceiptDetailsCss').length > 0) {
+
+                alert("Please add atleast one CBReceipt details.")
+                return false;
+            }
+        }
+
+    })
+
+    $("#btnCreate1").on("click", function (e) {
+        isEditLocal = false;
+    })
+
+
+
+    function OnMethodFailure(result) {
+        ModalShow(result.Message, "Failure", "Save");
+    }
+
+    function OnSaveSuccess(result) {
+        ModalShow(result.Message, "Success", "Save");
+        //
+        DocumentNo = result.CBReceiptdata.DocumentNo;
+    }
+
+    function BtnOK() {
+        if (ActionType == "Save") {
+            location.href = '@Url.Content("~/CB/CBReceiptList")';
+        }
+    }
+
+
+
+    function Search() {
+        var _selectedDocumentNoId = $("#txtSearch").val();
+        $("#btnSearch").href = "/CB/CBSearchReceipt?DocumentNo=" + _selectedDocumentNoId;
+        $("#btnSearch").attr("href", "/CB/CBSearchReceipt?DocumentNo=" + _selectedDocumentNoId)
+
+        return true;
+    }
+
+    var isEditLocal = false;
+    var rowdetails;
+
+    function EditCBReceiptDetails(rowId) {
+        $('#hdnFlag').val(rowId);
+        var tempRowId = rowId;
+        if (rowId != '-1') {
+            rowId = '#CBReceiptDetails_' + rowId;
+            var DocumentNo = $(rowId + '__DocumentNo').val();
+            var ItemNo = $(rowId + '__ItemNo').val();
+            //var ChargeCode = $(rowId + '__ChargeCode').val();
+            var AccountCode = $(rowId + '__AccountCode').val();
+            var Remark = $(rowId + '__Remark').val();
+            var CurrencyCode = $(rowId + '__CurrencyCode').val();
+            var BaseAmount = $(rowId + '__BaseAmount').val();
+            var LocalAmount = $(rowId + '__LocalAmount').val();
+            var SetOffDate = $(rowId + '__SetOffDate').val();
+
+            $('#AccountCode').val(AccountCode);
+            //$('#ChargeCode').val(ChargeCode);
+            $('#Remark').val(Remark);
+            $('#CurrencyCode').val(CurrencyCode);
+            $('#BaseAmount').val(BaseAmount);
+            $('#LocalAmount').val(LocalAmount);
+            $('#SetOffDate').val(SetOffDate);
+            $('#cbReceiptDetailsModal').modal('show');
+        }
+        else {
+            $('#AccountCode').val('');
+            //$('#ChargeCode').val('');
+            $('#Remark').val('');
+            $('#CurrencyCode').val('');
+            $('#BaseAmount').val('');
+            $('#LocalAmount').val('');
+            $('#SetOffDate').val('');
+        }
+        $('#hdnCbReceiptFlag').val(tempRowId);
+
+
+    }
+
+
+    function AddDataToTable() {
+
+        ModalValidation();
+        if (!$('#modalForm').valid()) {
+            return false;
+        }
+
+        var accountCode = $("#AccountCode").val();
+        var amount = $("#LocalAmount").val();
+        var customerCode = $('#ddlDebtor option:selected').val();
+        var bankCode = $('#BankCode option:selected').val();
+        var rooturl = '@Url.Content("~/AP/AddDAPInvoiceItem")';
+        var url = rooturl + "?customerCode=" + customerCode + "&accountCode=" + accountCode + "&amount=" + amount + '&bankCode=' + bankCode;
+        $.post(url, null, function (data) {
+            $('#cbReceiptDetailsModal').modal('hide');
+
+            $('#PaymentType').attr('disabled', 'disabled');
+            $('#hdnWHTaxCode').val(data.whAccount);
+            $('#hdnVatHTaxCode').val(data.vatAccount);
+            var rowId = $('#hdnCbReceiptFlag').val();
+            var hdnFlag = $('#hdnFlag').val();
+            var _Obj = {};
+            if (rowId == '-1') {
+                var _index = $('.cbReceiptCss').length;
+                var Obj = {
+                    index: _index,
+                    DocumentNo: '',
+                    ItemNo: '',
+                    //ChargeCode: $('#ChargeCode').val(),
+                    bankcode: $('#BankCode option:selected').val(),
+                    AccountCode: $('#AccountCode').val(),
+                    AccountCode_Span: $('#AccountCode option:selected').text(),
+                    Remark: $('#Remark').val(),
+                    CurrencyCode: $('#CurrencyCode').val(),
+                    BaseAmount: $('#BaseAmount').val(),
+                    LocalAmount: $('#LocalAmount').val(),
+                    SetOffDate: $('#SetOffDate').val(),
+                    Status: true,
+                };
+
+                var rowData = [
+                '<input id="CBReceiptDetails_' + Obj.index + '__DocumentNo" name="CBReceiptDetails[' + Obj.index + '].DocumentNo" type="hidden" value="">' +
+                '<input id="CBReceiptDetails_' + Obj.index + '__ItemNo" name="CBReceiptDetails[' + Obj.index + '].ItemNo" type="hidden" value="">' +
+                //'<input id="CBReceiptDetails_' + Obj.index + '__ChargeCode" name="CBReceiptDetails[' + Obj.index + '].ChargeCode" type="hidden" value="' + Obj.ChargeCode + '">' +
+                //'<input id="CBReceiptDetails_' + Obj.index + '__Status" name="CBReceiptDetails[' + Obj.index + '].Status" type="hidden" value="' + Obj.Status + '">' +
+                '<input id="CBReceiptDetails_' + Obj.index + '__AccountCode" name="CBReceiptDetails[' + Obj.index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '"><span id="CBReceiptDetails_' + Obj.index + '__AccountCode_span" class="cbReceiptCss">' + Obj.AccountCode_Span + '</span>',
+                '<input id="CBReceiptDetails_' + Obj.index + '__Remark" name="CBReceiptDetails[' + Obj.index + '].Remark" type="hidden" value="' + Obj.Remark + '"><span id="CBReceiptDetails_' + Obj.index + '__Remark_span">' + Obj.Remark + '</span>',
+                '<input id="CBReceiptDetails_' + Obj.index + '__CurrencyCode" name="CBReceiptDetails[' + Obj.index + '].CurrencyCode" type="hidden" value="' + Obj.CurrencyCode + '"><span id="CBReceiptDetails_' + Obj.index + '__CurrencyCode_span">' + Obj.CurrencyCode + '</span>',
+                //'<input id="CBReceiptDetails_' + Obj.index + '__BaseAmount" name="CBReceiptDetails[' + Obj.index + '].BaseAmount" type="hidden" value="' + Obj.BaseAmount + '"><span id="CBReceiptDetails_' + Obj.index + '__BaseAmount_span">' + parseFloat(Obj.BaseAmount).toFixed(2) + '</span>',
+                '<input id="CBReceiptDetails_' + Obj.index + '__LocalAmount" name="CBReceiptDetails[' + Obj.index + '].LocalAmount" type="hidden" value="' + Obj.LocalAmount + '"><span id="CBReceiptDetails_' + Obj.index + '__LocalAmount_span">' + parseFloat(Obj.LocalAmount).toFixed(2) + '</span>',
+                '<input id="CBReceiptDetails_' + Obj.index + '__SetOffDate" name="CBReceiptDetails[' + Obj.index + '].SetOffDate" type="hidden" value="' + Obj.SetOffDate + '"><span id="CBReceiptDetails_' + Obj.index + '__SetOffDate_span">' + Obj.SetOffDate + '</span>',
+                '<div class="dropdown">' +
+                '<button class="btn btn-warning btn-sm dropdown-toggle" id="btnAction_' + Obj.index + '" style="border-radius: 0px !important;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Action<span class="caret"></span></button>' +
+                '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+                    '<li><a class="cursorCss" id="Edit_' + Obj.index + '" onclick="EditCBReceiptDetails(' + Obj.index + ')"><i class="fa fa-pencil"></i>&nbsp;Edit</a></li>' +
+                    '<li><a class="cursorCss" onclick="DeleteCBReceiptDetails(' + Obj.index + ')"><i class="fa fa-trash-o"></i>&nbsp;Delete</a></li>' +
+                '</ul></div>'];
+
+                $('#tblQuotationItem').dataTable().fnAddData(rowData);
+
+                //$('#tblQuotationItem tr td:nth-child(4)').hide();
+
+                _Obj = {
+                    Index: Obj.index,
+                    ItemNo: data.APInvoiceDetail.ItemNo,
+                    AccountCode: data.APInvoiceDetail.AccountCode,
+                    AccountCodeDescription: data.APInvoiceDetail.AccountCodeDescription,
+                    bankCode: data.bankAccount,
+                    Remark: Obj.Remark,
+                    whAccount: data.whAccount,
+                    vatAccount: data.vatAccount,
+                    BaseAmount: parseFloat(Obj.LocalAmount),
+                    CurrencyCode: Obj.CurrencyCode,
+                    LocalAmount: parseFloat(Obj.LocalAmount),
+                    customerDebitCredit: data.customerDebitCredit,
+                    accountDebitCredit: data.accountDebitCredit,
+                    bankDebitCredit: data.bankDebitCredit
+                };
+
+
+            }
+            else {
+                var tttt = $('#AccountCode').val();
+                $('#CBReceiptDetails_' + rowId + '__DocumentNo').val('');
+                $('#CBReceiptDetails_' + rowId + '__ItemNo').val('');
+                //$('#CBReceiptDetails_' + rowId + '__ChargeCode').val($('#ChargeCode').val());
+                $('#CBReceiptDetails_' + rowId + '__AccountCode').val($('#AccountCode').val());
+                $('#CBReceiptDetails_' + rowId + '__AccountCode_span').text($('#AccountCode option:selected').text());
+
+                $('#CBReceiptDetails_' + rowId + '__Remark_span').text($('#Remark').val());
+                $('#CBReceiptDetails_' + rowId + '__Remark').val($('#Remark').val());
+
+                $('#CBReceiptDetails_' + rowId + '__CurrencyCode_span').text($('#CurrencyCode').val());
+                $('#CBReceiptDetails_' + rowId + '__CurrencyCode').val($('#CurrencyCode').val());
+
+                $('#CBReceiptDetails_' + rowId + '__BaseAmount_span').text($('#BaseAmount').val());
+                $('#CBReceiptDetails_' + rowId + '__BaseAmount').val($('#BaseAmount').val());
+
+                $('#CBReceiptDetails_' + rowId + '__LocalAmount_span').text(parseFloat($('#LocalAmount').val()).toFixed(2));
+                $('#CBReceiptDetails_' + rowId + '__LocalAmount').val($('#LocalAmount').val());
+
+                $('#CBReceiptDetails_' + rowId + '__SetOffDate_span').text($('#SetOffDate').val());
+                $('#CBReceiptDetails_' + rowId + '__SetOffDate').val($('#SetOffDate').val());
+
+                $('#CBReceiptDetails_' + rowId + '__SetOffDate_span').text($('#SetOffDate').val());
+                $('#CBReceiptDetails_' + rowId + '__SetOffDate').val($('#SetOffDate').val());
+
+                _Obj = {
+                    Index: rowId,
+                    ItemNo: data.APInvoiceDetail.ItemNo,
+                    AccountCode: data.APInvoiceDetail.AccountCode,
+                    AccountCodeDescription: data.APInvoiceDetail.AccountCodeDescription,
+                    bankCode: data.bankAccount,
+                    Remark: $('#Remark').val(),
+                    whAccount: data.whAccount,
+                    vatAccount: data.vatAccount,
+                    BaseAmount: parseFloat($('#LocalAmount').val()),
+                    CurrencyCode: $('#CurrencyCode').val(),
+                    LocalAmount: parseFloat($('#LocalAmount').val()),
+                    customerDebitCredit: data.customerDebitCredit,
+                    accountDebitCredit: data.accountDebitCredit,
+                    bankDebitCredit: data.bankDebitCredit
+                };
+
+            }
+            $('#cbReceiptDetailsModal').modal('hide');
+            $('#hdnFlag').val('-1');
+            setTimeout(function () {
+                AddToGLAllocationTbl(_Obj, data.debtorAccount, parseInt(hdnFlag));
+            }, 500);
+            CalTotalPaymentAmount();
+        });
+    }
+
+    function CalTotalPaymentAmount() {
+
+        var count = $('.cbReceiptCss').length;
+        var amount = 0.0;
+        for (var i = 0; i < count; i++) {
+            amount = amount + parseFloat($('#CBReceiptDetails_' + i + '__LocalAmount').val());
+        }
+        $('#txtLocalReceiptAmount, #NetTotalAmount, #LocalApplyAmount').val(amount.toFixed(2));
+
+
+        WHPercent($('#WHPercent').val());
+        VAT($('#IsVAT').is(':checked'))
+    }
+
+    function IsWHTaxOnChange() {
+        WHPercent($('#WHPercent').val());
+
+
+    }
+
+    function IsVATOnChange(el) {
+        VAT(el.checked);
+    }
+
+    function VAT(isChecked) {
+
+        var vatValue = 0;
+        if (isChecked) {
+            vatValue = 7;
+
+            var NetTotalAmount = parseFloat($('#NetTotalAmount').val());
+            var vatAmount = CalculateWHPercent(vatValue, NetTotalAmount);
+            var WHAmount = parseFloat($('#WHAmount').val());
+            if ($('.cbReceiptCss').length > 0) {
+                $('#TaxAmount').val(vatAmount.toFixed(2));
+                $('#TotalAmount').val((NetTotalAmount + vatAmount - WHAmount).toFixed(2));
+            }
+            VatFooterRow(true);
+
+        }
+        else {
+            $('#TaxAmount').val(0.00);
+            WHPercent($('#WHPercent').val());
+            VatFooterRow(false);
+            //var trObj = $('td .isvatTaxCss').parent().parent();
+            //$('#tblGLDetailsOthers').dataTable().fnDeleteRow(trObj);
+
+        }
+
+    }
+
+
+    function VATAmountOnBlur() {
+        debugger;
+        var NetTotalAmount = parseFloat($('#NetTotalAmount').val());
+        var WHAmount = parseFloat($('#WHAmount').val());
+        var taxAmount = parseFloat($('#TaxAmount').val());
+
+        if ($('.cbReceiptCss').length > 0) {
+
+            $('#TotalAmount').val((NetTotalAmount + taxAmount - WHAmount).toFixed(2));
+        }
+
+
+    }
+
+
+
+    function WHPercentChange(el) {
+        WHPercent(el.value);
+        VAT($("#IsVAT").is(':checked'));
+    }
+
+    function WHPercent(percent) {
+
+        var NetTotalAmount = parseFloat($('#NetTotalAmount').val());
+        var taxAmount = 0.00;
+        if ($("#IsWHTax").is(':checked')) {
+            if ($('.cbReceiptCss').length > 0)
+                taxAmount = CalculateWHPercent(percent, NetTotalAmount);
+            var Index = $('.tblGLDetailsCss').length;
+
+
+            $('#WHPercent').removeAttr('disabled');
+            WHFooterRow(true);
+        }
+        else {
+            $('#WHPercent').attr('disabled', 'disabled');
+            WHFooterRow(false);
+            //var trObj = $('td .isWHTaxCss').parent().parent();
+            //$('#tblGLDetailsOthers').dataTable().fnDeleteRow(trObj);
+        }
+
+        if ($('.cbReceiptCss').length > 0) {
+            $('#WHAmount').val(taxAmount.toFixed(2));
+            var vatAmount = parseFloat($('#TaxAmount').val());
+            $('#TotalAmount').val((NetTotalAmount + vatAmount - taxAmount).toFixed(2));
+        }
+        else {
+            $('#WHAmount').val(0.00);
+            $('#TotalAmount').val(0.00);
+        }
+    }
+
+
+    function WHFooterRow(isChecked) {
+        if (isChecked) {
+            $.ajax({
+                url: '@Url.Content("~/CB/GetCBRecAPWHTaxAccount")',
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {//bankAccount
+
+                    var whDebitCredit = $('#hdnWHDebitCredit').val();
+                    var whRowIndex = $('.tblGLDetailsCss').length - 1;
+                    var isVatFooter = ($('.footerCss').length == 0);
+
+                    var flag = $('.whFooterCss').length;
+                    if (flag > 0) {
+                        var tempIndex = $('.whFooterCss')[0].id.split('_');
+                        whRowIndex = tempIndex[1];
+                    }
+                    else {
+                        if (isVatFooter)
+                            whRowIndex = whRowIndex + 1;
+                        else
+                            whRowIndex = whRowIndex + 2;
+                    }
+
+                    var whRowAccountCode = data.bankAccount;
+                    var whRowDebitAmount = parseFloat($('#WHAmount').val()).toFixed(2);
+                    var whRow = [
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__DocumentNo" class="footerCss whFooterCss" name="GLTransactionDetails[' + whRowIndex + '].DocumentNo" type="hidden" value="">' +
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__ItemNo" name="GLTransactionDetails[' + whRowIndex + '].ItemNo" type="hidden" value="' + whRowIndex + '">' +
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__DocumentType" name="GLTransactionDetails[' + whRowIndex + '].DocumentType" type="hidden" value="AP">' +
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__AccountCode" name="GLTransactionDetails[' + whRowIndex + '].AccountCode" type="hidden" value="' + whRowAccountCode + '">' +
+                            '<span  id="GLTransactionDetails_' + whRowIndex + '__AccountCode_span">' + whRowAccountCode + '</span>',
+
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__CreditAmount" name="GLTransactionDetails[' + whRowIndex + '].CreditAmount" type="hidden" value="' + (whDebitCredit == 'CREDIT' ? whRowDebitAmount : 0.00) + '">' +
+                            '<span  id="GLTransactionDetails_' + whRowIndex + '__CreditAmount_span">' + (whDebitCredit == 'CREDIT' ? parseFloat(whRowDebitAmount).toFixed(2) : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__DebitAmount" name="GLTransactionDetails[' + whRowIndex + '].DebitAmount" type="hidden" value="' + (whDebitCredit == 'DEBIT' ? whRowDebitAmount : 0.00) + '">' +
+                            '<span  id="GLTransactionDetails_' + whRowIndex + '__DebitAmount_span">' + (whDebitCredit == 'DEBIT' ? parseFloat(whRowDebitAmount).toFixed(2) : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__TotalAmount" name="GLTransactionDetails[' + whRowIndex + '].TotalAmount" type="hidden" value="' + whRowDebitAmount + '">' +
+                            '<span  id="GLTransactionDetails_' + whRowIndex + '__TotalAmount_span">' + whRowDebitAmount + '</span>' +
+                            '<input id="GLTransactionDetails_' + whRowIndex + '__Status" name="GLTransactionDetails[' + whRowIndex + '].Status" type="hidden" value="True">'
+                    ];
+
+                    var whRowHtml = '<td>' + whRow[0] + '</td><td>' + whRow[1] + '</td><td>' + whRow[2] + '</td><td>' + whRow[3] + '</td><td>' + 'W/H ACCOUNT' + '</td>'
+                    $('#whRow').html(whRowHtml).show();
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+
+            $('#whRow').hide();
+
+            if ($('.whFooterCss').length > 0) {
+                var tempIndex = $('.whFooterCss')[0].id.split('_');
+                whRowIndex = tempIndex[1];
+
+                $('#whRow').html('<input type="hidden" name="GLTransactionDetails[' + whRowIndex + ']" />');
+            }
+        }
+    }
+
+    function VatFooterRow(isChecked) {
+        if (isChecked) {
+            $.ajax({
+                url: '@Url.Content("~/CB/GetCBRecAPVatTaxAccount")',
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+
+                    var varDebitCredit = $('#hdnVatDebitCredit').val();
+                    var vatRowIndex = $('.tblGLDetailsCss').length - 1;
+                    var isWHFooter = ($('.footerCss').length == 0);
+
+                    var flag = $('.vatFooterCss').length;
+                    if (flag > 0) {
+                        var tempIndex = $('.vatFooterCss')[0].id.split('_');
+                        vatRowIndex = tempIndex[1];
+                    }
+                    else {
+                        if (isWHFooter)
+                            vatRowIndex = vatRowIndex + 1;
+                        else {
+                            vatRowIndex = vatRowIndex + 2;
+                        }
+                    }
+
+                    var vatRowAccountCode = data.bankAccount;
+                    var vatRowDebitAmount = parseFloat($('#TaxAmount').val()).toFixed(2);
+                    var vatRow = [
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DocumentNo" class="footerCss vatFooterCss" name="GLTransactionDetails[' + vatRowIndex + '].DocumentNo" type="hidden" value="">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__ItemNo" name="GLTransactionDetails[' + vatRowIndex + '].ItemNo" type="hidden" value="' + vatRowIndex + '">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DocumentType" name="GLTransactionDetails[' + vatRowIndex + '].DocumentType" type="hidden" value="AP">' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__AccountCode" name="GLTransactionDetails[' + vatRowIndex + '].AccountCode" type="hidden" value="' + data.bankAccount + '">' +
+                            '<span  id="GLTransactionDetails_' + vatRowIndex + '__AccountCode_span">' + data.bankAccount + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__CreditAmount" name="GLTransactionDetails[' + vatRowIndex + '].CreditAmount" type="hidden" value="' + (varDebitCredit == 'CREDIT' ? vatRowDebitAmount : 0.00) + '">' +
+                            '<span  id="GLTransactionDetails_' + vatRowIndex + '__CreditAmount_span">' + (varDebitCredit == 'CREDIT' ? parseFloat(vatRowDebitAmount).toFixed(2) : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__DebitAmount" name="GLTransactionDetails[' + vatRowIndex + '].DebitAmount" type="hidden" value="' + (varDebitCredit == 'DEBIT' ? vatRowDebitAmount : 0.00) + '">' +
+                            '<span  id="GLTransactionDetails_' + vatRowIndex + '__DebitAmount_span">' + (varDebitCredit == 'DEBIT' ? parseFloat(vatRowDebitAmount).toFixed(2) : 0.00) + '</span>',
+
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__TotalAmount" name="GLTransactionDetails[' + vatRowIndex + '].TotalAmount" type="hidden" value="' + vatRowDebitAmount + '">' +
+                            '<span  id="GLTransactionDetails_' + vatRowIndex + '__TotalAmount_span">' + vatRowDebitAmount + '</span>' +
+                            '<input id="GLTransactionDetails_' + vatRowIndex + '__Status" name="GLTransactionDetails[' + vatRowIndex + '].Status" type="hidden" value="True">'
+                    ];
+
+                    var vatRowHtml = '<td>' + vatRow[0] + '</td><td>' + vatRow[1] + '</td><td>' + vatRow[2] + '</td><td>' + vatRow[3] + '</td><td>' + 'VAT ACCOUNT' + '</td>'
+                    $('#vatRow').html(vatRowHtml).show();
+                }
+            });
+        }
+        else {
+
+            $('#vatRow').hide();
+            if ($('.vatFooterCss').length > 0) {
+                var tempIndex = $('.vatFooterCss')[0].id.split('_');
+                vatRowIndex = tempIndex[1];
+
+                $('#vatRow').html('<input type="hidden" name="GLTransactionDetails[' + vatRowIndex + ']" />');
+            }
+        }
+
+
+    }
+
+
+    function CalculateWHPercent(percent, amount) {
+
+        var taxAmount = 0.0;
+        if (percent != '') {
+            taxAmount = (amount * parseInt(percent)) / 100;
+        }
+        return taxAmount;
+    }
+
+
+
+    var glTotalAmount = 0.00;
+    function AddToGLAllocationTbl(Obj, DebtorAccount, hdnFlag) {
+        var Index = $('.tblGLDetailsCss').length;
+        var footerRows = $('.footerCss').length;
+        $('#hdnVatDebitCredit').val(Obj.vatDebitCredit);
+        $('#hdnWHDebitCredit').val(Obj.whDebitCredit);
+
+        Index = Index + footerRows;
+        if (hdnFlag == -1)
+            glTotalAmount = glTotalAmount + Obj.BaseAmount;
+        else {
+            var glIndex = hdnFlag + 2;
+            var oldVal = parseInt($('#GLTransactionDetails_' + glIndex + '__TotalAmount').val());
+            glTotalAmount = glTotalAmount - oldVal;
+            glTotalAmount = glTotalAmount + Obj.BaseAmount;
+        }
+
+        if (Index == 0) {
+            var totalRow = [
+                '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + DebtorAccount + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + DebtorAccount + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.customerDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__CustCreditDebit" type="hidden" value="' + Obj.customerDebitCredit + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.customerDebitCredit == 'CREDIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0) + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.customerDebitCredit == 'DEBIT' ? Obj.BaseAmount : 0.00) + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.customerDebitCredit == 'DEBIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0.00) + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + glTotalAmount + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + parseFloat(glTotalAmount).toFixed(2) + '</span>' +
+                '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">',
+
+                '<input id="GLTransactionDetails_' + Index + '__Remark" name="GLTransactionDetails[' + Index + '].Remark" type="hidden" value="' + $('#txtRemark').val() + '">' +
+                '<span  id="GLTransactionDetails_' + Index + '__Remark_span">' + $('#txtRemark').val() + '</span>'
+            ];
+
+            $('#tblGLDetailsOthers').dataTable().fnAddData(totalRow);
+            Index = Index + 1;
+
+            var totalRow = [
+                '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + Obj.bankCode + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + Obj.bankCode + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.bankDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__BankCreditDebit" type="hidden" value="' + Obj.bankDebitCredit + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.bankDebitCredit == 'CREDIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0) + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.bankDebitCredit == 'DEBIT' ? Obj.BaseAmount : 0.00) + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.bankDebitCredit == 'DEBIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0.00) + '</span>',
+
+                '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + glTotalAmount + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + parseFloat(glTotalAmount).toFixed(2) + '</span>' +
+                '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">',
+
+                 '<input id="GLTransactionDetails_' + Index + '__Remark" name="GLTransactionDetails[' + Index + '].Remark" type="hidden" value="' + $('#txtRemark').val() + '">' +
+                '<span  id="GLTransactionDetails_' + Index + '__Remark_span">' + $('#txtRemark').val() + '</span>'
+            ];
+
+            $('#tblGLDetailsOthers').dataTable().fnAddData(totalRow);
+
+            Index = Index + 1;
+        }
+        else {
+
+            if (Obj.customerDebitCredit == 'CREDIT') {
+                $('#GLTransactionDetails_0__TotalAmount_span, #GLTransactionDetails_0__CreditAmount_span').text(parseFloat(glTotalAmount).toFixed(2));
+                $('#GLTransactionDetails_0__TotalAmount, #GLTransactionDetails_0__CreditAmount').val(glTotalAmount);
+
+            } else if (Obj.customerDebitCredit == 'DEBIT') {
+                $('#GLTransactionDetails_0__TotalAmount_span, #GLTransactionDetails_0__DebitAmount_span').text(parseFloat(glTotalAmount).toFixed(2));
+                $('#GLTransactionDetails_0__TotalAmount, #GLTransactionDetails_0__DebitAmount').val(glTotalAmount);
+            }
+
+
+            if (Obj.bankDebitCredit == "CREDIT") {
+                $('#GLTransactionDetails_1__TotalAmount_span, #GLTransactionDetails_1__CreditAmount_span').text(parseFloat(glTotalAmount).toFixed(2));
+                $('#GLTransactionDetails_1__TotalAmount, #GLTransactionDetails_1__CreditAmount').val(glTotalAmount);
+            } else if (Obj.bankDebitCredit == "DEBIT") {
+                $('#GLTransactionDetails_1__TotalAmount_span, #GLTransactionDetails_1__DebitAmount_span').text(parseFloat(glTotalAmount).toFixed(2));
+                $('#GLTransactionDetails_1__TotalAmount, #GLTransactionDetails_1__DebitAmount').val(glTotalAmount);
+            }
+        }
+        //Index = Index + 1;
+
+        if (hdnFlag == -1) {
+            var rowData = [
+                    '<input id="GLTransactionDetails_' + Index + '__DocumentNo" name="GLTransactionDetails[' + Index + '].DocumentNo" type="hidden" value="">' +
+                    '<input id="GLTransactionDetails_' + Index + '__ItemNo" name="GLTransactionDetails[' + Index + '].ItemNo" type="hidden" value="' + Obj.ItemNo + '">' +
+                    '<input id="GLTransactionDetails_' + Index + '__DocumentType" name="GLTransactionDetails[' + Index + '].DocumentType" type="hidden" value="AP">' +
+                    '<input id="GLTransactionDetails_' + Index + '__AccountCode" name="GLTransactionDetails[' + Index + '].AccountCode" type="hidden" value="' + Obj.AccountCode + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__AccountCode_span">' + Obj.AccountCode + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__CreditAmount" name="GLTransactionDetails[' + Index + '].CreditAmount" type="hidden" value="' + (Obj.accountDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '"><input id="GLTransactionDetails_' + Index + '__BankCreditDebit" type="hidden" value="' + Obj.accountDebitCredit + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__CreditAmount_span">' + (Obj.accountDebitCredit == 'CREDIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0) + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__DebitAmount" name="GLTransactionDetails[' + Index + '].DebitAmount" type="hidden" value="' + (Obj.accountDebitCredit == 'CREDIT' ? Obj.BaseAmount : 0.00) + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__DebitAmount_span">' + (Obj.accountDebitCredit == 'DEBIT' ? parseFloat(Obj.BaseAmount).toFixed(2) : 0) + '</span>',
+
+                    '<input id="GLTransactionDetails_' + Index + '__TotalAmount" name="GLTransactionDetails[' + Index + '].TotalAmount" type="hidden" value="' + Obj.BaseAmount + '">' +
+                    '<span id="GLTransactionDetails_' + Index + '__TotalAmount_span">' + parseFloat(Obj.BaseAmount).toFixed(2) + '</span>' +
+                    '<input id="GLTransactionDetails_' + Index + '__Status" name="GLTransactionDetails[' + Index + '].Status" type="hidden" value="True">',
+
+                     '<input id="GLTransactionDetails_' + Index + '__Remark" name="GLTransactionDetails[' + Index + '].Remark" type="hidden" value="' + Obj.Remark + '">' +
+                '<span id="GLTransactionDetails_' + Index + '__Remark_span">' + Obj.Remark + '</span>'
+            ];
+            $('#tblGLDetailsOthers').dataTable().fnAddData(rowData);
+        }
+        else {
+            var glIndex = hdnFlag + 2;
+            if (Obj.accountDebitCredit == 'DEBIT') {
+                $('#GLTransactionDetails_' + glIndex + '__DebitAmount_span').text(Obj.BaseAmount.toFixed(2));
+                $('#GLTransactionDetails_' + glIndex + '__DebitAmount').val(Obj.BaseAmount);
+            }
+            else if (Obj.accountDebitCredit == 'CREDIT') {
+                $('#GLTransactionDetails_' + glIndex + '__CreditAmount_span').text(Obj.BaseAmount.toFixed(2));
+                $('#GLTransactionDetails_' + glIndex + '__CreditAmount').val(Obj.BaseAmount);
+            }
+
+            $('#GLTransactionDetails_' + glIndex + '__TotalAmount_span').text(Obj.BaseAmount.toFixed(2));
+            $('#GLTransactionDetails_' + glIndex + '__TotalAmount').val(Obj.BaseAmount);
+        }
+
+        $('#txtLocalBankChargesAmount').removeAttr('readonly');
+    }
+
+
+    function DeleteCBReceiptDetails(rowId) {
+
+
+        $('#CBReceiptDetails_' + rowId).css({
+            'color': 'red',
+            'text-decoration': 'line-through',
+            'font-style': 'italic'
+        });
+        $('#CBReceiptDetails_' + rowId + '__Status').val('false');
+        $('#CBReceiptDetails_' + rowId).addClass('CBReceiptDeleteCss');
+        $('#btnAction_' + rowId).attr('disabled', 'disabled');
+        var rowsCount = $('.CBReceiptDetailsCss').length;
+        var amount = 0.00;
+        for (var x = 0; x < rowsCount; x++) {
+            if (!$('#CBReceiptDetails_' + x).hasClass('CBReceiptDeleteCss')) {
+                amount = amount + parseFloat($('#CBReceiptDetails_' + x + '__LocalAmount').val());
+            }
+        }
+        $('#txtLocalReceiptAmount, #NetTotalAmount, #LocalApplyAmount').val(amount.toFixed(2));
+        WHPercent($('#WHPercent').val());
+        VAT($('#IsVAT').is(':checked'))
+        DeleteGLAllocationItem(rowId, amount);
+        $('#hdnFlag').val('-1');
+    }
+
+    function DeleteGLAllocationItem(index, amount) {
+        amount = parseFloat(amount).toFixed(2);
+        $('#tblGLDetailstr_' + (index + 2)).css({
+            'text-decoration': 'line-through',
+            'color': 'red',
+            'font-style': 'italic'
+        });
+        $('#GLTransactionDetails_' + (index + 2) + '__Status').val('False');
+
+        if ($('#GLTransactionDetails_0__CustCreditDebit').val() == "DEBIT") {
+            $('#GLTransactionDetails_0__DebitAmount_span, #GLTransactionDetails_0__TotalAmount_span').text(amount);
+            $('#GLTransactionDetails_0__DebitAmount, #GLTransactionDetails_0__TotalAmount').val(amount);
+        } else {
+            $('#GLTransactionDetails_0__CreditAmount_span, #GLTransactionDetails_0__TotalAmount_span').text(amount);
+            $('#GLTransactionDetails_0__CredittAmount, #GLTransactionDetails_0__TotalAmount').val(amount);
+        }
+
+        if ($('#GLTransactionDetails_1__BankCreditDebit').val() == "DEBIT") {
+            $('#GLTransactionDetails_1__DebitAmount_span, #GLTransactionDetails_1__TotalAmount_span').text(amount);
+            $('#GLTransactionDetails_1__DebitAmount, #GLTransactionDetails_1__TotalAmount').val(amount);
+        } else {
+            $('#GLTransactionDetails_1__CreditAmount_span, #GLTransactionDetails_1__TotalAmount_span').text(amount);
+            $('#GLTransactionDetails_1__CreditAmount, #GLTransactionDetails_1__TotalAmount').val(amount);
+        }
+    }
+
+    function isNumber(evt) {
+        var text = $('#' + evt.target.id).val();
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (text.length >= 10) {
+            if (charCode == 8 || charCode == 9)
+                return true;
+            return false;
+        }
+        if (charCode == 46)
+            return true;
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function btnClear() {
+        $('input[type=text], select').val('');
+
+        $('#tblSetoffItem, #tblGLDetails, #tblQuotationItem').DataTable().clear().draw();
+        $('#PaymentType').removeAttr('disabled');
+    }
+
+
+
+
+    function linkClicked(li) {
+        linkedIndex = li;
+        isEditLocal = true;
+    }
+
+
+    function DeleteCBReceipt() {
+        var dno = $("#txtDocumentNo").val();
+        $.ajax({
+            url: "/CB/DeleteCBReceipt", type: "POST", dataType: "json",
+            data: { DocumentNo: dno, CancelBy: "" },
+            async: true,
+            success: function (response) {
+                redirectUrl = '@Url.Content("~/CB/CBReceiptList")';
+                if (response.result) {
+                    ModalShow(response.Message, "Success", "Delete");
+                    $("#txtDocumentNo").addClass("StrikeOut")
+                    $("#btnSave").attr("disabled", " disabled")
+                    $("#btnApprove").attr("disabled", " disabled")
+
+                } else {
+                    ModalShow(response.Message, "Failure", "Delete");
+                }
+            }
+        })
+    }
+
+    var reDateNet = /\/Date\((\d+)(?:-\d+)?\)\//i;
+    Date.parseJSON = function (value) {
+        if (value == '/Date(-62135568000000)/') return null; // .net min date
+        else if (reDateNet.test(value)) {
+            return new Date(parseInt(reDateNet.exec(value)[1], 10));
+        }
+        return value;
+    }
+
+
+    function AddDataToTableforSetOffDetails(data, debtorAccount, bankAccount) {
+
+        var tblData = new Array();
+        var qno = $("#hdnQuotationNo").val();
+        $('#tblSetoffItem').DataTable().clear().draw();
+        $('#tblGLDetails').DataTable().clear().draw();
+        for (var i = 0; i < data.length; i++) {
+            var dt = new Date(Date.parseJSON(data[i].SetOffDate));
+            var strDt = moment(dt).format('M/D/YYYY');
+            var rowCount = 0;
+            if ($('#tblSetoffItem').dataTable().fnSettings().aoData.length > 0) {
+                rowCount = $('#tblSetoffItem tr').length - 1;;
+            }
+            var rowData = [
+                        "<input id='CBReceiptSetOffDetails_" + rowCount + "_DocumentNo' type='hidden' value=" + data[i].DocumentNo + " name='CBReceiptSetOffDetails[" + rowCount + "].DocumentNo'>"
+                       , "<input id='CBReceiptSetOffDetails_" + rowCount + "_ItemNo' type='hidden' value=" + data[i].ItemNo + " name='CBReceiptSetOffDetails[" + rowCount + "].ItemNo'>"
+                       , "<input id='CBReceiptSetOffDetails_" + rowCount + "_MatchDocumentType' type='hidden' value=" + data[i].MatchDocumentType + "  name='CBReceiptSetOffDetails[" + rowCount + "].MatchDocumentType'>"
+                       , "<input id='CBReceiptSetOffDetails_" + rowCount + "_MatchDocumentDate' type='hidden' value=" + data[i].MatchDocumentDate + " name='CBReceiptSetOffDetails[" + rowCount + "].MatchDocumentDate'>" + data[i].MatchDocumentDate
+                       , "<input id='CBReceiptSetOffDetails_" + rowCount + "_MatchDocumentNo' type='hidden' value=" + data[i].MatchDocumentNo + " name='CBReceiptSetOffDetails[" + rowCount + "].MatchDocumentNo'>" + data[i].MatchDocumentNo
+                        , "<input id='CBReceiptSetOffDetails_" + rowCount + "_LocalAmount' class='form-control input-sm' type='text' class='DisableBackground' value=" + data[i].LocalAmount + " readonly name='CBReceiptSetOffDetails[" + rowCount + "].LocalAmount'>"
+                       , "<input id='CBReceiptSetOffDetails_" + rowCount + "_LocalApplyAmount' class='form-control input-sm' data-debtoraccount='" + debtorAccount + "' data-bankaccount='" + bankAccount + "' onchange='AddDataForGLAllocation(this," + rowCount + ")' type='text' value='" + data[i].LocalApplyAmount + "' name='CBReceiptSetOffDetails[" + rowCount + "].LocalApplyAmount'>" //+ data[i].LocalApplyAmount
+                       , "<input id='CBReceiptSetOffDetails_" + rowCount + "_SetOffDate' type='hidden' value=" + strDt + " name='CBReceiptSetOffDetails[" + rowCount + "].SetOffDate'>" + strDt
+
+                    ];
+
+            if ((qno != null && qno != "") || isEditLocal) {
+                $('#tblSetoffItem').dataTable().fnUpdate(rowData, 0);
+                $('#myModal').modal('hide');
+                linkedIndex = null;
+            }
+            else {
+
+                var row = "";
+                $('#tblSetoffItem').dataTable().fnAddData(rowData);
+                $('tr td:nth-child(1)').hide()
+                $('tr td:nth-child(2)').hide()
+                $('tr td:nth-child(3)').hide()
+                $('tr td:nth-child(4)').hide()
+            }
+        }
+		CalTotalSetOffDetailsAmount();
+
+    }
+ function CalTotalSetOffDetailsAmount() {
+              
+                var count = $('.tblSetoffItemtrCss').length;
+                var amount = 0.0;
+                for (var i = 0; i < count; i++) {
+                    amount = amount + parseFloat($('#CBReceiptSetOffDetails_' + i + '_LocalAmount').val());
+                }
+                $('#txtLocalReceiptAmount').val(amount.toFixed(2));
+
+            }
+    function AddDataForGLAllocation(thisid, no) {
+
+        debugger;
+        var LocalAmountId = "#CBReceiptDetails_" + no + "_LocalAmount";
+
+        var tblData = new Array();
+        var qno = $("#hdnQuotationNo").val();
+        var val = $(thisid).val();
+
+        $(thisid).val(val);
+        $(thisid).attr("value", val)
+
+        if (Number($(LocalAmountId).val()) < Number($(thisid).val())) {
+            alert("LocalApplyAmount should be less than LocalAmount");
+            return false;
+        }
+
+        var table = $('#tblGLDetails').dataTable();
+        var table1 = $('#tblSetoffItem').DataTable();
+        var creditAmt = debitAmt = 0;
+        var isUpdate = false;
+        if (table.fnGetData().length >= 2) {
+            isUpdate = true;
+
+        }
+
+        $.each($(table1.column(6).data()), function (key, value) {
+            var id = "#" + $(value)[0].id;
+            var baseamtlocal = Number($(id).val());
+            debitAmt = debitAmt + baseamtlocal;
+        })
+
+        var totalAmt = 0;
+        var AccountCode = "";
+
+        for (var i = 0; i < 2; i++) {
+            if (i == 0) {
+                creditAmt = 0
+                AccountCode = $(thisid).data('debtoraccount');
+                DebitCredit = $('#hdnCBPaymentCreditorDebitCredit').val();
+            } else {
+                creditAmt = debitAmt;
+                debitAmt = 0;
+                AccountCode = $(thisid).data('bankaccount');
+            }
+            totalAmt = debitAmt + creditAmt;
+            var rowCount = 0;
+            if ($('#tblGLDetails').dataTable().fnSettings().aoData.length > 0) {
+                rowCount = $('#tblGLDetails tr').length - 1;
+            }
+            var rowData = [
+                "<input id='CBReceiptGLDetails[" + rowCount + "].DocumentNo' type='hidden' value=" + + " name='CBReceiptGLDetails[" + rowCount + "].DocumentNo'>"
+               , "<input id='CBReceiptGLDetails[" + rowCount + "].ItemNo' type='hidden' value=" + + " name='CBReceiptGLDetails[" + rowCount + "].ItemNo'>"
+               , "<input id='CBReceiptGLDetails[" + rowCount + "].TransactionType' type='hidden' value=" + '' + "  name='CBReceiptGLDetails[" + rowCount + "].TransactionType'>"
+
+               , "<input id='CBReceiptGLDetails[" + rowCount + "].AccountCode' type='hidden' value=" + AccountCode + " name='CBReceiptGLDetails[" + rowCount + "].AccountCode'>" + AccountCode
+
+               , "<input id='CBReceiptGLDetails[" + rowCount + "].DebitAmount' class='DisableBackground' readonly type='text' value=" + parseFloat(debitAmt).toFixed(2) + " name='CBReceiptGLDetails[" + rowCount + "].DebitAmount'>"
+
+               , "<input id='CBReceiptGLDetails[" + rowCount + "].CreditAmount' class='DisableBackground' readonly type='text' value=" + parseFloat(creditAmt).toFixed(2) + " name='CBReceiptGLDetails[" + rowCount + "].CreditAmount'>" //+ data[i].LocalApplyAmount
+
+               , "<input id='CBReceiptGLDetails[" + rowCount + "].TotalAmount' class='DisableBackground' readonly type='text' value=" + parseFloat(totalAmt).toFixed(2) + " name='CBReceiptGLDetails[" + rowCount + "].TotalAmount'>"
+
+            ];
+
+            if (isUpdate) {
+                $('#tblGLDetails').dataTable().fnUpdate(rowData, i);
+
+
+            }
+            else {
+                var row = "";
+                $('#tblGLDetails').dataTable().fnAddData(rowData);
+                $('#tblGLDetails tr td:nth-child(1)').hide()
+                $('#tblGLDetails tr td:nth-child(2)').hide()
+                $('#tblGLDetails tr td:nth-child(3)').hide()
+            }
+
+
+        }
+
+        debugger;
+        if (!isUpdate) {
+            var isVat = $('#hdnIsVat').val() == 'true' ? true : false;
+            if (isVat) {
+                var vatAmount = parseFloat($('#hdnVatAmount').val());
+                var vatDebitCredit = 'CREDIT';//$('#hdnCBPaymentbankDebitCredit').val();
+                var arVatAccountCode = '@Utility.GetDefaultAccountCodes(DefaultAccountCodes.ARVATACCOUNTCODE)';
+
+                        /* vat code start */
+                        var varRowData = [
+                            "<input id='CBReceiptGLDetails[2].DocumentNo' type='hidden' value=" + + " name='CBReceiptGLDetails[2].DocumentNo'>"
+                            , "<input id='CBReceiptGLDetails[2].ItemNo' type='hidden' value=" + + " name='CBReceiptGLDetails[2].ItemNo'>"
+                            , "<input id='CBReceiptGLDetails[2].TransactionType' type='hidden' value=" + '' + "  name='CBReceiptGLDetails[2].TransactionType'>"
+
+                            , "<input id='CBReceiptGLDetails[2].AccountCode' type='hidden' value=" + arVatAccountCode + " name='CBReceiptGLDetails[2].AccountCode'>" + arVatAccountCode
+
+                    , "<input id='CBReceiptGLDetails[2].DebitAmount' class='DisableBackground' readonly type='text' value='" + (vatDebitCredit == 'DEBIT' ? vatAmount.toFixed(2) : 0.00) + "' name='CBReceiptGLDetails[2].DebitAmount'>"
+
+                    , "<input id='CBReceiptGLDetails[2].CreditAmount' class='DisableBackground' readonly type='text' value='" + (vatDebitCredit == 'CREDIT' ? vatAmount.toFixed(2) : 0.00) + "' name='CBReceiptGLDetails[2].CreditAmount'>" //+ data[i].LocalApplyAmount
+
+                    , "<input id='CBReceiptGLDetails[2].TotalAmount' class='DisableBackground' readonly type='text' value='" + parseFloat(vatAmount).toFixed(2) + "' name='CBReceiptGLDetails[2].TotalAmount'>"
+
+                ];
+
+                $('#tblGLDetails').dataTable().fnAddData(varRowData);
+                $('#tblGLDetails tr td:nth-child(1)').hide()
+                $('#tblGLDetails tr td:nth-child(2)').hide()
+                $('#tblGLDetails tr td:nth-child(3)').hide()
+                /* vat code end */
+
+                /* adv code start */
+
+                var advVatAccountCode = '@Utility.GetDefaultAccountCodes(DefaultAccountCodes.ARADVANCEVATACCOUNTCODE)';
+
+
+                vatDebitCredit = 'DEBIT';
+                var varRowData = [
+                    "<input id='CBReceiptGLDetails[3].DocumentNo' type='hidden' value=" + + " name='CBReceiptGLDetails[3].DocumentNo'>"
+                    , "<input id='CBReceiptGLDetails[3].ItemNo' type='hidden' value=" + + " name='CBReceiptGLDetails[3].ItemNo'>"
+                    , "<input id='CBReceiptGLDetails[3].TransactionType' type='hidden' value=" + '' + "  name='CBReceiptGLDetails[3].TransactionType'>"
+
+                    , "<input id='CBReceiptGLDetails[3].AccountCode' type='hidden' value=" + advVatAccountCode + " name='CBReceiptGLDetails[3].AccountCode'>" + advVatAccountCode
+
+                    , "<input id='CBReceiptGLDetails[3].DebitAmount' class='DisableBackground' readonly type='text' value='" + (vatDebitCredit == 'DEBIT' ? vatAmount.toFixed(2) : 0.00) + "' name='CBReceiptGLDetails[3].DebitAmount'>"
+
+                    , "<input id='CBReceiptGLDetails[3].CreditAmount' class='DisableBackground' readonly type='text' value='" + (vatDebitCredit == 'CREDIT' ? vatAmount.toFixed(2) : 0.00) + "' name='CBReceiptGLDetails[3].CreditAmount'>" //+ data[i].LocalApplyAmount
+
+                    , "<input id='CBReceiptGLDetails[3].TotalAmount' class='DisableBackground' readonly type='text' value='" + parseFloat(vatAmount).toFixed(2) + "' name='CBReceiptGLDetails[3].TotalAmount'>"
+
+                ];
+
+                $('#tblGLDetails').dataTable().fnAddData(varRowData);
+                $('#tblGLDetails tr td:nth-child(1)').hide()
+                $('#tblGLDetails tr td:nth-child(2)').hide()
+                $('#tblGLDetails tr td:nth-child(3)').hide()
+
+                /* adv vat code end */
+            }
+        }
+
+
+        $('#txtLocalBankChargesAmount').removeAttr('readonly');
+    }
+
+
+    /* Search Functions */
+
+    function SearchBox(SearchTable) {
+        sessionStorage.setItem('SsnSearchTbl', SearchTable);
+        var Obj = {
+            SearchTable: SearchTable,
+            whereclause: '',
+            txtSearch: '',
+            SearchBy: ''
+        };
+
+        Search(Obj);
+    }
+
+    function Search(Obj) {
+        $('#modalBody').empty().css('display', 'none');
+        $('#modalAni').html('<i class="fa fa-refresh fa-spin"></i>');
+
+        $('#mySearch').modal('show');
+
+        ajaxCall(Obj);
+    }
+
+    function ajaxCall(Obj) {
+
+        $.ajax({
+            type: 'POST',
+            url: searchBoxUrl,
+            dataType: 'html',
+            data: JSON.stringify(Obj),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $('#modalAni').empty();
+                $('#modalBody').html(data).slideDown(700);
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+
+    function trClick(rowId, searchTable) {
+        var Obj = $('#' + rowId);
+        var documentNo = Obj.data('document-no');
+        location.href = '@Url.Content("~/CB/CBReceipt?CBReceiptType=''&DocumentNo=")' + documentNo;
+
+    }
+
+    var isAlreadySearched = false;
+    function btnSearchClick() {
+        if (isAlreadySearched) {
+            var r = confirm('Are you sure you want to search again \n Warning: Previous data will be lost.');
+
+            if (!r)
+                return false;
+        }
+
+
+        var search = $('#srch-term').val();
+        var supplierCode = $('#ddlDebtor').val();
+        var bankCode = $('#BankCode').val();
+        $('.select2-hidden-accessible').next().next().css('border', '');
+        if (!$('#myForm').valid()) {
+            if ($('.select2-hidden-accessible').hasClass('error')) {
+                $('.select2-hidden-accessible.error').next().next().css('border', 'solid 1px red');
+            }
+
+            return false;
+        }
+
+        if (search.length > 4) {
+            if (supplierCode != null && supplierCode != '') {
+                var rooturl = '@Url.Action("GetDebtorOutStandingDocuments", "CB", new { area = "CB" })';
+                var url = rooturl + "?debtorCode=" + supplierCode + "&bankCode=" + bankCode + "&matchDocumentNo=" + search;
+                $('#overlayDiv').show();
+                $.post(url, null, function (data) {
+                    isAlreadySearched = true;
+
+                    $('#overlayDiv').hide();
+                    var localAmountTotal = 0;
+                    $('#hdnDebtorAccount').val(data.DebtorAccount);
+                    $('hdnBankAccount').val(data.BankAccount)
+                    $('#hdnCBPaymentCreditorDebitCredit').val(data.CreditorDebitCredit);
+                    $('#hdnCBPaymentbankDebitCredit').val(data.bankDebitCredit);
+                    $('#hdnIsVat').val(data.SetOffDetailsData[0].IsVAT);
+                    $('#hdnVatAmount').val(data.SetOffDetailsData[0].VATAmount);
+                    if (data.SetOffDetailsData.length > 0) {
+                        for (var i = 0; i < data.SetOffDetailsData.length; i++) {
+                            localAmountTotal += localAmountTotal + parseFloat(data.SetOffDetailsData[i].LocalAmount)
+                        }
+                    }
+                    $('#txtLocalReceiptAmount').val(localAmountTotal);
+                    AddDataToTableforSetOffDetails(data.SetOffDetailsData, data.DebtorAccount, data.BankAccount);
+                    $('#PaymentType').attr('disabled', 'disabled');
+                });
+            }
+            else {
+                $('#lblErrMsg').text('Please select supplier code.');
+                setTimeout(function () {
+                    $('#lblErrMsg').text('');
+                }, 3000)
+            }
+        }
+        else {
+            $('#lblErrMsg').text('Please enter atleast 5 characters.');
+            setTimeout(function () {
+                $('#lblErrMsg').text('');
+            }, 3000)
+        }
+    }
+
+    </script>
+}
+
+

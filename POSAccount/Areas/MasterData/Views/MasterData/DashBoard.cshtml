@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Title = "DashBoard";
+}
+<h1>Dashboard</h1>
+<div class="row">
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-red-active"><i class="fa fa-user"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total Sales Order For Today</span>
+                <span class="info-box-number">20</span>
+            </div><!-- /.info-box-content -->
+        </div><!-- /.info-box -->
+    </div>
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-aqua"><i class="fa fa-list-alt"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Pending Invoice</span>
+                <span class="info-box-number">23</span>
+            </div><!-- /.info-box-content -->
+        </div><!-- /.info-box -->
+    </div>
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-green"><i class="fa fa-usd"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total Invoice Amount</span>
+                <span class="info-box-number">90<small>%</small></span>
+            </div><!-- /.info-box-content -->
+        </div><!-- /.info-box -->
+
+    </div>
+</div>
+<h1>Quick Links</h1>
+
+<div class="box-body">
+    <div class="row">
+
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <a href="@Url.Action("SalesOrder", "POS", new { area = "POS" }, null)">
+                <div class="small-box bg-green">
+                    <div class="inner">
+                        <h3><i class="fa fa-credit-card"></i></h3>
+                        <p><b>Sales Order</b></p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-credit-card"></i>
+                    </div>
+                    <div class="small-box-footer">&nbsp;</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <a href="@Url.Action("CBPayment", "CB", new { area = "CB" }, null)">
+                <div class="small-box bg-aqua">
+                    <div class="inner">
+                        <h3><i class="fa fa-server"></i></h3>
+                        <p><b>Payments</b></p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-server"></i>
+                    </div>
+                    <div class="small-box-footer">&nbsp;</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <a href="@Url.Action("CBReceipt", "CB", new { area = "CB" }, null)">
+                <div class="small-box bg-orange">
+                    <div class="inner">
+                        <h3><i class="fa fa-newspaper-o"></i></h3>
+                        <p><b><i>Receipts</i></b></p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-newspaper-o"></i>
+                    </div>
+                    <div class="small-box-footer">&nbsp;</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <a href="#">
+                <div class="small-box bg-red">
+                    <div class="inner">
+                        <h3><i class="fa fa-edit"></i></h3>
+                        <p>Journal Entry</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-edit"></i>
+                    </div>
+                    <div class="small-box-footer">&nbsp;</div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+</div>
+

@@ -1,0 +1,83 @@
+﻿body {
+    /*padding-top: 50px;*/
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.img-class {
+    height: 13px;
+    margin-right: 10px;
+}
+
+/*#tblChartOfAccount_filter {
+    margin-right: 58px;
+}*/
+
+/*#tblQuotationItem_filter {
+    margin-right: 58px;
+}*/
+.anchor-image {
+    background: rgba(0, 0, 0, 0) url("/Images/Pencil.png") repeat scroll 0 0;
+    display: block;
+    height: 16px;
+    width: 16px;
+    float: left;
+    margin-right: 9px;
+    margin-top: 2px;
+}
+.search-location{
+    float:right;
+    margin-top:-27px;
+}
+
+.right-inner-addon {
+    position: relative;
+}
+.right-inner-addon input {
+    padding-right: 30px;    
+}
+.right-inner-addon i {
+    position: absolute;
+    right: 0px;
+    padding: 10px 12px;
+    pointer-events: none;
+}
+
+.StrikeOut{
+    color:#a94442;
+    text-decoration:line-through;
+}
+#tblSupplier_filter{
+    float:right;
+}
+#tblSupplier_paginate{
+    float:right;
+    margin-top:-27px;
+}
+
+#myModalContent .modal-header
+{
+    background-color:#00a7d0 !important;
+}
+#myModalContent .modal-header h4{
+    color:white;
+}

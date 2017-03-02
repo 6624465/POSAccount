@@ -1,0 +1,91 @@
+﻿@model List<POSAccount.Contract.Creditor>
+
+@{
+    ViewBag.Title = "List Of Suppliers";
+}
+<div class="modal fade in " id="myModal">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="box box-solid box-default">
+    <div class="box-header">
+        <h3 class="box-title">Supplier List</h3>
+    </div>
+    <div class="box-body">
+        <fieldset class="form-horizontal">
+
+
+
+            @* @Html.ActionLink("New Chart Of Account", "EditChartOfAccount", "MasterData", new { area = "MasterData" }, new { data_modal = "", id = "btnCreate", @class = "btn btn-small btn-primary" })*@
+
+
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="tbDetails" data-toggle="tab">Suppliers Details</a>
+                    </li>
+                    <li class="pull-right">
+                        <div class="btn-group btn-primary">
+                            <a class="btn btn-small btn-primary" href="@Url.Content("~/AP/SupplierProfile?CreditorCode=NEW")"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New Supplier</a>
+                        </div>
+                    </li>
+                </ul>
+                <!-- Display List Section -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tbDetails">
+                        <table id="tblSupplier" class="table table-striped table-hover table-bordered ">
+                            <thead style="background-color:steelblue;color:white;font-size:12px;">
+                                <tr>
+                                    <th>Supplier Code</th>
+                                    <th>Supplier Name</th>
+                                    <th>Registration No.</th>
+                                    <th>Account Code</th>
+                                    <th>Payment Type</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-size:12px;">
+                                @foreach (POSAccount.Contract.Creditor item in Model)
+                                {
+                                    <tr>
+                                        <td>@Html.ActionLink(@item.CreditorCode, "CreditorProfile", "AP", new { area = "AP", CreditorCode = @item.CreditorCode }, new { id = "btnCreate", @class = "btn btn-link" })</td>
+                                        <td> @item.CreditorName </td>
+                                        <td> @item.RegistrationNo </td>
+                                        <td> @item.CreditorAccountDescription </td>
+                                        <td> @item.PaymentType</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+        </fieldset>
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            $('#tblSupplier').DataTable({
+                responsive: true
+            });
+
+
+        });
+
+    </script>
+}
