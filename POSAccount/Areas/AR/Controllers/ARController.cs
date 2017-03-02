@@ -24,7 +24,8 @@ namespace POSAccount.Areas.AR.Controllers
         [Route("Customers")]
         public ActionResult CustomerList()
         {
-            var lstCustomer = new POSAccount.BusinessFactory.DebtorBO().GetList();
+            var lstCustomer = new POSAccount.BusinessFactory.DebtorBO().GetList()
+                    .Where(x => x.Status == true).ToList();
 
             return View("Customers", lstCustomer);
 

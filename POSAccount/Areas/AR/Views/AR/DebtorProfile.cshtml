@@ -27,7 +27,7 @@
 
         <!--Header Information-->
         <div class="box-header">
-            <h3 class="box-title">Customer Profile</h3>
+            <h3 class="box-title">Customer Profile </h3>
             <div class="box-tools pull-right">
                 <div class="has-feedback">
                     <div class="input-group input-group-sm">
@@ -66,7 +66,11 @@
                     <div>
                         <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Customer Code</label>
                         <div class="col-md-2">
-                            @Html.TextBoxFor(m => m.DebtorCode, new { @placeholder = "DebtorCode", @id = "txtDebtorCode", @class = "form-control input-sm", @readonly="readonly" })
+                            @Html.TextBoxFor(m => m.DebtorCode,
+                                new { placeholder = "DebtorCode",
+                                    id = "txtDebtorCode",
+                                    @class = "form-control input-sm",
+                                    @readonly ="readonly" })
                         </div>
                         <label for="txtInvoiceNo" class="col-md-2 control-label input-sm">Regirstration No.</label>
                         <div class="col-md-4">
@@ -265,18 +269,13 @@
 
 
         $(function () {
-
-            if ('@Model.DebtorCode' == '') {
-                $('input[name="DebtorCode"]').prop('readonly', false);
+            $('input[name="DebtorCode"]').prop('readonly', true);
+            if ('@Model.DebtorCode' == '') {                
                 $('#btnDelete').prop('disabled', false);
             }
 
             $('#myForm').validate({
-                rules: {
-                    DebtorCode: {
-                        required: false,
-                        maxlength:10
-                    },
+                rules: {                    
                     RegistrationNo: {
                         required: true
                     },
@@ -295,11 +294,7 @@
                     }
                 },
                 messages: {
-                    DebtorCode: {
-                        required: "Customer Code is required",
-                        minlength: "minimum length 10 character",
-                        maxlength: "minimum length 10 character"
-                    },
+                    
                     RegistrationNo: {
                         required: "Registration No is required"
                     },
