@@ -10,8 +10,7 @@ namespace POSAccount.Areas.AP.Controllers
     [RouteArea("AP")]
     [SessionFilter]
     public class APController : Controller
-    {
-        // GET: AP/AP
+    {        
         public ActionResult Index()
         {
             return View("APInvoice");
